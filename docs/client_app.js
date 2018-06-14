@@ -23,7 +23,6 @@ let setup = function(){
         console.log(data);
         // Set access Token
         client.setAccessToken(data.accessToken);
-       
         
     // Get Details of current User and save to Client App
         return usersApi.getUsersMe();
@@ -31,27 +30,30 @@ let setup = function(){
     .then( userMe => {
         clientApp.userId = userMe.id;
 
-
     // Create a Notifications Channel
         return notificationsApi.postNotificationsChannels();
     })
     .then(data => {
         clientApp.websocketUri = data.connectUri;
         clientApp.channelID = data.id;
+        clientApp.socket = new WebSocket(clientApp.websocketUri);
+        clientApp.socket.onmessage = onSocketMessage;
 
-
-    // Subsccribe to Call Conversations of Current user.
+    // Subscribe to Call Conversations of Current user.
         let topic = [{
             "id": "v2.users." + clientApp.userId + ".conversations.calls"
         }];
         return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
     })
-    .then(data => console.log(data))
+    .then(data => console.log("Succesfully set-up Client App."))
 
     // Catch for errors
     .catch( e => console.log(e) );
 }
-//return notificationsApi.postNotificationsChannels();
+
+let onSocketMessage = function(event){
+    console.log(event.data);
+}
 
 clientApp.setup = setup;
 
