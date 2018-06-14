@@ -24,6 +24,7 @@
         let usersApi = new platformClient.UsersApi();
 
         // Authenticate via PureCcloud
+        client.setDebugLog(console.log);
         client.setPersistSettings(true);
         client.loginImplicitGrant(clientId, redirectUri, { state: "state" })
         .then(data => {
