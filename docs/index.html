@@ -13,6 +13,19 @@
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/1.0.0-beta.1/purecloud-client-app-sdk-b5085f736353d8b32c6f7e6726ce18e9.min.js"></script>
 </head>
 <body>
-    <h1> Test </h1>
+    
+    <script>
+        // Authenticate via PureCloud
+        const platformClient = require('platformClient');
+        let client = platformClient.ApiClient.instance;
+        let clientId = "8c821827-57bd-4d44-8765-597d4a3220c5";
+        let redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
+        
+        client.loginImplicitGrant(clientId, redirectUri, { state: "state" })
+            .then(function(data) {
+                console.log(data);
+        })
+        .catch(e => console.log(err));
+    </script>
 </body>
 </html>
