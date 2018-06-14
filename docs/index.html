@@ -13,8 +13,10 @@
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/1.0.0-beta.1/purecloud-client-app-sdk-b5085f736353d8b32c6f7e6726ce18e9.min.js"></script>
 </head>
 <body>
-    
+    <p>Version: 0.0.1</p>
+
     <script>
+        // PureCloud OAuth information
         const platformClient = require('platformClient');
         let client = platformClient.ApiClient.instance;
         let clientId = "8c821827-57bd-4d44-8765-597d4a3220c5";
@@ -22,9 +24,9 @@
         
         // API instances
         let usersApi = new platformClient.UsersApi();
+        let notificationsApi = new platformClient.NotificationsApi();
 
         // Authenticate via PureCcloud
-        client.setDebugLog(console.log);
         client.setPersistSettings(true);
         client.loginImplicitGrant(clientId, redirectUri, { state: "state" })
         .then(data => {
@@ -32,8 +34,9 @@
             // Set access Token
             client.setAccessToken(data.accessToken);
             
-            return usersApi.getUsersMe();
+            return notificationsApi.postNotificationsChannels();
         })
+        // Create a new Channel and Subscribe to Changes
         .then( userMe => console.log(userMe) )
         .catch( e => console.log(err) );
     </script>
