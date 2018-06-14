@@ -36,9 +36,10 @@ clientApp.setup = function(){
         clientApp.channelID = data.id;
         clientApp.socket = new WebSocket(clientApp.websocketUri);
         clientApp.socket.onmessage = clientApp.onSocketMessage;
+        clientApp.topicId = "v2.users." + clientApp.userId + ".conversations.calls"
 
     // Subscribe to Call Conversations of Current user.
-        let topic = [{"id": "v2.users." + clientApp.userId + ".conversations.calls"}];
+        let topic = [{"id": clientApp.topicId}];
         return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
     }).then(data => console.log("Succesfully set-up Client App."))
 
@@ -48,7 +49,21 @@ clientApp.setup = function(){
 
 // Handler for every Websocket message
 clientApp.onSocketMessage = function(event){
-    console.log(event.data);
+    let data = JSON.parse(event.data);
+    let topic = data.topicName;
+    let eventBody = data.eventBody;
+
+    console.log(topic);
+    console.log(eventBody);
+    if(topic === clientApp.topicId){
+        let caller = eventBody.participants
+                .filter(participant => participant.purpose === "customer")[0];
+
+        $("#callerName").html(caller.name);
+        $("#callerNumber").html(caller.address);
+
+        console.log(callerName);
+    }
 }
 
 export default clientApp
