@@ -1,0 +1,17 @@
+/* 
+Custom CSS-style adhering to the PureCloud App Foundry Style Guide
+https://developer.mypurecloud.com/partners/
+(June 2018)
+*/
+
+body {
+    padding: 20px;
+
+    color: #4c4c4c;
+    font-family: “HelveticaNeue”, “Helvetica”, “Arial”, sans-serif;
+    font-size: 14px;
+}
+
+.secondary-font {
+    font-family: "Lato", “HelveticaNeue”, “Helvetica”, “Arial”, sans-serif;
+}
