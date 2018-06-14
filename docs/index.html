@@ -16,30 +16,9 @@
 <body>
     <p>Version: 0.0.1</p>
 
-    <script>
-        // PureCloud OAuth information
-        const platformClient = require('platformClient');
-        let client = platformClient.ApiClient.instance;
-        let clientId = "8c821827-57bd-4d44-8765-597d4a3220c5";
-        let redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
-        
-        // API instances
-        let usersApi = new platformClient.UsersApi();
-        let notificationsApi = new platformClient.NotificationsApi();
-
-        // Authenticate via PureCcloud
-        client.setPersistSettings(true);
-        client.loginImplicitGrant(clientId, redirectUri, { state: "state" })
-        .then(data => {
-            console.log(data);
-            // Set access Token
-            client.setAccessToken(data.accessToken);
-            
-            return notificationsApi.postNotificationsChannels();
-        })
-        // Create a new Channel and Subscribe to Changes
-        .then( data => console.log(userMe) )
-        .catch( e => console.log(err) );
+    <script type="module">
+        import clientApp from '/client_app.js'
+        clientApp.setup();
     </script>
 </body>
 </html>
