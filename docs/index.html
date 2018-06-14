@@ -24,14 +24,13 @@
         let usersApi = new platformClient.UsersApi();
 
         // Authenticate via PureCcloud
+        client.setPersistSettings(true);
         client.loginImplicitGrant(clientId, redirectUri, { state: "state" })
         .then(data => {
             console.log(data);
-
             // Set access Token
             client.setAccessToken(data.accessToken);
-            client.setPersistSettings(true);
-
+            
             return usersApi.getUsersMe();
         })
         .then( userMe => console.log(userMe) )
