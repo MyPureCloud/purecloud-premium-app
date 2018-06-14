@@ -1,10 +1,10 @@
 /*
-    This sample uses ES6 coding standards.
+*   NOTE: This sample uses ES6.
 */
 let clientApp = {};
 
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
-let setup = function(){
+clientApp.setup = function(){
     // PureCloud OAuth information
     const platformClient = require('platformClient');
     const client = platformClient.ApiClient.instance;
@@ -26,35 +26,29 @@ let setup = function(){
         
     // Get Details of current User and save to Client App
         return usersApi.getUsersMe();
-    })
-    .then( userMe => {
+    }).then( userMe => {
         clientApp.userId = userMe.id;
 
     // Create a Notifications Channel
         return notificationsApi.postNotificationsChannels();
-    })
-    .then(data => {
+    }).then(data => {
         clientApp.websocketUri = data.connectUri;
         clientApp.channelID = data.id;
         clientApp.socket = new WebSocket(clientApp.websocketUri);
-        clientApp.socket.onmessage = onSocketMessage;
+        clientApp.socket.onmessage = clientApp.onSocketMessage;
 
     // Subscribe to Call Conversations of Current user.
-        let topic = [{
-            "id": "v2.users." + clientApp.userId + ".conversations.calls"
-        }];
+        let topic = [{"id": "v2.users." + clientApp.userId + ".conversations.calls"}];
         return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
-    })
-    .then(data => console.log("Succesfully set-up Client App."))
+    }).then(data => console.log("Succesfully set-up Client App."))
 
-    // Catch for errors
+    // Error Handling
     .catch( e => console.log(e) );
 }
 
-let onSocketMessage = function(event){
+// Handler for every Websocket message
+clientApp.onSocketMessage = function(event){
     console.log(event.data);
 }
-
-clientApp.setup = setup;
 
 export default clientApp
