@@ -14,6 +14,15 @@
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/1.0.0-beta.1/purecloud-client-app-sdk-b5085f736353d8b32c6f7e6726ce18e9.min.js"></script>
 </head>
 <body>
+    <div>
+        <span><strong>Name: </strong></span>
+        <span id="callerName"></span>   
+    </div>
+    <div>
+        <span><strong>Number: </strong></span>
+        <span id="callerNumber"></span>   
+    </div>
+
     <script type="module">
         import clientApp from './client_app.js'
         clientApp.setup();
