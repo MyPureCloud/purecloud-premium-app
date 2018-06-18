@@ -16,21 +16,27 @@ div {
     padding: 5px 0 0 4px;
 }
 
-.field-title {
+div.field-title {
     color: #1997CA;
     font-size: 18px;
 }
 
-.field-value {
+div.field-value {
     color: #4498B4;
     text-align: right;
 }
 
-.floating{
+div.floating{
     display: inline-block;
     width: 50px;
 }
 
 .secondary-font {
     font-family: "Lato", “HelveticaNeue”, “Helvetica”, “Arial”, sans-serif;
+}
+
+div.test-area{
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #FFEAEA;
 }

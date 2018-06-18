@@ -29,8 +29,12 @@
         <div id="callerArea" class="floating field-value">test</div>   
     </div>
 
-    <button onclick="toast()">Test Button</button>
-    <button onclick="profile_pop()">Profile Pop</button>
+    <div class="test-area">
+        <h3 style="color: #888;">FOR TESTING</h3>
+        
+        <button onclick="toast()">Toasty</button>
+        <button onclick="profile_pop()">Profile Pop</button>
+    </div>
 
     <script type="module">
         import clientApp from './client_app.js'
@@ -42,7 +46,7 @@
         myClientApp.alerting.showToastPopup("A", "B");
     }
     function profile_pop(){
-        myClientApp.apps.users.showProfile("8ebf31a1-3232-4154-97a5-9e9e780d194e")
+        myClientApp.users.showProfile("8ebf31a1-3232-4154-97a5-9e9e780d194e")
     }
     </script>
 </body> 
