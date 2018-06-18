@@ -30,16 +30,19 @@
     </div>
 
     <button onclick="toast()">Test Button</button>
+    <button onclick="profile_pop()">Profile Pop</button>
 
     <script type="module">
         import clientApp from './client_app.js'
         clientApp.setup();
     </script>
     <script>
+    myClientApp = new window.purecloud.apps.ClientApp();
     function toast(){
-        myClientApp = new window.purecloud.apps.ClientApp();
-        console.log(myClientApp);
         myClientApp.alerting.showToastPopup("A", "B");
+    }
+    function profile_pop(){
+        myClientApp.apps.users.showProfile("8ebf31a1-3232-4154-97a5-9e9e780d194e")
     }
     </script>
 </body> 
