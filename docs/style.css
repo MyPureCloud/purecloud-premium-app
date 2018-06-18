@@ -19,6 +19,7 @@ div {
 div.field-title {
     color: #1997CA;
     font-size: 18px;
+    width: 100px;
 }
 
 div.field-value {
@@ -28,7 +29,6 @@ div.field-value {
 
 div.floating{
     display: inline-block;
-    width: 50px;
 }
 
 .secondary-font {
