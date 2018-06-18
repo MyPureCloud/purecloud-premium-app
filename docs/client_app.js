@@ -1,6 +1,8 @@
 /*
 *   NOTE: This sample uses ES6.
 */
+import area_codes from './area_codes.js'
+
 let clientApp = {};
 
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
@@ -55,15 +57,27 @@ clientApp.onSocketMessage = function(event){
 
     console.log(topic);
     console.log(eventBody);
+    // If a call conversation come ins
     if(topic === clientApp.topicId){
         let caller = eventBody.participants
                 .filter(participant => participant.purpose === "customer")[0];
 
         $("#callerName").html(caller.name);
         $("#callerNumber").html(caller.address);
+        $("#callerArea").html(getAreaName(caller.address));
 
         console.log(callerName);
     }
+}
+
+// Get the State based from the Phone Number
+function getAreaName(phoneNumber){
+    // Parse phone number to get Area Code if from the US.
+    if((phoneNumber.substr(0,3) === "tel") && (phoneNumber.substr(5,1) === "1")){
+        return area_codes[phoneNumber.substr(6, 3)];
+    } 
+
+    return "Not in the US";    
 }
 
 export default clientApp
