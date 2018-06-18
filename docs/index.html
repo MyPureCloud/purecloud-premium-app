@@ -37,12 +37,14 @@
         clientApp.setup();
     </script>
     <script>
-    myClientApp = new window.purecloud.apps.ClientApp();
+    //myClientApp = new window.purecloud.apps.ClientApp();
     function toast(){
-        myClientApp.alerting.showToastPopup("A", "B");
+        purecloud.apps.alerting.showToastPopup("A", "B");
+        //myClientApp.alerting.showToastPopup("A", "B");
     }
     function profile_pop(){
-        myClientApp.users.showProfile("8ebf31a1-3232-4154-97a5-9e9e780d194e")
+        purecloud.apps.showProfile("8ebf31a1-3232-4154-97a5-9e9e780d194e");
+        //myClientApp.users.showProfile("8ebf31a1-3232-4154-97a5-9e9e780d194e")
     }
     </script>
 </body> 
