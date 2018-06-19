@@ -64,20 +64,16 @@ clientApp.onSocketMessage = function(event){
 
         $("#callerName").html(caller.name);
         $("#callerNumber").html(caller.address);
-        $("#callerArea").html(getAreaName(caller.address));
+
+        getLocalInfo(caller.address,{
+            military: false,
+            zone_display: 'area'
+            }, object => $("#callerArea").html(getAreaName(caller.address))
+        );
+        
 
         console.log(callerName);
     }
-}
-
-// Get the State based from the Phone Number
-function getAreaName(phoneNumber){
-    // Parse phone number to get Area Code if from the US.
-    if((phoneNumber.substr(0,3) === "tel") && (phoneNumber.substr(5,1) === "1")){
-        return area_codes[phoneNumber.substr(6, 3)];
-    } 
-
-    return "Not in the US";    
 }
 
 export default clientApp
