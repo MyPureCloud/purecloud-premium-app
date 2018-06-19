@@ -1,8 +1,6 @@
 /* 
 *   NOTE: This sample uses ES6.
 */
-import area_codes from './area_codes.js'
-
 let clientApp = {};
 
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
