@@ -66,7 +66,7 @@ clientApp.onSocketMessage = function(event){
         getLocalInfo(caller.address,{
             military: false,
             zone_display: 'area'
-            }, object => $("#callerArea").html(getAreaName(caller.address))
+            }, object => $("#callerArea").html(object.time.display +' '+ object.location)
         );
         
 
