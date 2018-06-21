@@ -59,9 +59,7 @@ clientApp.onSocketMessage = function(event){
     if(topic === clientApp.topicId){
         let caller = eventBody.participants
                 .filter(participant => participant.purpose === "customer")[0];
-
-        console.log(caller.endTime);
-        
+                
         // Put values to the fields
         if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
             $("#callerName").html("");
@@ -90,8 +88,6 @@ clientApp.onSocketMessage = function(event){
 
             clientApp.toastIncomingCall(callerLocation);
         }
-
-        console.log(callerName);
     }
 }
 
