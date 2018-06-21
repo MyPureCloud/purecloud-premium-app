@@ -13,3 +13,5 @@ Page Link: https://princemerluza.github.io/purecloud-premium-app/
 2.	The web page will display basic information about the caller (e.g. name, phone number) and will also display the state assoicated with the phone number.
 
 3.	The web page will process notifications to determine when a new call has arrived and will use the client app sdk to send a toast to the user indicating what state they have a call from.
+
+![alt text](https://github.com/PrinceMerluza/purecloud-premium-app/blob/master/screenshot.png "Screenshot")
