@@ -9,8 +9,8 @@ clientApp.setup = function(){
     const platformClient = require('platformClient');
     const client = platformClient.ApiClient.instance;
     const clientId = "8c821827-57bd-4d44-8765-597d4a3220c5";
-    //const redirectUri = "http://localhost:3000";
-    const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
+    const redirectUri = "http://localhost:3000";
+    //const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
 
     // API instances
     const usersApi = new platformClient.UsersApi();
@@ -55,20 +55,27 @@ clientApp.onSocketMessage = function(event){
 
     console.log(topic);
     console.log(eventBody);
-    // If a call conversation come ins
+    // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
         let caller = eventBody.participants
                 .filter(participant => participant.purpose === "customer")[0];
 
-        $("#callerName").html(caller.name);
-        $("#callerNumber").html(caller.address);
+        console.log(caller.endTime);
+        if(caller.endTime === undefined){
+            $("#callerName").html(caller.name);
+            $("#callerNumber").html(caller.address);
 
-        getLocalInfo(caller.address,{
-            military: false,
-            zone_display: 'area'
-            }, object => $("#callerArea").html(object.time.display +' '+ object.location)
-        );
-        
+            getLocalInfo(caller.address,{
+                military: false,
+                zone_display: 'area'
+                }, object => $("#callerArea").html(object.time.display +' '+ object.location)
+            );
+        } else {
+        // If call is disconnected clear the fields instead
+            $("#callerName").html("");
+            $("#callerNumber").html("");
+            $("#callerArea").html("");
+        }
 
         console.log(callerName);
     }
