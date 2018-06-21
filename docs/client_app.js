@@ -61,23 +61,43 @@ clientApp.onSocketMessage = function(event){
                 .filter(participant => participant.purpose === "customer")[0];
 
         console.log(caller.endTime);
-        if(caller.endTime === undefined){
+        
+        // Put values to the fields
+        if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
+            $("#callerName").html("");
+            $("#callerNumber").html("");
+            $("#callerArea").html("");
+
+            clientApp.isCallActive = false;
+
+        } else {
+            let callerLocation = '';
+
             $("#callerName").html(caller.name);
             $("#callerNumber").html(caller.address);
 
             getLocalInfo(caller.address,{
                 military: false,
                 zone_display: 'area'
-                }, object => $("#callerArea").html(object.time.display +' '+ object.location)
+                }, object => {
+                    $("#callerArea").html(object.time.display +' '+ object.location);
+                    callerLocation = object.location;
+                }
             );
-        } else {
-        // If call is disconnected clear the fields instead
-            $("#callerName").html("");
-            $("#callerNumber").html("");
-            $("#callerArea").html("");
+            
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActive = true;
+
+            clientApp.toastIncomingCall(callerLocation);
         }
 
         console.log(callerName);
+    }
+}
+
+clientApp.toastIncomingCall = function(callerLocation){
+    if(clientApp.hasOwnProperty('purecloudClientApi')){
+        clientApp.purecloudClientApi.alerting.showToastPopup("Incoming Call", "From: " + callerLocation);
     }
 }
 
