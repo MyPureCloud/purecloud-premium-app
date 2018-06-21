@@ -9,8 +9,8 @@ clientApp.setup = function(){
     const platformClient = require('platformClient');
     const client = platformClient.ApiClient.instance;
     const clientId = "8c821827-57bd-4d44-8765-597d4a3220c5";
-    const redirectUri = "http://localhost:3000";
-    //const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
+    //const redirectUri = "http://localhost:3000";
+    const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
 
     // API instances
     const usersApi = new platformClient.UsersApi();
@@ -59,7 +59,7 @@ clientApp.onSocketMessage = function(event){
     if(topic === clientApp.topicId){
         let caller = eventBody.participants
                 .filter(participant => participant.purpose === "customer")[0];
-                
+
         // Put values to the fields
         if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
             $("#callerName").html("");
