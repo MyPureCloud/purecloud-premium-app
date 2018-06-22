@@ -5,8 +5,6 @@ import clientIDs from './clientIDs.js';
 
 let clientApp = {};
 
-var test;
-
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
 clientApp.setup = function(pcEnv){
     // PureCloud OAuth information
@@ -15,8 +13,6 @@ clientApp.setup = function(pcEnv){
     const clientId = clientIDs[pcEnv];
     // const redirectUri = "http://localhost:3000";
     const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
-
-    test = clientId;
 
     // API instances
     const usersApi = new platformClient.UsersApi();
