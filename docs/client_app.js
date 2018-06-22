@@ -99,8 +99,7 @@ clientApp.onSocketMessage = function(event){
 
 clientApp.toastIncomingCall = function(callerLocation){
     if(clientApp.hasOwnProperty('purecloudClientApi')){
-        // clientApp.purecloudClientApi.alerting.showToastPopup("Incoming Call", "From: " + callerLocation);
-        clientApp.purecloudClientApi.alerting.showToastPopup("Incoming Call", "From: " + test);
+        clientApp.purecloudClientApi.alerting.showToastPopup("Incoming Call", "From: " + callerLocation);
     }
 }
 
