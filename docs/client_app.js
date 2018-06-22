@@ -1,16 +1,29 @@
 /* 
 *   NOTE: This sample uses ES6.
 */
+import clientIDs from './clientIDs.js';
+
 let clientApp = {};
 
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
-clientApp.setup = function(){
+clientApp.setup = function(pcEnv){
     // PureCloud OAuth information
     const platformClient = require('platformClient');
     const client = platformClient.ApiClient.instance;
-    const clientId = "8c821827-57bd-4d44-8765-597d4a3220c5";
-    //const redirectUri = "http://localhost:3000";
-    const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
+    var clientId = null;
+    var redirectUri = null;
+    // // const clientId = "8c821827-57bd-4d44-8765-597d4a3220c5";
+    // const clientId = clientIDs[pcEnv];
+    // const redirectUri = "http://localhost:3000";
+    // // const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
+
+    if(pcEnv == null) { // Development Environment
+        clientId = clientIDs.default;
+        redirectUri = "http://localhost:3000";
+    } else {
+        clientId = clientIDs[pcEnv];
+        redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
+    }
 
     // API instances
     const usersApi = new platformClient.UsersApi();
