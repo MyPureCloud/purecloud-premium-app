@@ -95,7 +95,7 @@ clientApp.onSocketMessage = function(event){
             clientApp.toastIncomingCall(callerLocation);
         }
     }
-    
+}
 
 clientApp.toastIncomingCall = function(callerLocation){
     if(clientApp.hasOwnProperty('purecloudClientApi')){
