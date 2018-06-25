@@ -12,9 +12,10 @@ clientApp.setup = function(pcEnv){
     // PureCloud OAuth information
     const platformClient = require('platformClient');
     const client = platformClient.ApiClient.instance;
-    const clientId = clientIDs[pcEnv];
     // const redirectUri = "http://localhost:3000";
     const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
+
+    let clientId = clientIDs[pcEnv] || 'mypurecloud.com';
 
     test = clientId;
 
