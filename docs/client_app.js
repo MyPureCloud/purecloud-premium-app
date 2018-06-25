@@ -15,8 +15,6 @@ clientApp.setup = function(pcEnv){
 
     let clientId = clientIDs[pcEnv] || 'mypurecloud.com';
 
-    test = clientId;
-
     // API instances
     const usersApi = new platformClient.UsersApi();
     const notificationsApi = new platformClient.NotificationsApi();
