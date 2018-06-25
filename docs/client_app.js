@@ -13,13 +13,10 @@ clientApp.setup = function(pcEnv){
     // const redirectUri = "http://localhost:3000";
     const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
 
-<<<<<<< HEAD
     let clientId = clientIDs[pcEnv] || 'mypurecloud.com';
 
     test = clientId;
 
-=======
->>>>>>> 1f7c5182d813cd84a3e4a169a593e0f83e214086
     // API instances
     const usersApi = new platformClient.UsersApi();
     const notificationsApi = new platformClient.NotificationsApi();
