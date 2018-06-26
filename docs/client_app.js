@@ -65,23 +65,23 @@ clientApp.onSocketMessage = function(event){
 
         // Put values to the fields
         if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
-            $("#callerName").html("");
-            $("#callerNumber").html("");
-            $("#callerArea").html("");
+            $("#callerName").text("");
+            $("#callerNumber").text("");
+            $("#callerArea").text("");
 
             clientApp.isCallActive = false;
 
         } else {
             let callerLocation = '';
 
-            $("#callerName").html(caller.name);
-            $("#callerNumber").html(caller.address);
+            $("#callerName").text(caller.name);
+            $("#callerNumber").text(caller.address);
 
             getLocalInfo(caller.address,{
                 military: false,
                 zone_display: 'area'
                 }, object => {
-                    $("#callerArea").html(object.time.display +' '+ object.location);
+                    $("#callerArea").text(object.time.display +' '+ object.location);
                     callerLocation = object.location;
                 }
             );
