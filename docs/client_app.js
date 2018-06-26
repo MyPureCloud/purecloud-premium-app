@@ -18,8 +18,9 @@ clientApp.setup = function(pcEnv){
     // API instances
     const usersApi = new platformClient.UsersApi();
     const notificationsApi = new platformClient.NotificationsApi();
+    const routingApi = new platformClient.RoutingApi();
 
-    // Authenticate via PureCcloud
+    // Authenticate via PureCloud
     client.setPersistSettings(true);
     client.loginImplicitGrant(clientId, redirectUri, { state: "state" })
     .then(data => {
@@ -27,12 +28,12 @@ clientApp.setup = function(pcEnv){
         // Set access Token
         client.setAccessToken(data.accessToken);
         
-    // Get Details of current User and save to Client App
+        // Get Details of current User and save to Client App
         return usersApi.getUsersMe();
     }).then( userMe => {
         clientApp.userId = userMe.id;
 
-    // Create a Notifications Channel
+        // Create a Notifications Channel
         return notificationsApi.postNotificationsChannels();
     }).then(data => {
         clientApp.websocketUri = data.connectUri;
@@ -41,10 +42,15 @@ clientApp.setup = function(pcEnv){
         clientApp.socket.onmessage = clientApp.onSocketMessage;
         clientApp.topicId = "v2.users." + clientApp.userId + ".conversations.calls"
 
-    // Subscribe to Call Conversations of Current user.
+        // Subscribe to Call Conversations of Current user.
         let topic = [{"id": clientApp.topicId}];
         return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
-    }).then(data => console.log("Succesfully set-up Client App."))
+    }).then(function() {
+        // Get list of queues
+        let opts = [{"pageSize": 25}];
+        return routingApi.getRoutingQueues(opts);
+    }).then(clientApp.loadSupervisorView)    
+    .then(data => console.log("Succesfully set-up Client App."))
 
     // Error Handling
     .catch( e => console.log(e) );
@@ -97,6 +103,18 @@ clientApp.onSocketMessage = function(event){
 clientApp.toastIncomingCall = function(callerLocation){
     if(clientApp.hasOwnProperty('purecloudClientApi')){
         clientApp.purecloudClientApi.alerting.showToastPopup("Incoming Call", "From: " + callerLocation);
+    }
+}
+
+clientApp.loadSupervisorView = function(data){
+    let queues = data.entities;
+
+    for (var i = 0; i < queues.length; i++) {
+        var row$ = $('<tr/>');
+        var cellValue = queues[i].name;
+        if (cellValue == null) cellValue = "";
+        row$.append($('<td/>').html(cellValue));
+        $("#queuesTable").append(row$);
     }
 }
 
