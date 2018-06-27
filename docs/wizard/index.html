@@ -12,6 +12,15 @@
     <script src="https://sdk-cdn.mypurecloud.com/javascript/29.1.0/purecloud-platform-client-v2.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/1.0.0/purecloud-client-app-sdk-ed1f20f5244ee2bb9cc242f669369639.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+    <style>
+    #unauthorized{
+        display: none;
+    }
+    #authorized{
+        display: none;
+    }
+    </style>
 </head>
 <body>
     <noscript>
@@ -21,6 +30,26 @@
     <h1 class="title">App Setup Wizard</h1>
     <p class="subtitle is-size-6">Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App.</p>
 
+    <div id="unauthorized">
+        <article class="message is-warning">
+            <div class="message-header">
+                <p>Warning</p>
+            </div>
+            <div class="message-body">
+                Your PureCloud user lacks the required permission(s) to proceed with the wizard.
+            </div>
+        </article>
+    </div>
+
+    <div id="authorized">
+        <table>
+            <thead>
+                <th></th>
+            </thead>
+        </table>
+    </div>
+
+    <!-- Client Instances and PureCloud API will be encapsulated in the wizardApp module -->
     <script type="module">
         import wizardApp from './wizard-app.js'
         wizardApp.setup();
