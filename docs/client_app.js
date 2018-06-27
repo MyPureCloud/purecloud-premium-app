@@ -159,8 +159,6 @@ clientApp.onSocketMessageQueue = function(event){
     let topic = data.topicName;
     let eventBody = data.eventBody;
 
-    console.log(data);
-
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
         let caller = eventBody.participants
@@ -170,11 +168,27 @@ clientApp.onSocketMessageQueue = function(event){
         if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
             $("#txtQueue").text("");
 
+            $("#callerName").text("");
+            $("#callerANI").text("");
+            $("#callerDNIS").text("");
+            $("#callerState").text("");
+            $("#callerWaitTime").text("");
+            $("#callerDuration").text("");
+
             clientApp.isCallActive = false;
 
         } else {
-            var jsonString = JSON.stringify(data);
-            $("#txtQueue").text(jsonString);
+            $("#txtQueue").text(JSON.stringify(data));
+
+            $("#callerName").text(caller.name);
+            $("#callerANI").text("caller ANI");
+            $("#callerDNIS").text("caller DNIS");
+            $("#callerState").text(caller.calls.state);
+            $("#callerWaitTime").text("caller wait time");
+            $("#callerDuration").text("caller duration");
+
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActive = true;
         }
     }
 }
