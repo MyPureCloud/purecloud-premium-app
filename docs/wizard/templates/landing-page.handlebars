@@ -1,7 +1,18 @@
-<h1 class="title">App Setup Wizard</h1>
-<p class="subtitle is-size-6">Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App.</p>
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+        App Setup Wizard
+      </h1>
+      <h2 class="subtitle">
+        Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App.
+      </h2>
+    </div>
+  </div>
+</section>
 
 {{#if isAuthorized}}
+
 <table class="table is-striped is-hoverable is-fullwidth">
     <thead>
         <th>Org Feature</th>
@@ -16,7 +27,13 @@
         {{/each}}
     </tbody>
 </table>
+
+<button id="btn-start-wizard" class="button is-info has-text-centered">
+    Start Wizard
+</button>
+
 {{else}}
+
 <article class="message is-warning">
     <div class="message-header">
         <p>Warning</p>
@@ -25,4 +42,5 @@
         Your PureCloud user lacks the required permission(s) to proceed with the wizard.
     </div>
 </article>
+
 {{/if}}
