@@ -119,7 +119,7 @@ clientApp.loadSupervisorView = function(){
         '/api/v2/routing/queues', 
         'GET', 
         {  }, 
-        {  }, 
+        { 'pageSize': 1000 }, 
         {  }, 
         {  }, 
         null, 
