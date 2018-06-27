@@ -1,5 +1,17 @@
-// Requires jQuery and Handlebars from parent module context
 import clientIDs from '../clientIDs.js'
+
+// Requires jQuery and Handlebars from parent context
+const $ = window.$;
+const jQuery = window.jQuery;
+const Handlebars = window.Handlebars;
+if((typeof $ === 'undefined') ||
+        (typeof jQuery === 'undefined') ||
+        (typeof Handlebars === 'undefined')){
+    console.error("===== PREMIUM APP ERROR ====== \n" +
+                  "A required library is missing. \n" +
+                  "==============================");   
+}
+
 
 let wizardApp = {
     // Reference to the PureCloud App (Client App SDK)
