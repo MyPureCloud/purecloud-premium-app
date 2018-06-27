@@ -135,7 +135,7 @@ clientApp.loadSupervisorView = function(){
         dropdown.prop('selectedIndex', 0);
 
         for (var i = 1; i < queues.length; i++) {
-            dropdown.append($('<option></option>').attr('value', queues[i].id).text(queues[i].name));
+            dropdown.append($('<option style="left: 0;"></option>').attr('value', queues[i].id).text(queues[i].name));
         }
     })
 }
