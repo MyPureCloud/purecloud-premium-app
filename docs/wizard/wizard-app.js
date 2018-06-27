@@ -25,15 +25,10 @@ class WizardApp {
         // Permissions required for using the app 
         // TODO: store permissions on a separate file
         this.setupPermissionsRequired = ['admin'];
-        // Handlebars values
-        this.templateSource = null;
-        this.template = null;
     }
 
-    setupClientApp(){
-        this.templateSource = document.getElementById("wizard-app-template").innerHTML;
-        this.template = Handlebars.compile(this.templateSource);
-    
+    // First thing that needs to be called to setup up the PureCloud Client App
+    setupClientApp(){    
         // Backwards compatibility snippet from: https://github.com/MyPureCloud/client-app-sdk
         let envQueryParamName = 'pcEnvironment';
     
@@ -47,6 +42,7 @@ class WizardApp {
         console.log(this.pcApp.pcEnvironment);
     }
 
+    // TODO: Assign default or notify user if can't determine purecloud environment
     pureCloudAuthenticate() {
         // Authenticate through PureCloud
         const redirectUri = "https://localhost/wizard/index.html";
@@ -80,16 +76,33 @@ class WizardApp {
     }
 
     renderPage(page) {
-        switch(page){
-            case 'landing_page':
-                let context = {
-                    title: 'App Setup Wizard',
-                    subtitle: 'Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App.'
+        let templateUri = 'templates/' + page + '.handlebars';
+        let templateSource;
+        let template;
+        let context = {};
+
+        // Async get the desired template file
+        $.ajax({
+            url: templateUri,
+            cache: true,
+            success: data => {
+                // Compile Handlebars template 
+                templateSource = data;
+                template = Handlebars.compile(templateSource);
+
+                // Assign context
+                switch(page){
+                    case 'landing-page':
+                        context = {};
+                        break;
                 }
-                let renderedHtml = this.template(context);
+
+                // Render html and display to webpage
+                let renderedHtml = template(context);
                 $('#wizard-app-display').html(renderedHtml);
-                break;
-        }
+            }
+        });
+        
     }
 }
 
