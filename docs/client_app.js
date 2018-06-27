@@ -8,8 +8,8 @@ let clientApp = {};
 // PureCloud OAuth information
 const platformClient = require('platformClient');
 const client = platformClient.ApiClient.instance;
-const redirectUri = "http://localhost:3000";
-// const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
+// const redirectUri = "http://localhost:3000";
+const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
 
 // API instances
 const usersApi = new platformClient.UsersApi();
@@ -31,19 +31,6 @@ clientApp.setup = function(pcEnv){
         return usersApi.getUsersMe();
     }).then( userMe => {
         clientApp.userId = userMe.id;
-
-    //     // Create a Notifications Channel
-    //     return notificationsApi.postNotificationsChannels();
-    // }).then(data => {
-    //     clientApp.websocketUri = data.connectUri;
-    //     clientApp.channelID = data.id;
-    //     clientApp.socket = new WebSocket(clientApp.websocketUri);
-    //     clientApp.socket.onmessage = clientApp.onSocketMessage;
-    //     clientApp.topicId = "v2.users." + clientApp.userId + ".conversations.calls"
-
-    //     // Subscribe to Call Conversations of Current user.
-    //     let topic = [{"id": clientApp.topicId}];
-    //     return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
     }).then(data => console.log("Succesfully set-up Client App."))
 
     // Error Handling
