@@ -5,7 +5,7 @@
 */
 
 body {
-    padding: 20px;
+    margin: 20px;
 
     color: #0F465D;
     font-family: “HelveticaNeue”, “Helvetica”, “Arial”, sans-serif;
@@ -43,7 +43,7 @@ div.test-area{
 
 /* Addition to Bulma classes */
 
-.title{
+h1.title{
     color: #0F465D;
 }
 
