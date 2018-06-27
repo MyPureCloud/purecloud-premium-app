@@ -172,8 +172,8 @@ clientApp.onSocketMessageQueue = function(event){
     let topic = data.topicName;
     let eventBody = data.eventBody;
 
-    console.log(topic);
-    console.log(eventBody);
+    console.log(data);
+    
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
         let caller = eventBody.participants
