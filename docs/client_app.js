@@ -31,29 +31,10 @@ clientApp.setup = function(pcEnv){
         return usersApi.getUsersMe();
     }).then( userMe => {
         clientApp.userId = userMe.id;
-    }).then(data => console.log("Succesfully set-up Client App."))
 
-    // Error Handling
-    .catch( e => console.log(e) );
-}
-
-clientApp.loadWidget = function() {
-    console.log("===============================================");
-    console.log("LOAD WIDGET" + clientApp.userId);
-
-    // Create a Notifications Channel
-    client.callApi(
-        '/api/v2/notifications/channels', 
-        'POST', 
-        {  }, 
-        {  }, 
-        {  }, 
-        {  }, 
-        null, 
-        ['PureCloud Auth'], 
-        ['application/json'], 
-        ['application/json']
-    ).then(data => {
+        // Create a Notifications Channel
+        return notificationsApi.postNotificationsChannels();
+    }).then(data => {
         clientApp.websocketUri = data.connectUri;
         clientApp.channelID = data.id;
         clientApp.socket = new WebSocket(clientApp.websocketUri);
@@ -63,8 +44,40 @@ clientApp.loadWidget = function() {
         // Subscribe to Call Conversations of Current user.
         let topic = [{"id": clientApp.topicId}];
         return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
-    })
+    }).then(data => console.log("Succesfully set-up Client App."))
+
+    // Error Handling
+    .catch( e => console.log(e) );
 }
+
+// clientApp.loadWidget = function() {
+//     console.log("===============================================");
+//     console.log("LOAD WIDGET" + clientApp.userId);
+
+//     // Create a Notifications Channel
+//     client.callApi(
+//         '/api/v2/notifications/channels', 
+//         'POST', 
+//         {  }, 
+//         {  }, 
+//         {  }, 
+//         {  }, 
+//         null, 
+//         ['PureCloud Auth'], 
+//         ['application/json'], 
+//         ['application/json']
+//     ).then(data => {
+//         clientApp.websocketUri = data.connectUri;
+//         clientApp.channelID = data.id;
+//         clientApp.socket = new WebSocket(clientApp.websocketUri);
+//         clientApp.socket.onmessage = clientApp.onSocketMessage;
+//         clientApp.topicId = "v2.users." + clientApp.userId + ".conversations.calls"
+
+//         // Subscribe to Call Conversations of Current user.
+//         let topic = [{"id": clientApp.topicId}];
+//         return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
+//     })
+// }
 
 // Handler for every Websocket message
 clientApp.onSocketMessage = function(event){
