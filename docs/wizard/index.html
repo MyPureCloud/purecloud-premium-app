@@ -23,42 +23,20 @@
     </style>
 </head>
 <body>
+    <!-- TODO: Check if browser supports ES6 and notify user. -->
     <noscript>
         For full functionality of this site it is necessary to enable JavaScript. Here are the <a href="http://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web browser</a>.
     </noscript>
     <div id="wizard-app-display"></div>
 
-    <script id="wizard-app-template" type="text/x-handlebars-template">
-        <h1 class="title">{{title}}</h1>
-        <p class="subtitle is-size-6">{{subtitle}}</p>
-
-        <div id="unauthorized">
-            <article class="message is-warning">
-                <div class="message-header">
-                    <p>Warning</p>
-                </div>
-                <div class="message-body">
-                    Your PureCloud user lacks the required permission(s) to proceed with the wizard.
-                </div>
-            </article>
-        </div>
-
-        <div id="authorized">
-            <table>
-                <thead>
-                    <th></th>
-                </thead>
-            </table>
-        </div>
-    </script>
-
     <!-- Client Instances and PureCloud API will be encapsulated in the wizardApp module -->
     <script type="module">
         import WizardApp from './wizard-app.js'
+
         let myApp = new WizardApp();
         myApp.setupClientApp();
         myApp.pureCloudAuthenticate();
-        myApp.renderPage('landing_page');
+        myApp.renderPage('landing-page');
 
         // Expose to window
         window.myApp = myApp;
