@@ -11,23 +11,21 @@
 
     <script src="https://sdk-cdn.mypurecloud.com/javascript/29.1.0/purecloud-platform-client-v2.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/1.0.0/purecloud-client-app-sdk-ed1f20f5244ee2bb9cc242f669369639.min.js"></script>
+    
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
-    <style>
-    #unauthorized{
-        display: none;
-    }
-    #authorized{
-        display: none;
-    }
-    </style>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
 </head>
 <body>
     <!-- TODO: Check if browser supports ES6 and notify user. -->
     <noscript>
         For full functionality of this site it is necessary to enable JavaScript. Here are the <a href="http://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web browser</a>.
     </noscript>
-    <div id="wizard-app-display"></div>
+    <div id="wizard-app-display">
+        <h1 class="is-size-2 has-text-centered has-text-grey-light">
+            Loading...
+        </h1>
+    </div>
 
     <!-- Client Instances and PureCloud API will be encapsulated in the wizardApp module -->
     <script type="module">

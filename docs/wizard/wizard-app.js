@@ -78,7 +78,8 @@ class WizardApp {
 
             this._renderPage('landing-page',
                     {isAuthorized: isAuthorized,
-                     features: orgFeature
+                     features: orgFeature,
+                     startWizardFunction: this.loadRolesPage
                     });
 
         // Error handler catch all
@@ -103,13 +104,30 @@ class WizardApp {
                 // Render html and display to webpage
                 let renderedHtml = template(context);
                 $('#wizard-app-display').html(renderedHtml);
+
+                this._assignEventListeners(page);
             }
         }); 
+    }
+
+    // Manual assignment of event listeners after page is rendered
+    // TODO: Find better alternative
+    _assignEventListeners(page){
+        switch(page){
+            case 'landing-page':
+                // Button to Start the Wizard
+                $('#btn-start-wizard').click(this.loadRolesPage);
+                break;
+        }
     }
 
     loadLandingPage(){
         this._setupClientApp();
         this._pureCloudAuthenticate();
+    }
+
+    loadRolesPage(){
+        console.log("YEP");
     }
 
     start(){
