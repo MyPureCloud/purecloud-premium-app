@@ -1,5 +1,5 @@
 /*
-*   This sample uses ES6 features
+*   NOTE: This sample uses ES6 features
 */
 import clientIDs from '../clientIDs.js'
 
@@ -20,15 +20,16 @@ class WizardApp {
         // Reference to the PureCloud App (Client App SDK)
         this.pcApp = null;
         // PureCloud Javascript SDK clients
-        this.platformClient = null;
-        this.purecloudClient = null;
+        this.platformClient = require('platformClient');
+        this.purecloudClient = this.platformClient.ApiClient.instance;
+        this.redirectUri = "https://localhost/wizard/index.html";
         // Permissions required for using the app 
         // TODO: store permissions on a separate file
         this.setupPermissionsRequired = ['admin'];
     }
 
     // First thing that needs to be called to setup up the PureCloud Client App
-    setupClientApp(){    
+    _setupClientApp(){    
         // Backwards compatibility snippet from: https://github.com/MyPureCloud/client-app-sdk
         let envQueryParamName = 'pcEnvironment';
     
@@ -43,43 +44,52 @@ class WizardApp {
     }
 
     // TODO: Assign default or notify user if can't determine purecloud environment
-    pureCloudAuthenticate() {
+    _pureCloudAuthenticate() {
+        let isAuthorized = false;
         // Authenticate through PureCloud
-        const redirectUri = "https://localhost/wizard/index.html";
-        this.platformClient = require('platformClient');
-        this.purecloudClient = this.platformClient.ApiClient.instance;
         this.purecloudClient.setPersistSettings(true, 'premium_app');
-    
         this.purecloudClient.loginImplicitGrant(clientIDs[this.pcApp.pcEnvironment], 
-                                redirectUri, 
+                                this.redirectUri, 
                                 {state: ('pcEnvironment=' + this.pcApp.pcEnvironment)})
-        // Check permission of user
+        
+        // Check user permissions
         .then(data => {
             console.log(data);
-    
             let usersApi = new this.platformClient.UsersApi();
+
             let opts = {'expand': ['authorization']};
+
             return usersApi.getUsersMe(opts); 
-        
         }).then(userMe => {
             console.log(userMe);
+            let organizationApi = new this.platformClient.OrganizationApi();
+
             // Show appropriate elements based on qualification of user permissions.
             if(!this.setupPermissionsRequired.every(perm => userMe.authorization.permissions.indexOf(perm) > -1)){
-                $('#unauthorized').show();
-                $('#authorized').hide();
+                isAuthorized = false;
             }else{
-                $('#unauthorized').hide();
-                $('#authorized').show();
+                isAuthorized = true;
             }
-            
+
+        // Get organization information
+            return organizationApi.getOrganizationsMe();
+        }).then(orgData => {
+            let orgFeature = orgData.features;
+
+            this._renderPage('landing-page',
+                    {isAuthorized: isAuthorized,
+                     features: orgFeature
+                    });
+
+        // Error handler catch all
         }).catch(err => console.log(err));
     }
 
-    renderPage(page) {
+    _renderPage(page, context) {
+        context = (typeof context !== 'undefined') ? context : {}; 
         let templateUri = 'templates/' + page + '.handlebars';
         let templateSource;
         let template;
-        let context = {};
 
         // Async get the desired template file
         $.ajax({
@@ -90,19 +100,20 @@ class WizardApp {
                 templateSource = data;
                 template = Handlebars.compile(templateSource);
 
-                // Assign context
-                switch(page){
-                    case 'landing-page':
-                        context = {};
-                        break;
-                }
-
                 // Render html and display to webpage
                 let renderedHtml = template(context);
                 $('#wizard-app-display').html(renderedHtml);
             }
-        });
-        
+        }); 
+    }
+
+    loadLandingPage(){
+        this._setupClientApp();
+        this._pureCloudAuthenticate();
+    }
+
+    start(){
+        this.loadLandingPage();
     }
 }
 
