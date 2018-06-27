@@ -5,20 +5,19 @@ import clientIDs from './clientIDs.js';
 
 let clientApp = {};
 
+// PureCloud OAuth information
+const platformClient = require('platformClient');
+const client = platformClient.ApiClient.instance;
+const redirectUri = "http://localhost:3000";
+// const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
+
+// API instances
+const usersApi = new platformClient.UsersApi();
+const notificationsApi = new platformClient.NotificationsApi();
+
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
 clientApp.setup = function(pcEnv){
-    // PureCloud OAuth information
-    const platformClient = require('platformClient');
-    const client = platformClient.ApiClient.instance;
-    // const redirectUri = "http://localhost:3000";
-    const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
-
     let clientId = clientIDs[pcEnv] || clientIDs['mypurecloud.com'];
-
-    // API instances
-    const usersApi = new platformClient.UsersApi();
-    const notificationsApi = new platformClient.NotificationsApi();
-    const routingApi = new platformClient.RoutingApi();
 
     // Authenticate via PureCloud
     client.setPersistSettings(true);
@@ -33,9 +32,38 @@ clientApp.setup = function(pcEnv){
     }).then( userMe => {
         clientApp.userId = userMe.id;
 
-        // Create a Notifications Channel
-        return notificationsApi.postNotificationsChannels();
-    }).then(data => {
+    //     // Create a Notifications Channel
+    //     return notificationsApi.postNotificationsChannels();
+    // }).then(data => {
+    //     clientApp.websocketUri = data.connectUri;
+    //     clientApp.channelID = data.id;
+    //     clientApp.socket = new WebSocket(clientApp.websocketUri);
+    //     clientApp.socket.onmessage = clientApp.onSocketMessage;
+    //     clientApp.topicId = "v2.users." + clientApp.userId + ".conversations.calls"
+
+    //     // Subscribe to Call Conversations of Current user.
+    //     let topic = [{"id": clientApp.topicId}];
+    //     return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
+    }).then(data => console.log("Succesfully set-up Client App."))
+
+    // Error Handling
+    .catch( e => console.log(e) );
+}
+
+clientApp.loadWidget = function() {
+    // Create a Notifications Channel
+    client.callApi(
+        '/api/v2/notifications/channels', 
+        'POST', 
+        {  }, 
+        {  }, 
+        {  }, 
+        {  }, 
+        null, 
+        ['PureCloud Auth'], 
+        ['application/json'], 
+        ['application/json']
+    ).then(data => {
         clientApp.websocketUri = data.connectUri;
         clientApp.channelID = data.id;
         clientApp.socket = new WebSocket(clientApp.websocketUri);
@@ -45,15 +73,7 @@ clientApp.setup = function(pcEnv){
         // Subscribe to Call Conversations of Current user.
         let topic = [{"id": clientApp.topicId}];
         return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
-    }).then(function() {
-        // Get list of queues
-        let opts = [{"pageSize": 25}];
-        return routingApi.getRoutingQueues(opts);
-    }).then(clientApp.loadSupervisorView)    
-    .then(data => console.log("Succesfully set-up Client App."))
-
-    // Error Handling
-    .catch( e => console.log(e) );
+    })
 }
 
 // Handler for every Websocket message
@@ -106,15 +126,81 @@ clientApp.toastIncomingCall = function(callerLocation){
     }
 }
 
-clientApp.loadSupervisorView = function(data){
-    let queues = data.entities;
+clientApp.loadSupervisorView = function(){
+    // Get all Queues
+    client.callApi(
+        '/api/v2/routing/queues', 
+        'GET', 
+        {  }, 
+        {  }, 
+        {  }, 
+        {  }, 
+        null, 
+        ['PureCloud Auth'], 
+        ['application/json'], 
+        ['application/json']
+    ).then(data => {
+        let queues = data.entities;
 
-    for (var i = 0; i < queues.length; i++) {
-        var row$ = $('<tr/>');
-        var cellValue = queues[i].name;
-        if (cellValue == null) cellValue = "";
-        row$.append($('<td/>').html(cellValue));
-        $("#queuesTable").append(row$);
+        let dropdown = $('#ddlQueues');
+        dropdown.empty();
+        dropdown.append('<option selected="true" disabled>Subscribe to Queue</option>');
+        dropdown.prop('selectedIndex', 0);
+
+        for (var i = 1; i < queues.length; i++) {
+            dropdown.append($('<option></option>').attr('value', queues[i].id).text(queues[i].name));
+        }
+    })
+}
+
+clientApp.subscribeToQueue = function(queue){
+    // Create a Notifications Channel
+    client.callApi(
+        '/api/v2/notifications/channels', 
+        'POST', 
+        {  }, 
+        {  }, 
+        {  }, 
+        {  }, 
+        null, 
+        ['PureCloud Auth'], 
+        ['application/json'], 
+        ['application/json']
+    ).then(data => {
+        clientApp.websocketUri = data.connectUri;
+        clientApp.channelID = data.id;
+        clientApp.socket = new WebSocket(clientApp.websocketUri);
+        clientApp.socket.onmessage = clientApp.onSocketMessageQueue;
+        clientApp.topicId = "v2.routing.queues." + queue + ".conversations"
+
+        // Subscribe to Call Conversations of selected queue.
+        let topic = [{"id": clientApp.topicId}];
+        return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
+    })
+}
+
+// Handler for every Websocket message
+clientApp.onSocketMessageQueue = function(event){
+    let data = JSON.parse(event.data);
+    let topic = data.topicName;
+    let eventBody = data.eventBody;
+
+    console.log(topic);
+    console.log(eventBody);
+    // If a voice interaction (from queue) comes in
+    if(topic === clientApp.topicId){
+        let caller = eventBody.participants
+                .filter(participant => participant.purpose === "customer")[0];
+
+        // Put values to the fields
+        if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
+            $("#txtQueue").text("");
+
+            clientApp.isCallActive = false;
+
+        } else {
+            $("#txtQueue").text(data);
+        }
     }
 }
 
