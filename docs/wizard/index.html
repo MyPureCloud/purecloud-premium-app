@@ -6,7 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Premium App Wizard</title>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
     <link rel="stylesheet" href="../style.css">
+
+    <script src="https://sdk-cdn.mypurecloud.com/javascript/29.1.0/purecloud-platform-client-v2.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/1.0.0/purecloud-client-app-sdk-ed1f20f5244ee2bb9cc242f669369639.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 </head>
@@ -15,22 +18,13 @@
         For full functionality of this site it is necessary to enable JavaScript. Here are the <a href="http://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web browser</a>.
     </noscript>
 
-    <h1>Premium App Wizard</h1>
+    <h1 class="title">App Setup Wizard</h1>
+    <p class="subtitle is-size-6">Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App.</p>
 
-    <script>
-        let myClientApp = null;
-
-        // Backwards compatibility snippet from: https://github.com/MyPureCloud/client-app-sdk
-        let envQueryParamName = 'pcEnvironment';
-        if (window && window.location && typeof window.location.search === 'string' &&
-            window.location.search.indexOf('pcEnvironment') >= 0) {
-            myClientApp = new window.purecloud.apps.ClientApp({pcEnvironmentQueryParam: envQueryParamName});
-        } else {
-            // Use default PureCloud region
-            myClientApp = new window.purecloud.apps.ClientApp();
-        }
-
-        console.log(myClientApp.pcEnvironment);
+    <script type="module">
+        import wizardApp from './wizard-app.js'
+        wizardApp.setup();
+        wizardApp.pureCloudAuthenticate();
     </script>
 </body>
 </html>
