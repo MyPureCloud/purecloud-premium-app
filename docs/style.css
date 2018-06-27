@@ -40,3 +40,13 @@ div.test-area{
     padding: 10px;
     background-color: #FFEAEA;
 }
+
+/* Addition to Bulma classes */
+
+.title{
+    color: #0F465D;
+}
+
+.subtitle{
+    color: #1997CA;
+}
