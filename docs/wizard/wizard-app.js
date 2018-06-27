@@ -15,7 +15,7 @@ let wizardApp = {
     template: null,
 
     // Functions
-    setup: () => null,
+    setupClientApp: () => null,
     pureCloudAuthenticate: () => null,
     renderPage: (page) => null
 }
@@ -27,7 +27,7 @@ let _setupPermissionsRequired = wizardApp.setupPermissionsRequired;
 let _templateSource = wizardApp.templateSource;
 let _template = wizardApp.template;
 
-wizardApp.setup = function(){
+wizardApp.setupClientApp = function(){
     _templateSource = document.getElementById("wizard-app-template").innerHTML;
     _template = Handlebars.compile(_templateSource);
 
