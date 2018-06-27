@@ -54,12 +54,14 @@
 
     <!-- Client Instances and PureCloud API will be encapsulated in the wizardApp module -->
     <script type="module">
-        import wizardApp from './wizard-app.js'
-        wizardApp.setupClientApp();
-        wizardApp.pureCloudAuthenticate();
-        wizardApp.renderPage('landing_page');
+        import WizardApp from './wizard-app.js'
+        let myApp = new WizardApp();
+        myApp.setupClientApp();
+        myApp.pureCloudAuthenticate();
+        myApp.renderPage('landing_page');
+
         // Expose to window
-        window.wizardApp = wizardApp;
+        window.myApp = myApp;
     </script>
 </body>
 </html>
