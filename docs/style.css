@@ -50,3 +50,12 @@ h1.title{
 .subtitle{
     color: #1997CA;
 }
+
+select {
+    position: relative; /* containing block for positioning */
+    display: inline; /* to fix IE's doubled float-margin bug */
+    /* float: right; */
+    list-style: none;
+    padding: 0;
+    margin:0 20px 0 0;
+}
