@@ -15,9 +15,13 @@
 </head>
 <body>
     <h1>Queues:</h1>
-    <div>
-        <table id="queuesTable">
-        </table>
+    <div>        
+        <div>
+            <select id="ddlQueues" name="queues" onChange="subscribeToQueue()"></select>
+        </div>
+        <div>
+            <textarea id="txtQueue" rows="30" cols="50"></textarea>
+        </div>
     </div>
 
     <script type="module">
@@ -33,7 +37,19 @@
         }
         
         clientApp.setup(pcEnv);
+        clientApp.loadSupervisorView();
         clientApp.purecloudClientApi = new window.purecloud.apps.ClientApp();
+
+        window.clientApp = clientApp;
+    </script>
+    <script>
+        function subscribeToQueue() {
+            var queue = document.getElementById("ddlQueues");
+            var queueValue = document.getElementById("ddlQueues").value;
+            var queueText = queue.options[queue.selectedIndex].text;
+
+            clientApp.subscribeToQueue(queueValue);
+        }
     </script>
 </body> 
 </html>
