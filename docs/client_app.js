@@ -189,7 +189,8 @@ clientApp.onSocketMessageQueue = function(event){
             clientApp.isCallActive = false;
 
         } else {
-            $("#txtQueue").text(data);
+            var jsonString = JSON.stringify(data);
+            $("#txtQueue").text(jsonString);
         }
     }
 }
