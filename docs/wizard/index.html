@@ -34,9 +34,7 @@
         import WizardApp from './wizard-app.js'
 
         let myApp = new WizardApp();
-        myApp.setupClientApp();
-        myApp.pureCloudAuthenticate();
-        myApp.renderPage('landing-page');
+        myApp.start();
 
         // Expose to window
         window.myApp = myApp;

@@ -1,21 +1,28 @@
 <h1 class="title">App Setup Wizard</h1>
 <p class="subtitle is-size-6">Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App.</p>
 
-<div id="unauthorized">
-    <article class="message is-warning">
-        <div class="message-header">
-            <p>Warning</p>
-        </div>
-        <div class="message-body">
-            Your PureCloud user lacks the required permission(s) to proceed with the wizard.
-        </div>
-    </article>
-</div>
-
-<div id="authorized">
-    <table>
-        <thead>
-            <th></th>
-        </thead>
-    </table>
-</div>
+{{#if isAuthorized}}
+<table class="table is-striped is-hoverable is-fullwidth">
+    <thead>
+        <th>Org Feature</th>
+        <th>Enabled</th>
+    </thead>
+    <tbody>
+        {{#each features}}
+            <tr>
+                <td>{{@key}}</td>
+                <td>{{this}}</td>
+            </tr>
+        {{/each}}
+    </tbody>
+</table>
+{{else}}
+<article class="message is-warning">
+    <div class="message-header">
+        <p>Warning</p>
+    </div>
+    <div class="message-body">
+        Your PureCloud user lacks the required permission(s) to proceed with the wizard.
+    </div>
+</article>
+{{/if}}
