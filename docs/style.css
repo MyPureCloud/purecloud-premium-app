@@ -5,15 +5,9 @@
 */
 
 body {
-    margin: 20px;
-
     color: #0F465D;
     font-family: “HelveticaNeue”, “Helvetica”, “Arial”, sans-serif;
     font-size: 14px;
-}
-
-div {
-    padding: 5px 0 0 4px;
 }
 
 div.field-title {
