@@ -59,3 +59,8 @@ select {
     padding: 0;
     margin:0 20px 0 0;
 }
+
+option:hover ul.last, #nav li.sfhover ul.last {
+    left: auto;
+    right: 4px; /* you might want to change this */
+}
