@@ -45,7 +45,7 @@ class WizardApp {
         // Shoule be loaded from an external JSON (without ext).
         this.defaultOrder = null;
         this.defaultOrderFileName = 'sample-order';
-        this.loadOrder(this.defaultOrderFileName);
+        this.loadOrderFile(this.defaultOrderFileName);
     }
 
     /**
@@ -103,7 +103,6 @@ class WizardApp {
 
     /**
      * Render the Handlebars template to the window
-     * Also call _assignEventListeners after rendering the page
      * @param {string} page     contains filename of handlebars file
      * @param {object} context  context oject
      * @param {string} target   ID of element HTML where rendered module will be placed
@@ -130,8 +129,6 @@ class WizardApp {
                 // Render html and display to the target element
                 let renderedHtml = template(context);
                 $('#' + target).html(renderedHtml);
-
-                this._assignEventListeners(page);
 
                 resolve();
             })
@@ -163,27 +160,6 @@ class WizardApp {
     }
 
     /**
-     * Manual assignment of event listeners after page is rendered
-     * @param {string} page 
-     * 
-     * @todo Find potential alternative that does this better
-     */
-    _assignEventListeners(page){
-        switch(page){
-            case 'landing-page':
-                // Button to Start the Wizard
-                // jquery proxy to keep the context of 'this'
-                $('#btn-check-installation').click($.proxy(this.loadCheckInstallationStatus, this));
-                break;
-            case 'check-installation':
-                // Button to Start the Wizard
-                // jquery proxy to keep the context of 'this'
-                $('#btn-start-wizard').click($.proxy(this.loadGroupsCreation, this));
-                break;
-        }
-    }
-
-    /**
      * Loads the landing page of the app
      */
     loadLandingPage(){
@@ -207,6 +183,9 @@ class WizardApp {
                     },
                     'landing-page'
                 )
+                .then(() => {
+                    $('#btn-check-installation').click($.proxy(this.loadCheckInstallationStatus, this));
+                });
             });
         });
         
@@ -228,6 +207,9 @@ class WizardApp {
             },
             'check-installation'
         )
+        .then(() => {
+            $('#btn-start-wizard').click($.proxy(this.loadGroupsCreation, this));
+        });
 
         // PureCloud API instances
         let groupsApi = new this.platformClient.GroupsApi();
@@ -331,7 +313,7 @@ class WizardApp {
      * @param {string} fileName extensionless json filename
      * @todo have it called only when needed and set promises properly. Currently called at constructor.  
      */
-    loadOrder(fileName){
+    loadOrderFile(fileName){
         let fileUri = fileName + ".json";
         $.ajax({
             url: fileUri,
