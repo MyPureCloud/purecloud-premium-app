@@ -163,6 +163,9 @@ clientApp.onSocketMessageQueue = function(event){
     if(topic === clientApp.topicId){
         let caller = eventBody.participants
                 .filter(participant => participant.purpose === "customer")[0];
+        
+        let agent = eventBody.participants
+                .filter(participant => participant.purpose === "agent")[0];
 
         // Put values to the fields
         if(((caller.endTime !== undefined) && (!clientApp.isCallActive))){
@@ -184,7 +187,7 @@ clientApp.onSocketMessageQueue = function(event){
             $("#callerName").text(caller.name);
             $("#callerANI").text("caller ANI");
             $("#callerDNIS").text("caller DNIS");
-            $("#callerState").text(caller.calls[0].state);
+            $("#callerState").text(agent.calls[0].state);
             $("#callerWaitTime").text("caller wait time");
             $("#callerDuration").text("caller duration");
 
