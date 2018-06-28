@@ -184,7 +184,10 @@ clientApp.onSocketMessageQueue = function(event){
             $("#callerANI").text(caller.address);
             $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
             $("#callerState").text(agent.calls[0].state);
-            $("#callerWaitTime").text(new Date(new Date() - acdConnectedDt).toISOString().slice(11, -1));
+            $("#callerWaitTime").text(setInterval(function() {
+                                            var duration = Date.now() - acdConnectedDt;
+                                            return new Date(duration).toISOString().slice(11, -1);
+                                        }, 1000));
             $("#callerDuration").text("00:00:00.000");
 
             // Makes sure that the field only changes the first time. 
