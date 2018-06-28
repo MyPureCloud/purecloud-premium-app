@@ -178,17 +178,21 @@ clientApp.onSocketMessageQueue = function(event){
         // If incoming call
         if(acd.endTime === undefined){
             $("#txtQueue").text(JSON.stringify(data));
-            let currentDt = new Date();
 
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
             $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
             $("#callerState").text(agent.calls[0].state);
-            $("#callerWaitTime").text(setInterval(function() {
-                                            var duration = Date.now() - acdConnectedDt;
-                                            return new Date(duration).toISOString().slice(11, -1);
-                                        }, 1000));
+            // $("#callerWaitTime").text(setInterval(function() {
+            //                                 var duration = Date.now() - acdConnectedDt;
+            //                                 return new Date(duration).toISOString().slice(11, -1);
+            //                             }, 1000));
             $("#callerDuration").text("00:00:00.000");
+
+            setInterval(function() {
+                var currentDate = new Date();        
+                $("#callerWaitTime").text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1));
+            }, 1000);
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActive = true;
