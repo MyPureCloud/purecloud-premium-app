@@ -165,7 +165,7 @@ clientApp.onSocketMessageQueue = function(event){
                 .filter(participant => participant.purpose === "customer")[0];
 
         // Put values to the fields
-        if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
+        if(((caller.endTime !== undefined) && (!clientApp.isCallActive)) || caller.calls[0].state === "disconnected"){
             $("#txtQueue").text("");
 
             $("#callerName").text("");
@@ -178,10 +178,6 @@ clientApp.onSocketMessageQueue = function(event){
             clientApp.isCallActive = false;
 
         } else {
-            console.log(JSON.stringify("caller.calls[0]"+caller.calls[0]));
-            console.log(JSON.stringify("caller.calls[0].state"+caller.calls[0].state));
-            $("#txtQueue").text(JSON.stringify(data));
-
             $("#callerName").text(caller.name);
             $("#callerANI").text("caller ANI");
             $("#callerDNIS").text("caller DNIS");
