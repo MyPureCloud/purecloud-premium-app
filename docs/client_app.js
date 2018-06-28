@@ -169,19 +169,22 @@ clientApp.onSocketMessageQueue = function(event){
         
         let acd = eventBody.participants
                 .filter(participant => participant.purpose === "acd")[0];
+        
+        let acdConnectedDt = new Date(acd.connectedTime);
+        let acdEndDt = new Date(acd.endTime);
+        let custConnectedDt = new Date(caller.connectedTime);
+        let custEndDt = new Date(caller.endTime);
 
         // If incoming call
         if(acd.endTime === undefined){
             $("#txtQueue").text(JSON.stringify(data));
-
-            let connectedDt = new Date(acd.connectedTime);
             let currentDt = new Date();
 
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
             $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
             $("#callerState").text(agent.calls[0].state);
-            $("#callerWaitTime").text(new Date(currentDt - connectedDt).toISOString().slice(11, -1));
+            $("#callerWaitTime").text(new Date(new Date() - acdConnectedDt).toISOString().slice(11, -1));
             $("#callerDuration").text("00:00:00.000");
 
             // Makes sure that the field only changes the first time. 
@@ -189,28 +192,20 @@ clientApp.onSocketMessageQueue = function(event){
         } else if((acd.endTime === undefined) && (caller.endTime === undefined) && (!clientApp.isCallActive)) {
             // If active call
             $("#txtQueue").text(JSON.stringify(data));
-
-            let connectedDt = new Date(acd.connectedTime);
-            let endDt = new Date(acd.endTime);
             let currentDt = new Date();
 
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
             $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
             $("#callerState").text(agent.calls[0].state);
-            $("#callerWaitTime").text(new Date(endDt - connectedDt).toISOString().slice(11, -1));
-            $("#callerDuration").text(new Date(currentDt - endDt).toISOString().slice(11, -1));
+            $("#callerWaitTime").text(new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1));
+            $("#callerDuration").text(new Date(new Date() - acdEndDt).toISOString().slice(11, -1));
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActive = true;
         } else if(agent.calls[0].state === "disconnected") {
             // If disconnected call
             $("#txtQueue").text(JSON.stringify(data));
-
-            let acdConnectedDt = new Date(acd.connectedTime);
-            let acdEndDt = new Date(acd.endTime);
-            let custConnectedDt = new Date(caller.connectedTime);
-            let custEndDt = new Date(caller.endTime);
 
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
