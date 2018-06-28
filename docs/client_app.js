@@ -165,7 +165,7 @@ clientApp.onSocketMessageQueue = function(event){
                 .filter(participant => participant.purpose === "customer")[0];
 
         // Put values to the fields
-        if(((caller.endTime !== undefined) && (!clientApp.isCallActive)) || caller.calls[0].state === "disconnected"){
+        if(((caller.endTime !== undefined) && (!clientApp.isCallActive))){
             $("#txtQueue").text("");
 
             $("#callerName").text("");
