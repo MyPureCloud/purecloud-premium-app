@@ -116,31 +116,46 @@ class WizardApp {
         let templateSource;
         let template;
 
-        // Async get the desired template file
-        $.ajax({
-            url: templateUri,
-            cache: true
-        })
-        .done(data => {
-            // Compile Handlebars template 
-            templateSource = data;
-            template = Handlebars.compile(templateSource);
+        return new Promise((resolve, reject) => {
+            // Async get the desired template file
+            $.ajax({
+                url: templateUri,
+                cache: true
+            })
+            .done(data => {
+                // Compile Handlebars template 
+                templateSource = data;
+                template = Handlebars.compile(templateSource);
 
-            // Render html and display to the target element
-            let renderedHtml = template(context);
-            $('#' + target).html(renderedHtml);
+                // Render html and display to the target element
+                let renderedHtml = template(context);
+                $('#' + target).html(renderedHtml);
 
-            this._assignEventListeners(page);
-        })
-        .fail(xhr => console.log('error', xhr));
+                this._assignEventListeners(page);
+
+                resolve();
+            })
+            .fail(xhr => {
+                console.log('error', xhr);
+                reject();
+            });
+        });
     }
 
-    _renderCompletePage(headerContext, bodyContext, sidebarContext, footerContext){
+    /**
+     * Render a complete page with header and body
+     * @param {Object} headerContext    contains title and subtitle for header
+     * @param {Object} bodyContext      context for the body
+     * @param {string} bodyTemplate     filename of template for the body section
+     */
+    _renderCompletePage(headerContext, bodyContext, bodyTemplate){
         // Default values
         headerContext = (typeof headerContext !== 'undefined') ? headerContext : {};
         bodyContext = (typeof bodyContext !== 'undefined') ? bodyContext : {};
-        sidebarContext = (typeof sidebarContext !== 'undefined') ? sidebarContext : {};
-        footerContext = (typeof footerContext !== 'undefined') ? footerContext : {};
+
+        this._renderModule('root')
+        .then(() => this._renderModule('module-header', headerContext, 'root-header'))
+        .then(() => this._renderModule(bodyTemplate, bodyContext, 'root-body'))
     }
 
     /**
@@ -177,9 +192,17 @@ class WizardApp {
             .then(orgData => {
                 let orgFeature = orgData.features;
     
-                this._renderModule('landing-page',
-                        {features: orgFeature,
-                        startWizardFunction: this.loadRolesPage});
+                this._renderCompletePage(
+                    {
+                        "title": "App Setup Wizard",
+                        "subtitle": "Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App."
+                    }, 
+                    {
+                        features: orgFeature,
+                        startWizardFunction: this.loadRolesPage
+                    },
+                    'landing-page'
+                )
             });
         });
         
@@ -191,9 +214,16 @@ class WizardApp {
      *          Get integration has max 100 before manual filter.
      */
     loadCheckInstallationStatus(){
-        this._renderModule('check-installation', {
-            objectPrefix: this.prefix
-        });
+        this._renderCompletePage(
+            {
+                "title": "Checking Installation",
+                "subtitle": "Check any existing PureCloud Objects that is set up by the App"
+            }, 
+            {
+                objectPrefix: this.prefix
+            },
+            'check-installation'
+        )
 
         // PureCloud API instances
         let groupsApi = new this.platformClient.GroupsApi();
@@ -274,11 +304,18 @@ class WizardApp {
 
 
     loadGroupsCreation(){
-        let context = {
-            order: this.defaultOrder,
-            orderFilename: this.defaultOrderFileName
-        }
-        this._renderModule('wizard-groups', context);
+        this._renderCompletePage(
+            {
+                title: "Create groups",
+                subtitle: "Groups are required to filter which members will have access to specific instances of the App."
+            },
+            {
+                order: this.defaultOrder,
+                orderFilename: this.defaultOrderFileName
+            },
+            "wizard-groups"
+        )
+        
     }
 
     /**
