@@ -1,0 +1,23 @@
+{
+    "groups": ["agents", "supervisors", "admin"],
+    "roles": [
+        {
+            "name": "agents",
+            "permissions": ["conversation:call:add,record"]
+        }
+    ],
+    "appInstances": [
+        {
+            "name": "Agent Widget",
+            "url": "https://localhost/index.html",
+            "type": "standalone",
+            "group": "agents"
+        },
+        {
+            "name": "Supervisor Widget",
+            "url": "https://localhost/supervisor.html",
+            "type": "widget",
+            "group": "agents"
+        }
+    ]
+}
