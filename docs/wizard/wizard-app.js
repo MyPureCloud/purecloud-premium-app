@@ -29,6 +29,7 @@ class WizardApp {
         // PureCloud Javascript SDK clients
         this.platformClient = require('platformClient');
         this.purecloudClient = this.platformClient.ApiClient.instance;
+        this.purecloudClient.setPersistSettings(true, 'premium_app');
         this.redirectUri = "https://localhost/wizard/index.html";
 
         // Permissions required for using the app 
@@ -62,48 +63,35 @@ class WizardApp {
     /**
      * Authenticate to PureCloud (Implicit Grant)
      * @todo Assign default or notify user if can't determine purecloud environment
-     * @todo Decouple so can be called in every new rendered page
      */
     _pureCloudAuthenticate() {
-        let isAuthorized = false;
-        // Authenticate through PureCloud
-        this.purecloudClient.setPersistSettings(true, 'premium_app');
-        this.purecloudClient.loginImplicitGrant(clientIDs[this.pcApp.pcEnvironment], 
-                                this.redirectUri, 
-                                {state: ('pcEnvironment=' + this.pcApp.pcEnvironment)})
-        
-        // Check user permissions
-        .then(data => {
-            console.log(data);
-            let usersApi = new this.platformClient.UsersApi();
+        return new Promise((resolve, reject) => {
+            // Authenticate through PureCloud
+            this.purecloudClient.loginImplicitGrant(clientIDs[this.pcApp.pcEnvironment], 
+                                    this.redirectUri, 
+                                    {state: ('pcEnvironment=' + this.pcApp.pcEnvironment)})
+            
+            // Check user permissions
+            .then(data => {
+                console.log(data);
+                let usersApi = new this.platformClient.UsersApi();
 
-            let opts = {'expand': ['authorization']};
+                let opts = {'expand': ['authorization']};
 
-            return usersApi.getUsersMe(opts); 
-        }).then(userMe => {
-            console.log(userMe);
-            let organizationApi = new this.platformClient.OrganizationApi();
+                return usersApi.getUsersMe(opts); 
+            }).then(userMe => {
+                console.log(userMe);
 
-            // Show appropriate elements based on qualification of user permissions.
-            if(!this.setupPermissionsRequired.every(perm => userMe.authorization.permissions.indexOf(perm) > -1)){
-                isAuthorized = false;
-            }else{
-                isAuthorized = true;
-            }
-
-        // Get organization information
-            return organizationApi.getOrganizationsMe();
-        }).then(orgData => {
-            let orgFeature = orgData.features;
-
-            this._renderModule('landing-page',
-                    {isAuthorized: isAuthorized,
-                     features: orgFeature,
-                     startWizardFunction: this.loadRolesPage
-                    });
-
-        // Error handler catch all
-        }).catch(err => console.log(err));
+                // Show appropriate elements based on qualification of user permissions.
+                if(!this.setupPermissionsRequired.every(perm => userMe.authorization.permissions.indexOf(perm) > -1)){
+                    this._renderModule('not-authorized');
+                }else{
+                    resolve();
+                }
+                
+            // Error handler catch all
+            }).catch(err => console.log(err));
+        });
     }
 
     /**
@@ -158,7 +146,21 @@ class WizardApp {
      * Loads the landing page of the app
      */
     loadLandingPage(){
-        this._pureCloudAuthenticate();
+        this._pureCloudAuthenticate()
+        .then(() => {
+            let organizationApi = new this.platformClient.OrganizationApi();
+
+            // Get organization information
+            return organizationApi.getOrganizationsMe()
+            .then(orgData => {
+                let orgFeature = orgData.features;
+    
+                this._renderModule('landing-page',
+                        {features: orgFeature,
+                        startWizardFunction: this.loadRolesPage});
+            });
+        });
+        
     }
 
     /**

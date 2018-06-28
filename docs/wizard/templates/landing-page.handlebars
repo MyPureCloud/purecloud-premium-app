@@ -11,8 +11,6 @@
   </div>
 </section>
 
-{{#if isAuthorized}}
-
 <table class="table is-striped is-hoverable is-fullwidth">
     <thead>
         <th>Org Feature</th>
@@ -40,16 +38,3 @@
     </p>
   </div>
 </nav>
-
-{{else}}
-
-<article class="message is-warning">
-    <div class="message-header">
-        <p>Warning</p>
-    </div>
-    <div class="message-body">
-        Your PureCloud user lacks the required permission(s) to proceed with the wizard.
-    </div>
-</article>
-
-{{/if}}
