@@ -15,20 +15,33 @@ if((typeof $ === 'undefined') ||
                   "==============================");   
 }
 
+/**
+ * WizardApp class that handles everything in the App.
+ * @todo Change all members to static if more appropriate
+ */
 class WizardApp {
     constructor(){
         // Reference to the PureCloud App (Client App SDK)
         this.pcApp = null;
+
         // PureCloud Javascript SDK clients
         this.platformClient = require('platformClient');
         this.purecloudClient = this.platformClient.ApiClient.instance;
         this.redirectUri = "https://localhost/wizard/index.html";
+
         // Permissions required for using the app 
         // TODO: store permissions on a separate file
         this.setupPermissionsRequired = ['admin'];
+
+        // Prefix to add to all objects that will be added
+        // (roles, groups, integrations, etc..)
+        // as a result of this installatino wizard
+        this.prefix = 'PREMIUM_APP_';
     }
 
-    // First thing that needs to be called to setup up the PureCloud Client App
+    /**
+     * First thing that needs to be called to setup up the PureCloud Client App
+     */
     _setupClientApp(){    
         // Backwards compatibility snippet from: https://github.com/MyPureCloud/client-app-sdk
         let envQueryParamName = 'pcEnvironment';
@@ -43,7 +56,12 @@ class WizardApp {
         console.log(this.pcApp.pcEnvironment);
     }
 
-    // TODO: Assign default or notify user if can't determine purecloud environment
+
+    /**
+     * Authenticate to PureCloud (Implicit Grant)
+     * @todo Assign default or notify user if can't determine purecloud environment
+     * @todo Decouple so can be called in every new rendered page
+     */
     _pureCloudAuthenticate() {
         let isAuthorized = false;
         // Authenticate through PureCloud
@@ -86,6 +104,11 @@ class WizardApp {
         }).catch(err => console.log(err));
     }
 
+    /**
+     * Render the Handlebars template to the window
+     * @param {string} page 
+     * @param {object} context 
+     */
     _renderPage(page, context) {
         context = (typeof context !== 'undefined') ? context : {}; 
         let templateUri = 'templates/' + page + '.handlebars';
@@ -110,29 +133,46 @@ class WizardApp {
         }); 
     }
 
-    // Manual assignment of event listeners after page is rendered
-    // TODO: Find better alternative
+    /**
+     * Manual assignment of event listeners after page is rendered
+     * @param {string} page 
+     * 
+     * @todo Find potential alternative that does this better
+     */
     _assignEventListeners(page){
         switch(page){
             case 'landing-page':
                 // Button to Start the Wizard
-                $('#btn-start-wizard').click(this.loadRolesPage);
+                // jquery proxy to keep the context of 'this'
+                $('#btn-start-wizard').click($.proxy(this.loadCheckInstallationStatus, this));
                 break;
         }
     }
 
+    /**
+     * Loads the landing page of the app
+     */
     loadLandingPage(){
-        this._setupClientApp();
         this._pureCloudAuthenticate();
     }
 
-    loadRolesPage(){
-        console.log("YEP");
+    /**
+     * Load the page to generate roles
+     */
+    loadCheckInstallationStatus(event){
+        this._renderPage('check-installation', {
+            objectPrefix: this.prefix
+        });
     }
 
+    /**
+     * First thing that must be called to set-up the App
+     */
     start(){
+        this._setupClientApp();
         this.loadLandingPage();
     }
 }
+WizardApp.instance = null;
 
 export default WizardApp
