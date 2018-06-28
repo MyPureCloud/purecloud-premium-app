@@ -179,7 +179,8 @@ clientApp.onSocketMessageQueue = function(event){
         var duration;
 
         // If incoming call
-        if(acd.endTime === undefined){
+        if((acd.endTime === undefined) && (clientApp.isCallActive)){
+            console.log("RINGING");
             $("#txtQueue").text(JSON.stringify(data));            
 
             $("#callerName").text(caller.name);
@@ -195,7 +196,9 @@ clientApp.onSocketMessageQueue = function(event){
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActive = true;
-        } else if((acd.endTime === undefined) && (caller.endTime === undefined) && (!clientApp.isCallActive)) {
+        } else if((acd.endTime === undefined) && (caller.endTime === undefined) && (clientApp.isCallActive)) {
+            console.log("CALL ACTIVE");
+
             // If active call
             $("#txtQueue").text(JSON.stringify(data));
 
@@ -216,6 +219,8 @@ clientApp.onSocketMessageQueue = function(event){
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActive = true;
         } else if(agent.calls[0].state === "disconnected") {
+            console.log("CALL DISCONNECTED");
+
             // If disconnected call
             $("#txtQueue").text(JSON.stringify(data));
 
@@ -229,7 +234,7 @@ clientApp.onSocketMessageQueue = function(event){
             $("#callerDuration").text(new Date(custEndDt - custConnectedDt).toISOString().slice(11, -1).split('.')[0]);
 
             // Makes sure that the field only changes the first time. 
-            clientApp.isCallActive = true;
+            clientApp.isCallActive = false;
         } else if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
             $("#txtQueue").text("");
 
