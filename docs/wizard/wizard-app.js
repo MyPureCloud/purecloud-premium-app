@@ -201,7 +201,8 @@ class WizardApp {
         .then(data => {
             let group = data.results;
             let context = {
-                panelHeading: 'Existing Groups',
+                panelHeading: 'Existing Groups (' + 
+                                Object.keys(group).length + ')',
                 objType: 'groups',
                 pureCloudObjArr: group,
                 icon: 'fa-users'
@@ -216,7 +217,8 @@ class WizardApp {
         .then(data => {
             let roles = data.entities;
             let context = {
-                panelHeading: 'Existing Roles',
+                panelHeading: 'Existing Roles (' + 
+                                Object.keys(roles).length + ')',
                 objType: 'roles',
                 pureCloudObjArr: roles,
                 icon: 'fa-briefcase'
@@ -232,7 +234,8 @@ class WizardApp {
         .then(data => {
             let integrations = data.entities.filter(entity => entity.name.startsWith(this.prefix));
             let context = {
-                panelHeading: 'Existing Integrations',
+                panelHeading: 'Existing Integrations (' + 
+                              Object.keys(integrations).length + ')',
                 objType: 'integrations',
                 pureCloudObjArr: integrations,
                 icon: 'fa-cogs'
