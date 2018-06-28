@@ -162,6 +162,8 @@ class WizardApp {
 
     /**
      * Load the page to check for existing PureCloud objects
+     * @summary Get roles and groups have max 25 after query. 
+     *          Get integration has max 100 before manual filter.
      */
     loadCheckInstallationStatus(){
         this._renderModule('check-installation', {
@@ -171,7 +173,9 @@ class WizardApp {
         // PureCloud API instances
         let groupsApi = new this.platformClient.GroupsApi();
         let authApi = new this.platformClient.AuthorizationApi();
+        let integrationApi = new this.platformClient.IntegrationsApi();
 
+        // Query bodies
         var groupSearchBody = {
             "query": [
                {
@@ -183,10 +187,14 @@ class WizardApp {
             ]
         };
 
-        var authOpt = { 
+        var authOpts = { 
             'name': this.prefix + "*", // Wildcard to work like STARTS_WITH 
             'userCount': false
         };
+
+        var integrationsOpts = {
+            'pageSize': 100
+        }
         
         // Check existing groups
         groupsApi.postGroupsSearch(groupSearchBody)
@@ -204,7 +212,7 @@ class WizardApp {
         }).catch(err => console.log(err));
 
         // Check existing roles
-        authApi.getAuthorizationRoles(authOpt)
+        authApi.getAuthorizationRoles(authOpts)
         .then(data => {
             let roles = data.entities;
             let context = {
@@ -216,6 +224,22 @@ class WizardApp {
             this._renderModule('panel-existing-objects',
                                 context,
                                 'results-role');
+        })
+        .catch(err => console.log(err));
+
+        // Check existing Integrations
+        integrationApi.getIntegrations(integrationsOpts)
+        .then(data => {
+            let integrations = data.entities.filter(entity => entity.name.startsWith(this.prefix));
+            let context = {
+                panelHeading: 'Existing Integrations',
+                objType: 'integrations',
+                pureCloudObjArr: integrations,
+                icon: 'fa-cogs'
+            }
+            this._renderModule('panel-existing-objects',
+                                context,
+                                'results-integration');
         })
         .catch(err => console.log(err));
     }
