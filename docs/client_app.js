@@ -118,7 +118,7 @@ clientApp.loadSupervisorView = function(){
 
         let dropdown = $('#ddlQueues');
         dropdown.empty();
-        dropdown.append('<option selected="true" disabled>Queues</option>');
+        dropdown.append('<option selected="true" disabled style="left: 0; width=100%">Queues</option>');
         dropdown.prop('selectedIndex', 0);
 
         for (var i = 1; i < queues.length; i++) {
@@ -163,9 +163,12 @@ clientApp.onSocketMessageQueue = function(event){
     if(topic === clientApp.topicId){
         let caller = eventBody.participants
                 .filter(participant => participant.purpose === "customer")[0];
+        
+        let agent = eventBody.participants
+                .filter(participant => participant.purpose === "agent")[0];
 
         // Put values to the fields
-        if(((caller.endTime !== undefined) && (!clientApp.isCallActive)) || caller.calls[0].state === "disconnected"){
+        if(((caller.endTime !== undefined) && (!clientApp.isCallActive))){
             $("#txtQueue").text("");
 
             $("#callerName").text("");
@@ -177,14 +180,14 @@ clientApp.onSocketMessageQueue = function(event){
 
             clientApp.isCallActive = false;
         } else {
-            console.log(JSON.stringify("data || " + data));
-            console.log(JSON.stringify("caller || " + caller));
+            console.log("data || " + JSON.stringify(data));
+            console.log("caller || " + JSON.stringify(caller));
             $("#txtQueue").text(JSON.stringify(data));
 
             $("#callerName").text(caller.name);
             $("#callerANI").text("caller ANI");
             $("#callerDNIS").text("caller DNIS");
-            $("#callerState").text(caller.calls[0].state);
+            $("#callerState").text(agent.calls[0].state);
             $("#callerWaitTime").text("caller wait time");
             $("#callerDuration").text("caller duration");
 
