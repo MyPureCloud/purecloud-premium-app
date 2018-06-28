@@ -179,7 +179,7 @@ clientApp.onSocketMessageQueue = function(event){
         var duration;
 
         // If incoming call
-        if((acd.endTime === undefined) && (clientApp.isCallActive)){
+        if((acd.endTime === undefined) && (!clientApp.isCallActive)){
             console.log("RINGING");
             $("#txtQueue").text(JSON.stringify(data));            
 
