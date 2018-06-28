@@ -177,7 +177,9 @@ clientApp.onSocketMessageQueue = function(event){
 
             clientApp.isCallActive = false;
         } else {
-            $("#txtQueue").text("caller || " + JSON.stringify(caller));
+            console.log(JSON.stringify("data || " + data));
+            console.log(JSON.stringify("caller || " + caller));
+            $("#txtQueue").text(JSON.stringify(data));
 
             $("#callerName").text(caller.name);
             $("#callerANI").text("caller ANI");
