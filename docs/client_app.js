@@ -176,8 +176,9 @@ clientApp.onSocketMessageQueue = function(event){
             $("#callerDuration").text("");
 
             clientApp.isCallActive = false;
-
         } else {
+            $("#txtQueue").text(JSON.stringify(caller));
+
             $("#callerName").text(caller.name);
             $("#callerANI").text("caller ANI");
             $("#callerDNIS").text("caller DNIS");
