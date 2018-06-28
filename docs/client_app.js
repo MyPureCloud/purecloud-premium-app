@@ -188,6 +188,7 @@ clientApp.onSocketMessageQueue = function(event){
                 $("#callerWaitTime").text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);
             }, 1000);
             $("#callerWaitTime").attr("data-timer-id",intervalId1);
+            console.log("Wait Time Interval ID: " + intervalId1);
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActive = true;
@@ -197,6 +198,7 @@ clientApp.onSocketMessageQueue = function(event){
             // clearInterval(duration);
             // window.clearInterval($("#callerWaitTime"));
             window.clearInterval($("#callerWaitTime").attr("data-timer-id"));
+            console.log("Active Call: Clear Interval Wait Time");
 
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
@@ -206,10 +208,12 @@ clientApp.onSocketMessageQueue = function(event){
             // $("#callerDuration").text(new Date(new Date() - acdEndDt).toISOString().slice(11, -1).split('.')[0]);
 
             var intervalId2 = setInterval(function() {
+                console.log("Active Call: Set Interval Duration");
                 var currentDate = new Date();        
                 $("#callerDuration").text(new Date(currentDate - acdEndDt).toISOString().slice(11, -1).split('.')[0]);
             }, 1000);
             $("#callerDuration").attr("data-timer-id",intervalId2);
+            console.log("Duration Interval ID: " + intervalId2);
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActive = true;
