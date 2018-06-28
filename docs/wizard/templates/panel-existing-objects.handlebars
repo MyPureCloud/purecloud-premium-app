@@ -1,0 +1,22 @@
+<nav class="panel">
+    <p class="panel-heading">
+        {{panelHeading}} 
+    </p>
+    {{#each pureCloudObjArr}}
+        {{#with this}}
+            <a class="panel-block">
+                <span class="panel-icon">
+                    <i class="fas {{../icon}}" aria-hidden="true"></i>
+                </span>
+                {{name}}
+            </a>
+        {{/with}}
+    {{else}}
+    {{/each}}
+ 
+    <div class="panel-block">
+        <button class="button is-link is-outlined is-fullwidth">
+            delete existing {{objType}}
+        </button>
+    </div>
+</nav>
