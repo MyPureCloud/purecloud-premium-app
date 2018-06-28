@@ -213,7 +213,7 @@ clientApp.onSocketMessageQueue = function(event){
 
             var intervalId2 = setInterval(function() {
                 var currentDate = new Date();        
-                $("#callerDuration").text(new Date(currentDate - acdEndDt).toISOString().slice(11, -1).split('.')[0]);
+                $("#callerDuration").text(new Date(currentDate - custConnectedDt).toISOString().slice(11, -1).split('.')[0]);
             }, 1000);
             $("#callerDuration").attr("data-timer-id",intervalId2);
 
