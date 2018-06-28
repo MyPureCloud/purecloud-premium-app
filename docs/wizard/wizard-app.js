@@ -20,6 +20,7 @@ if((typeof $ === 'undefined') ||
  * @todo Change all members to static if more appropriate
  * @todo keep track of current main module(page) to check with inner modules before they're rendered
  * @todo keep track of current status with local storage to enable resuming
+ * @todo separate some Handlebar utility functions to separate file.
  */
 class WizardApp {
     constructor(){
@@ -41,9 +42,10 @@ class WizardApp {
         // as a result of this installatino wizard
         this.prefix = '111';
 
-        // JS object that will contain information about the default installation.
-        // Shoule be loaded from an external JSON (without ext).
-        this.defaultOrder = null;
+        // JS object that will stage  information about the installation.
+        this.stagingArea = null;
+
+        // Default order to prefill staging area
         this.defaultOrderFileName = 'sample-order';
         this.loadOrderFile(this.defaultOrderFileName);
     }
@@ -162,7 +164,7 @@ class WizardApp {
     /**
      * Loads the landing page of the app
      */
-    loadLandingPage(){
+    loadLandingPage(event){
         this._pureCloudAuthenticate()
         .then(() => {
             let organizationApi = new this.platformClient.OrganizationApi();
@@ -193,10 +195,10 @@ class WizardApp {
 
     /**
      * Load the page to check for existing PureCloud objects
-     * @summary Get roles and groups have max 25 after query. 
+     * @todo Reminder: Get roles and groups have max 25 after query. 
      *          Get integration has max 100 before manual filter.
      */
-    loadCheckInstallationStatus(){
+    loadCheckInstallationStatus(event){
         this._renderCompletePage(
             {
                 "title": "Checking Installation",
@@ -289,7 +291,7 @@ class WizardApp {
     }
 
 
-    loadGroupsCreation(){
+    loadGroupsCreation(event){
         this._renderCompletePage(
             {
                 title: "Create groups",
@@ -303,9 +305,19 @@ class WizardApp {
         
         //Render actual content
         .then(() => this._renderModule('wizard-groups', {
-                order: this.defaultOrder,
+                order: this.stagingArea,
                 orderFilename: this.defaultOrderFileName
-            }, 'wizard-right'));
+            }, 'wizard-right'))
+
+        // Assign event handlers
+        .then(() => {
+            $('#btn-add-group').click($.proxy(this.stageGroup, this));
+        });
+    }
+
+    stageGroup(event){
+        let groupName = $('#txt-group-name').val();
+        this.stagingArea.groups.push(groupName);
     }
 
     /**
@@ -315,14 +327,11 @@ class WizardApp {
      */
     loadOrderFile(fileName){
         let fileUri = fileName + ".json";
-        $.ajax({
-            url: fileUri,
-            cache: true,
-            success: data => {
-                this.defaultOrder = data;
-                console.log("Loaded default installation order");
-            }
-        }); 
+        $.getJSON(fileUri)
+        .done(data => {
+            this.stagingArea = data;
+        })
+        .fail(xhr => console.log('error', xhr)); 
     }
 
 
