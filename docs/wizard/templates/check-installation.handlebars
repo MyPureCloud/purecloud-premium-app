@@ -14,35 +14,50 @@
 <div class="box">
   <div class="content is-medium">
     <p>
-        We're currently verifying if it's safe to start the installation process.
+        Before starting, let's analyze your PureCloud org for existing App configurations.
     </p>
     <p>
-        Purecloud objects that is in use of the app will be labeled with the prefix 
+        PureCloud objects that the App uses are prefixed with
         <strong>{{objectPrefix}}</strong>.
         This can be changed in the WizardApp class.
+    </p>
+    <p>
+        For a clean installation, you may wish to delete any of the existing Objects to prevent duplication.
+    </p>
+    <p>
+        If you would rather manage your existing installation, please click the <strong>Manager</strong> button.
     </p>
   </div>
 </div>
 
 <div>
   <div style="margin: 20px; margin-bottom: 40px;" id="results-group">
+    <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
     <em>Loading Groups data...</em>
   </div>
   <div style="margin: 20px; margin-bottom: 40px;" id="results-role">
+    <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
     <em>Loading Roles data...</em>
   </div>
   <div style="margin: 20px; margin-bottom: 40px;" id="results-integration">
+    <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
     <em>Loading Integrations data...</em>
   </div>
 </div>
 
 
 <nav class="level">
-  <div class="level-left"></div>
+  <div class="level-left">
+    <p class="level-item">
+      <button id="btn-goto-manager"class="button is-info has-text-centered is-size-4">
+        Go to App Manager
+      </button>
+    </p>
+  </div>
   
   <div class="level-right">
     <p class="level-item">
-      <button id="btn-proceed"class="button is-info has-text-centered is-size-4">
+      <button id="btn-start-wizard"class="button is-info has-text-centered is-size-4">
         Proceed with Installation
       </button>
     </p>
