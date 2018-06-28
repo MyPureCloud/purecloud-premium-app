@@ -166,6 +166,9 @@ clientApp.onSocketMessageQueue = function(event){
         
         let agent = eventBody.participants
                 .filter(participant => participant.purpose === "agent")[0];
+        
+        let acd = eventBody.participants
+                .filter(participant => participant.purpose === "acd")[0];
 
         // Put values to the fields
         if(((caller.endTime !== undefined) && (!clientApp.isCallActive))){
@@ -180,15 +183,18 @@ clientApp.onSocketMessageQueue = function(event){
 
             clientApp.isCallActive = false;
         } else {
-            console.log("data || " + JSON.stringify(data));
-            console.log("caller || " + JSON.stringify(caller));
+            // console.log("data || " + JSON.stringify(data));
+            // console.log("caller || " + JSON.stringify(caller));
+            let connectedDt = new Date(acd.connectedTime);
+            let endDt = new Date(acd.endTime);
+            console.log("wait time || " + (endDt - connectedDt))
             $("#txtQueue").text(JSON.stringify(data));
 
             $("#callerName").text(caller.name);
-            $("#callerANI").text("caller ANI");
-            $("#callerDNIS").text("caller DNIS");
+            $("#callerANI").text(caller.address);
+            $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
             $("#callerState").text(agent.calls[0].state);
-            $("#callerWaitTime").text("caller wait time");
+            $("#callerWaitTime").text(endDt - connectedDt);
             $("#callerDuration").text("caller duration");
 
             // Makes sure that the field only changes the first time. 
