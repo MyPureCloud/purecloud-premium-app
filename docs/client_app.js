@@ -185,16 +185,21 @@ clientApp.onSocketMessageQueue = function(event){
         } else {
             // console.log("data || " + JSON.stringify(data));
             // console.log("caller || " + JSON.stringify(caller));
+
             let connectedDt = new Date(acd.connectedTime);
             let endDt = new Date(acd.endTime);
-            console.log("wait time || " + (endDt - connectedDt))
+
+            // let connectedDt = new Date("2018-06-28T02:43:15.220Z");
+            // let endDt = new Date("2018-06-28T02:43:25.143Z");
+            console.log("wait time || " + (Date(endDt - connectedDt).toISOString().slice(11, -1)));
+            // new Date(endDt - connectedDt).toISOString().slice(11, -1);
             $("#txtQueue").text(JSON.stringify(data));
 
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
             $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
             $("#callerState").text(agent.calls[0].state);
-            $("#callerWaitTime").text(endDt - connectedDt);
+            $("#callerWaitTime").text(Date(endDt - connectedDt).toISOString().slice(11, -1));
             $("#callerDuration").text("caller duration");
 
             // Makes sure that the field only changes the first time. 
