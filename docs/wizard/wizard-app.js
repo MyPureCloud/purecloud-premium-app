@@ -39,7 +39,13 @@ class WizardApp {
         // Prefix to add to all objects that will be added
         // (roles, groups, integrations, etc..)
         // as a result of this installatino wizard
-        this.prefix = 'Prince';
+        this.prefix = '111';
+
+        // JS object that will contain information about the default installation.
+        // Shoule be loaded from an external JSON (without ext).
+        this.defaultOrder = null;
+        this.defaultOrderFileName = 'sample-order';
+        this.loadOrder(this.defaultOrderFileName);
     }
 
     /**
@@ -74,6 +80,7 @@ class WizardApp {
             // Check user permissions
             .then(data => {
                 console.log(data);
+
                 let usersApi = new this.platformClient.UsersApi();
 
                 let opts = {'expand': ['authorization']};
@@ -96,6 +103,7 @@ class WizardApp {
 
     /**
      * Render the Handlebars template to the window
+     * Also call _assignEventListeners after rendering the page
      * @param {string} page     contains filename of handlebars file
      * @param {object} context  context oject
      * @param {string} target   ID of element HTML where rendered module will be placed
@@ -111,19 +119,28 @@ class WizardApp {
         // Async get the desired template file
         $.ajax({
             url: templateUri,
-            cache: true,
-            success: data => {
-                // Compile Handlebars template 
-                templateSource = data;
-                template = Handlebars.compile(templateSource);
+            cache: true
+        })
+        .done(data => {
+            // Compile Handlebars template 
+            templateSource = data;
+            template = Handlebars.compile(templateSource);
 
-                // Render html and display to the target element
-                let renderedHtml = template(context);
-                $('#' + target).html(renderedHtml);
+            // Render html and display to the target element
+            let renderedHtml = template(context);
+            $('#' + target).html(renderedHtml);
 
-                this._assignEventListeners(page);
-            }
-        }); 
+            this._assignEventListeners(page);
+        })
+        .fail(xhr => console.log('error', xhr));
+    }
+
+    _renderCompletePage(headerContext, bodyContext, sidebarContext, footerContext){
+        // Default values
+        headerContext = (typeof headerContext !== 'undefined') ? headerContext : {};
+        bodyContext = (typeof bodyContext !== 'undefined') ? bodyContext : {};
+        sidebarContext = (typeof sidebarContext !== 'undefined') ? sidebarContext : {};
+        footerContext = (typeof footerContext !== 'undefined') ? footerContext : {};
     }
 
     /**
@@ -137,7 +154,12 @@ class WizardApp {
             case 'landing-page':
                 // Button to Start the Wizard
                 // jquery proxy to keep the context of 'this'
-                $('#btn-proceed').click($.proxy(this.loadCheckInstallationStatus, this));
+                $('#btn-check-installation').click($.proxy(this.loadCheckInstallationStatus, this));
+                break;
+            case 'check-installation':
+                // Button to Start the Wizard
+                // jquery proxy to keep the context of 'this'
+                $('#btn-start-wizard').click($.proxy(this.loadGroupsCreation, this));
                 break;
         }
     }
@@ -181,12 +203,12 @@ class WizardApp {
         // Query bodies
         var groupSearchBody = {
             "query": [
-               {
-                 "fields": ["name"],
-                  "value": this.prefix,
-                  "operator": "OR",
-                  "type": "STARTS_WITH"
-               }
+            {
+                "fields": ["name"],
+                "value": this.prefix,
+                "operator": "OR",
+                "type": "STARTS_WITH"
+            }
             ]
         };
 
@@ -202,7 +224,7 @@ class WizardApp {
         // Check existing groups
         groupsApi.postGroupsSearch(groupSearchBody)
         .then(data => {
-            let group = data.results;
+            let group = (typeof data.results !== 'undefined') ? data.results : {};
             let context = {
                 panelHeading: 'Existing Groups (' + 
                                 Object.keys(group).length + ')',
@@ -238,7 +260,7 @@ class WizardApp {
             let integrations = data.entities.filter(entity => entity.name.startsWith(this.prefix));
             let context = {
                 panelHeading: 'Existing Integrations (' + 
-                              Object.keys(integrations).length + ')',
+                            Object.keys(integrations).length + ')',
                 objType: 'integrations',
                 pureCloudObjArr: integrations,
                 icon: 'fa-cogs'
@@ -249,6 +271,33 @@ class WizardApp {
         })
         .catch(err => console.log(err));
     }
+
+
+    loadGroupsCreation(){
+        let context = {
+            order: this.defaultOrder,
+            orderFilename: this.defaultOrderFileName
+        }
+        this._renderModule('wizard-groups', context);
+    }
+
+    /**
+     * Load the default installation order for the wizard
+     * @param {string} fileName extensionless json filename
+     * @todo have it called only when needed and set promises properly. Currently called at constructor.  
+     */
+    loadOrder(fileName){
+        let fileUri = fileName + ".json";
+        $.ajax({
+            url: fileUri,
+            cache: true,
+            success: data => {
+                this.defaultOrder = data;
+                console.log("Loaded default installation order");
+            }
+        }); 
+    }
+
 
     /**
      * @description First thing that must be called to set-up the App
