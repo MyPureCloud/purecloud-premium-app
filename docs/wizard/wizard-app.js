@@ -18,6 +18,7 @@ if((typeof $ === 'undefined') ||
 /**
  * WizardApp class that handles everything in the App.
  * @todo Change all members to static if more appropriate
+ * @todo keep track of current main module(page) to check with inner modules before they're rendered
  */
 class WizardApp {
     constructor(){
@@ -36,7 +37,7 @@ class WizardApp {
         // Prefix to add to all objects that will be added
         // (roles, groups, integrations, etc..)
         // as a result of this installatino wizard
-        this.prefix = 'PREMIUM_APP_';
+        this.prefix = 'Prince';
     }
 
     /**
@@ -167,9 +168,32 @@ class WizardApp {
             objectPrefix: this.prefix
         });
 
-        let groupsApi = new platformClient.GroupsApi();
-
+        let groupsApi = new this.platformClient.GroupsApi();
+        var searchBody = {
+            "query": [
+               {
+                 "fields": ["name"],
+                  "value": this.prefix,
+                  "operator": "OR",
+                  "type": "STARTS_WITH"
+               }
+            ]
+        };
         
+        groupsApi.postGroupsSearch(searchBody)
+        .then(data => {
+            let group = data.results;
+            let context = {
+                panelHeading: 'Existing Groups',
+                objType: 'groups',
+                pureCloudObjArr: group,
+                icon: 'fa-users'
+            }
+            this._renderModule('panel-existing-objects',
+                                context,
+                                'results-group');
+        })
+        .catch(err => console.log(err));
     }
 
     /**
