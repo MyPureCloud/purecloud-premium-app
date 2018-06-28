@@ -19,6 +19,7 @@ if((typeof $ === 'undefined') ||
  * WizardApp class that handles everything in the App.
  * @todo Change all members to static if more appropriate
  * @todo keep track of current main module(page) to check with inner modules before they're rendered
+ * @todo keep track of current status with local storage to enable resuming
  */
 class WizardApp {
     constructor(){
@@ -148,7 +149,7 @@ class WizardApp {
             case 'landing-page':
                 // Button to Start the Wizard
                 // jquery proxy to keep the context of 'this'
-                $('#btn-start-wizard').click($.proxy(this.loadCheckInstallationStatus, this));
+                $('#btn-proceed').click($.proxy(this.loadCheckInstallationStatus, this));
                 break;
         }
     }
@@ -248,7 +249,7 @@ class WizardApp {
     }
 
     /**
-     * First thing that must be called to set-up the App
+     * @description First thing that must be called to set-up the App
      */
     start(){
         this._setupClientApp();
