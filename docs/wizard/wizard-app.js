@@ -94,7 +94,7 @@ class WizardApp {
         }).then(orgData => {
             let orgFeature = orgData.features;
 
-            this._renderPage('landing-page',
+            this._renderModule('landing-page',
                     {isAuthorized: isAuthorized,
                      features: orgFeature,
                      startWizardFunction: this.loadRolesPage
@@ -106,11 +106,14 @@ class WizardApp {
 
     /**
      * Render the Handlebars template to the window
-     * @param {string} page 
-     * @param {object} context 
+     * @param {string} page     contains filename of handlebars file
+     * @param {object} context  context oject
+     * @param {string} target   ID of element HTML where rendered module will be placed
      */
-    _renderPage(page, context) {
+    _renderModule(page, context, target) {
         context = (typeof context !== 'undefined') ? context : {}; 
+        target = (typeof target !== 'undefined') ? target : 'default-module'; 
+
         let templateUri = 'templates/' + page + '.handlebars';
         let templateSource;
         let template;
@@ -124,9 +127,9 @@ class WizardApp {
                 templateSource = data;
                 template = Handlebars.compile(templateSource);
 
-                // Render html and display to webpage
+                // Render html and display to the target element
                 let renderedHtml = template(context);
-                $('#wizard-app-display').html(renderedHtml);
+                $('#' + target).html(renderedHtml);
 
                 this._assignEventListeners(page);
             }
@@ -160,9 +163,13 @@ class WizardApp {
      * Load the page to generate roles
      */
     loadCheckInstallationStatus(event){
-        this._renderPage('check-installation', {
+        this._renderModule('check-installation', {
             objectPrefix: this.prefix
         });
+
+        let groupsApi = new platformClient.GroupsApi();
+
+        
     }
 
     /**
