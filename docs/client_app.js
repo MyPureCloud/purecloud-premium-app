@@ -177,6 +177,7 @@ clientApp.onSocketMessageQueue = function(event){
 
         // If incoming call
         if((acd.endTime === undefined) && (!clientApp.isCallActive)){
+            console.log("INCOMING CALL || " + JSON.stringify(eventBody));
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
             $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
@@ -197,8 +198,9 @@ clientApp.onSocketMessageQueue = function(event){
             window.clearInterval($("#callerWaitTime").attr("data-timer-id"));
             console.log("Active Call: Clear Interval Wait Time");
 
-            console.log("acdEndDt" + acdEndDt);
-            console.log("acdConnectedDt" + acdConnectedDt);
+            console.log("ACTIVE CALL || " + JSON.stringify(eventBody));
+            console.log("acd || " + JSON.stringify(acd));
+            // console.log("acdConnectedDt" + acdConnectedDt);
             // console.log(new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1));
 
             $("#callerName").text(caller.name);
@@ -209,7 +211,7 @@ clientApp.onSocketMessageQueue = function(event){
             // $("#callerDuration").text(new Date(new Date() - acdEndDt).toISOString().slice(11, -1).split('.')[0]);
 
             var intervalId2 = setInterval(function() {
-                console.log("Active Call: Set Interval Duration");
+                // console.log("Active Call: Set Interval Duration");
                 var currentDate = new Date();        
                 $("#callerDuration").text(new Date(currentDate - acdEndDt).toISOString().slice(11, -1).split('.')[0]);
             }, 1000);
@@ -220,6 +222,8 @@ clientApp.onSocketMessageQueue = function(event){
             clientApp.isCallActive = true;
         } else if(agent.calls[0].state === "disconnected") {
             // If disconnected call
+            console.log("Disconnect Call: Clear Intervals");
+            console.log("DISCONNECTED CALL || " + JSON.stringify(eventBody));
 
             // clearInterval(duration);
             // window.clearInterval($("#callerWaitTime"));
