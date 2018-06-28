@@ -194,9 +194,6 @@ clientApp.onSocketMessageQueue = function(event){
             clientApp.isCallActive = true;
         } else if((acd.endTime === undefined) && (caller.endTime === undefined) && (clientApp.isCallActive)) {
             // If active call
-
-            // clearInterval(duration);
-            // window.clearInterval($("#callerWaitTime"));
             window.clearInterval($("#callerWaitTime").attr("data-timer-id"));
             console.log("Active Call: Clear Interval Wait Time");
 
@@ -204,7 +201,7 @@ clientApp.onSocketMessageQueue = function(event){
             $("#callerANI").text(caller.address);
             $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
             $("#callerState").text(agent.calls[0].state);
-            $("#callerWaitTime").text((new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1)).split('.')[0]);
+            $("#callerWaitTime").text(new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1));
             // $("#callerDuration").text(new Date(new Date() - acdEndDt).toISOString().slice(11, -1).split('.')[0]);
 
             var intervalId2 = setInterval(function() {
@@ -230,8 +227,8 @@ clientApp.onSocketMessageQueue = function(event){
             $("#callerANI").text(caller.address);
             $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
             $("#callerState").text(agent.calls[0].state);
-            $("#callerWaitTime").text((new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1)).split('.')[0]);
-            $("#callerDuration").text((new Date(custEndDt - custConnectedDt).toISOString().slice(11, -1)).split('.')[0]);
+            $("#callerWaitTime").text(new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1));
+            $("#callerDuration").text(new Date(custEndDt - custConnectedDt).toISOString().slice(11, -1));
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActive = false;
