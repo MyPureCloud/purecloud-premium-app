@@ -185,14 +185,16 @@ clientApp.onSocketMessageQueue = function(event){
         } else {
             // console.log("data || " + JSON.stringify(data));
             // console.log("caller || " + JSON.stringify(caller));
-            console.log("wait time || " + (acd.endTime - acd.connectedTime))
+            let connectedDt = new Date(acd.connectedTime);
+            let endDt = new Date(acd.endTime);
+            console.log("wait time || " + (endDt - connectedDt))
             $("#txtQueue").text(JSON.stringify(data));
 
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
-            $("#callerDNIS").text(caller.calls[0].other[0].addressNormalized);
+            $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
             $("#callerState").text(agent.calls[0].state);
-            $("#callerWaitTime").text(acd.endTime - acd.connectedTime);
+            $("#callerWaitTime").text(endDt - connectedDt);
             $("#callerDuration").text("caller duration");
 
             // Makes sure that the field only changes the first time. 
