@@ -161,15 +161,18 @@ class WizardApp {
     }
 
     /**
-     * Load the page to generate roles
+     * Load the page to check for existing PureCloud objects
      */
-    loadCheckInstallationStatus(event){
+    loadCheckInstallationStatus(){
         this._renderModule('check-installation', {
             objectPrefix: this.prefix
         });
 
+        // PureCloud API instances
         let groupsApi = new this.platformClient.GroupsApi();
-        var searchBody = {
+        let authApi = new this.platformClient.AuthorizationApi();
+
+        var groupSearchBody = {
             "query": [
                {
                  "fields": ["name"],
@@ -179,8 +182,14 @@ class WizardApp {
                }
             ]
         };
+
+        var authOpt = { 
+            'name': this.prefix + "*", // Wildcard to work like STARTS_WITH 
+            'userCount': false
+        };
         
-        groupsApi.postGroupsSearch(searchBody)
+        // Check existing groups
+        groupsApi.postGroupsSearch(groupSearchBody)
         .then(data => {
             let group = data.results;
             let context = {
@@ -192,6 +201,21 @@ class WizardApp {
             this._renderModule('panel-existing-objects',
                                 context,
                                 'results-group');
+        }).catch(err => console.log(err));
+
+        // Check existing roles
+        authApi.getAuthorizationRoles(authOpt)
+        .then(data => {
+            let roles = data.entities;
+            let context = {
+                panelHeading: 'Existing Roles',
+                objType: 'roles',
+                pureCloudObjArr: roles,
+                icon: 'fa-briefcase'
+            }
+            this._renderModule('panel-existing-objects',
+                                context,
+                                'results-role');
         })
         .catch(err => console.log(err));
     }
