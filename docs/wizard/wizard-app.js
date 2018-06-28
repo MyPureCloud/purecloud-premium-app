@@ -153,9 +153,13 @@ class WizardApp {
         headerContext = (typeof headerContext !== 'undefined') ? headerContext : {};
         bodyContext = (typeof bodyContext !== 'undefined') ? bodyContext : {};
 
-        this._renderModule('root')
-        .then(() => this._renderModule('module-header', headerContext, 'root-header'))
-        .then(() => this._renderModule(bodyTemplate, bodyContext, 'root-body'))
+        return new Promise((resolve, reject) => {
+            this._renderModule('root')
+            .then(() => this._renderModule('module-header', headerContext, 'root-header'))
+            .then(() => this._renderModule(bodyTemplate, bodyContext, 'root-body'))
+            .then(() => resolve())
+        })
+        
     }
 
     /**
@@ -309,13 +313,13 @@ class WizardApp {
                 title: "Create groups",
                 subtitle: "Groups are required to filter which members will have access to specific instances of the App."
             },
-            {
+            null, "wizard-groups"
+        )
+        .then(() => this._renderModule('module-wizard-sidebar', {"highlight1": true}, 'wizard-left'))
+        .then(() => this._renderModule('module-wizard-content', {
                 order: this.defaultOrder,
                 orderFilename: this.defaultOrderFileName
-            },
-            "wizard-groups"
-        )
-        
+            }, 'wizard-right'));
     }
 
     /**
