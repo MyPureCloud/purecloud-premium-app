@@ -118,7 +118,7 @@ clientApp.loadSupervisorView = function(){
 
         let dropdown = $('#ddlQueues');
         dropdown.empty();
-        dropdown.append('<option selected="true" disabled>Subscribe to Queue</option>');
+        dropdown.append('<option selected="true" disabled>Queues</option>');
         dropdown.prop('selectedIndex', 0);
 
         for (var i = 1; i < queues.length; i++) {
@@ -176,8 +176,11 @@ clientApp.onSocketMessageQueue = function(event){
             $("#callerDuration").text("");
 
             clientApp.isCallActive = false;
-
         } else {
+            console.log(JSON.stringify("data || " + data));
+            console.log(JSON.stringify("caller || " + caller));
+            $("#txtQueue").text(JSON.stringify(data));
+
             $("#callerName").text(caller.name);
             $("#callerANI").text("caller ANI");
             $("#callerDNIS").text("caller DNIS");
