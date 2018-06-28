@@ -170,8 +170,58 @@ clientApp.onSocketMessageQueue = function(event){
         let acd = eventBody.participants
                 .filter(participant => participant.purpose === "acd")[0];
 
-        // Put values to the fields
-        if(((caller.endTime !== undefined) && (!clientApp.isCallActive))){
+        // If incoming call
+        if(acd.endTime === undefined){
+            $("#txtQueue").text(JSON.stringify(data));
+
+            let connectedDt = new Date(acd.connectedTime);
+            let currentDt = new Date();
+
+            $("#callerName").text(caller.name);
+            $("#callerANI").text(caller.address);
+            $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
+            $("#callerState").text(agent.calls[0].state);
+            $("#callerWaitTime").text(new Date(currentDt - connectedDt).toISOString().slice(11, -1));
+            $("#callerDuration").text("00:00:00.000");
+
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActive = true;
+        } else if((acd.endTime === undefined) && (caller.endTime === undefined) && (!clientApp.isCallActive)) {
+            // If active call
+            $("#txtQueue").text(JSON.stringify(data));
+
+            let connectedDt = new Date(acd.connectedTime);
+            let endDt = new Date(acd.endTime);
+            let currentDt = new Date();
+
+            $("#callerName").text(caller.name);
+            $("#callerANI").text(caller.address);
+            $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
+            $("#callerState").text(agent.calls[0].state);
+            $("#callerWaitTime").text(new Date(endDt - connectedDt).toISOString().slice(11, -1));
+            $("#callerDuration").text(new Date(currentDt - endDt).toISOString().slice(11, -1));
+
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActive = true;
+        } else if(agent.calls[0].state === "disconnected") {
+            // If disconnected call
+            $("#txtQueue").text(JSON.stringify(data));
+
+            let acdConnectedDt = new Date(acd.connectedTime);
+            let acdEndDt = new Date(acd.endTime);
+            let custConnectedDt = new Date(caller.connectedTime);
+            let custEndDt = new Date(caller.endTime);
+
+            $("#callerName").text(caller.name);
+            $("#callerANI").text(caller.address);
+            $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
+            $("#callerState").text(agent.calls[0].state);
+            $("#callerWaitTime").text(new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1));
+            $("#callerDuration").text(new Date(custEndDt - custConnectedDt).toISOString().slice(11, -1));
+
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActive = true;
+        } else if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
             $("#txtQueue").text("");
 
             $("#callerName").text("");
@@ -182,29 +232,37 @@ clientApp.onSocketMessageQueue = function(event){
             $("#callerDuration").text("");
 
             clientApp.isCallActive = false;
-        } else {
-            // console.log("data || " + JSON.stringify(data));
-            // console.log("caller || " + JSON.stringify(caller));
-
-            let connectedDt = new Date(acd.connectedTime);
-            let endDt = new Date(acd.endTime);
-
-            // let connectedDt = new Date("2018-06-28T02:43:15.220Z");
-            // let endDt = new Date("2018-06-28T02:43:25.143Z");
-            console.log("wait time || " + (new Date(endDt - connectedDt).toISOString().slice(11, -1)));
-            // new Date(endDt - connectedDt).toISOString().slice(11, -1);
-            $("#txtQueue").text(JSON.stringify(data));
-
-            $("#callerName").text(caller.name);
-            $("#callerANI").text(caller.address);
-            $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
-            $("#callerState").text(agent.calls[0].state);
-            $("#callerWaitTime").text(new Date(endDt - connectedDt).toISOString().slice(11, -1));
-            $("#callerDuration").text("caller duration");
-
-            // Makes sure that the field only changes the first time. 
-            clientApp.isCallActive = true;
         }
+                
+        // // Put values to the fields
+        // if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
+        //     $("#txtQueue").text("");
+
+        //     $("#callerName").text("");
+        //     $("#callerANI").text("");
+        //     $("#callerDNIS").text("");
+        //     $("#callerState").text("");
+        //     $("#callerWaitTime").text("");
+        //     $("#callerDuration").text("");
+
+        //     clientApp.isCallActive = false;
+        // } else {
+        //     let connectedDt = new Date(acd.connectedTime);
+        //     let endDt = new Date(acd.endTime);
+
+        //     console.log("wait time || " + (new Date(endDt - connectedDt).toISOString().slice(11, -1)));
+        //     $("#txtQueue").text(JSON.stringify(data));
+
+        //     $("#callerName").text(caller.name);
+        //     $("#callerANI").text(caller.address);
+        //     $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
+        //     $("#callerState").text(agent.calls[0].state);
+        //     $("#callerWaitTime").text(new Date(endDt - connectedDt).toISOString().slice(11, -1));
+        //     $("#callerDuration").text("caller duration");
+
+        //     // Makes sure that the field only changes the first time. 
+        //     clientApp.isCallActive = true;
+        // }
     }
 }
 
