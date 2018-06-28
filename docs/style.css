@@ -44,3 +44,7 @@ h1.title{
 .subtitle{
     color: #1997CA;
 }
+
+option{
+    left:0;
+}

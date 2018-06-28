@@ -183,7 +183,7 @@ clientApp.onSocketMessageQueue = function(event){
             $("#callerName").text(caller.name);
             $("#callerANI").text("caller ANI");
             $("#callerDNIS").text("caller DNIS");
-            $("#callerState").text(caller.calls.state);
+            $("#callerState").text(caller.calls[0].state);
             $("#callerWaitTime").text("caller wait time");
             $("#callerDuration").text("caller duration");
 
