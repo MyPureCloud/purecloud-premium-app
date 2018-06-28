@@ -19,6 +19,7 @@ if((typeof $ === 'undefined') ||
  * WizardApp class that handles everything in the App.
  * @todo Change all members to static if more appropriate
  * @todo keep track of current main module(page) to check with inner modules before they're rendered
+ * @todo keep track of current status with local storage to enable resuming
  */
 class WizardApp {
     constructor(){
@@ -148,7 +149,7 @@ class WizardApp {
             case 'landing-page':
                 // Button to Start the Wizard
                 // jquery proxy to keep the context of 'this'
-                $('#btn-start-wizard').click($.proxy(this.loadCheckInstallationStatus, this));
+                $('#btn-proceed').click($.proxy(this.loadCheckInstallationStatus, this));
                 break;
         }
     }
@@ -162,6 +163,8 @@ class WizardApp {
 
     /**
      * Load the page to check for existing PureCloud objects
+     * @summary Get roles and groups have max 25 after query. 
+     *          Get integration has max 100 before manual filter.
      */
     loadCheckInstallationStatus(){
         this._renderModule('check-installation', {
@@ -171,7 +174,9 @@ class WizardApp {
         // PureCloud API instances
         let groupsApi = new this.platformClient.GroupsApi();
         let authApi = new this.platformClient.AuthorizationApi();
+        let integrationApi = new this.platformClient.IntegrationsApi();
 
+        // Query bodies
         var groupSearchBody = {
             "query": [
                {
@@ -183,17 +188,22 @@ class WizardApp {
             ]
         };
 
-        var authOpt = { 
+        var authOpts = { 
             'name': this.prefix + "*", // Wildcard to work like STARTS_WITH 
             'userCount': false
         };
+
+        var integrationsOpts = {
+            'pageSize': 100
+        }
         
         // Check existing groups
         groupsApi.postGroupsSearch(groupSearchBody)
         .then(data => {
             let group = data.results;
             let context = {
-                panelHeading: 'Existing Groups',
+                panelHeading: 'Existing Groups (' + 
+                                Object.keys(group).length + ')',
                 objType: 'groups',
                 pureCloudObjArr: group,
                 icon: 'fa-users'
@@ -204,11 +214,12 @@ class WizardApp {
         }).catch(err => console.log(err));
 
         // Check existing roles
-        authApi.getAuthorizationRoles(authOpt)
+        authApi.getAuthorizationRoles(authOpts)
         .then(data => {
             let roles = data.entities;
             let context = {
-                panelHeading: 'Existing Roles',
+                panelHeading: 'Existing Roles (' + 
+                                Object.keys(roles).length + ')',
                 objType: 'roles',
                 pureCloudObjArr: roles,
                 icon: 'fa-briefcase'
@@ -218,10 +229,27 @@ class WizardApp {
                                 'results-role');
         })
         .catch(err => console.log(err));
+
+        // Check existing Integrations
+        integrationApi.getIntegrations(integrationsOpts)
+        .then(data => {
+            let integrations = data.entities.filter(entity => entity.name.startsWith(this.prefix));
+            let context = {
+                panelHeading: 'Existing Integrations (' + 
+                              Object.keys(integrations).length + ')',
+                objType: 'integrations',
+                pureCloudObjArr: integrations,
+                icon: 'fa-cogs'
+            }
+            this._renderModule('panel-existing-objects',
+                                context,
+                                'results-integration');
+        })
+        .catch(err => console.log(err));
     }
 
     /**
-     * First thing that must be called to set-up the App
+     * @description First thing that must be called to set-up the App
      */
     start(){
         this._setupClientApp();
