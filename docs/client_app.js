@@ -175,34 +175,34 @@ clientApp.onSocketMessageQueue = function(event){
         let custConnectedDt = new Date(caller.connectedTime);
         let custEndDt = new Date(caller.endTime);
 
-        clearInterval(duration);
-        var duration;
+        // var newTimerId = window.setInterval("function(){}");
+        // for (var i = 0 ; i <= newTimerId; i++) {
+        //     window.clearInterval(i); 
+        // }
+        // var duration;
 
         // If incoming call
         if((acd.endTime === undefined) && (!clientApp.isCallActive)){
-            console.log("RINGING");
-            $("#txtQueue").text(JSON.stringify(data));            
-
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
             $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
             $("#callerState").text(agent.calls[0].state);
             $("#callerDuration").text("00:00:00");
 
-            duration = setInterval(function() {
+            var intervalId1 = setInterval(function() {
                 var currentDate = new Date();        
                 $("#callerWaitTime").text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);
             }, 1000);
+            $("#callerWaitTime").attr("data-timer-id",intervalId1);
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActive = true;
         } else if((acd.endTime === undefined) && (caller.endTime === undefined) && (clientApp.isCallActive)) {
-            console.log("CALL ACTIVE");
-
             // If active call
-            $("#txtQueue").text(JSON.stringify(data));
 
-            clearInterval(duration);
+            // clearInterval(duration);
+            // window.clearInterval($("#callerWaitTime"));
+            window.clearInterval($("#callerWaitTime").attr("data-timer-id"));
 
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
@@ -211,20 +211,22 @@ clientApp.onSocketMessageQueue = function(event){
             $("#callerWaitTime").text(new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);
             // $("#callerDuration").text(new Date(new Date() - acdEndDt).toISOString().slice(11, -1).split('.')[0]);
 
-            duration = setInterval(function() {
+            var intervalId2 = setInterval(function() {
                 var currentDate = new Date();        
                 $("#callerDuration").text(new Date(currentDate - acdEndDt).toISOString().slice(11, -1).split('.')[0]);
             }, 1000);
+            $("#callerDuration").attr("data-timer-id",intervalId2);
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActive = true;
         } else if(agent.calls[0].state === "disconnected") {
-            console.log("CALL DISCONNECTED");
-
             // If disconnected call
-            $("#txtQueue").text(JSON.stringify(data));
 
-            clearInterval(duration);
+            // clearInterval(duration);
+            // window.clearInterval($("#callerWaitTime"));
+            // window.clearInterval($("#callerDuration"));
+            window.clearInterval($("#callerWaitTime").attr("data-timer-id"));
+            window.clearInterval($("#callerDuration").attr("data-timer-id"));
 
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
@@ -236,9 +238,9 @@ clientApp.onSocketMessageQueue = function(event){
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActive = false;
         } else if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
-            $("#txtQueue").text("");
-
-            clearInterval(duration);
+            // clearInterval(duration);
+            window.clearInterval($("#callerWaitTime"));
+            window.clearInterval($("#callerDuration"));
 
             $("#callerName").text("");
             $("#callerANI").text("");
