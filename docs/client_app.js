@@ -175,9 +175,19 @@ clientApp.onSocketMessageQueue = function(event){
         let custConnectedDt = new Date(caller.connectedTime);
         let custEndDt = new Date(caller.endTime);
 
+        let duration = setInterval(function() {
+            var currentDate = new Date();        
+            $("#callerWaitTime").text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);
+        }, 1000);
+
         // If incoming call
         if(acd.endTime === undefined){
             $("#txtQueue").text(JSON.stringify(data));
+
+            // let duration = setInterval(function() {
+            //     var currentDate = new Date();        
+            //     $("#callerWaitTime").text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);
+            // }, 1000);
 
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
@@ -187,12 +197,7 @@ clientApp.onSocketMessageQueue = function(event){
             //                                 var duration = Date.now() - acdConnectedDt;
             //                                 return new Date(duration).toISOString().slice(11, -1);
             //                             }, 1000));
-            $("#callerDuration").text("00:00:00.000");
-
-            setInterval(function() {
-                var currentDate = new Date();        
-                $("#callerWaitTime").text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1));
-            }, 1000);
+            $("#callerDuration").text("00:00:00.000");            
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActive = true;
@@ -200,6 +205,8 @@ clientApp.onSocketMessageQueue = function(event){
             // If active call
             $("#txtQueue").text(JSON.stringify(data));
             let currentDt = new Date();
+
+            clearInterval(duration);
 
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
@@ -214,6 +221,8 @@ clientApp.onSocketMessageQueue = function(event){
             // If disconnected call
             $("#txtQueue").text(JSON.stringify(data));
 
+            clearInterval(duration);
+
             $("#callerName").text(caller.name);
             $("#callerANI").text(caller.address);
             $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
@@ -225,6 +234,8 @@ clientApp.onSocketMessageQueue = function(event){
             clientApp.isCallActive = true;
         } else if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
             $("#txtQueue").text("");
+
+            clearInterval(duration);
 
             $("#callerName").text("");
             $("#callerANI").text("");
