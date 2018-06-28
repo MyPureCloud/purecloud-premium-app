@@ -313,10 +313,14 @@ class WizardApp {
                 title: "Create groups",
                 subtitle: "Groups are required to filter which members will have access to specific instances of the App."
             },
-            null, "wizard-groups"
+            null, "module-wizard"
         )
+
+        // Render left guide bar
         .then(() => this._renderModule('module-wizard-sidebar', {"highlight1": true}, 'wizard-left'))
-        .then(() => this._renderModule('module-wizard-content', {
+        
+        //Render actual content
+        .then(() => this._renderModule('wizard-groups', {
                 order: this.defaultOrder,
                 orderFilename: this.defaultOrderFileName
             }, 'wizard-right'));
