@@ -175,6 +175,7 @@ clientApp.onSocketMessageQueue = function(event){
         let custConnectedDt = new Date(caller.connectedTime);
         let custEndDt = new Date(caller.endTime);
 
+        clearInterval(duration);
         var duration;
 
         // If incoming call
@@ -197,7 +198,6 @@ clientApp.onSocketMessageQueue = function(event){
         } else if((acd.endTime === undefined) && (caller.endTime === undefined) && (!clientApp.isCallActive)) {
             // If active call
             $("#txtQueue").text(JSON.stringify(data));
-            let currentDt = new Date();
 
             clearInterval(duration);
 
