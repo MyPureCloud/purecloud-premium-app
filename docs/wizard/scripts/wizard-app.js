@@ -16,10 +16,12 @@ if((typeof $ === 'undefined') || (typeof jQuery === 'undefined') || (typeof Hand
 
 /**
  * WizardApp class that handles everything in the App.
+ * @todo codebase is too verbose now, might look into implementing proper MVC and different templating engine
  * @todo Change all members to static if more appropriate
  * @todo keep track of current main module(page) to check with inner modules before they're rendered
  * @todo keep track of current status with local storage to enable resuming
  * @todo move  Handlebar renderer functions to separate module.
+ * @todo Separate functions for assigning event handlers
  * @todo Roles Creation
  * @todo For load page methods, check the event to make sure that it was invoked legally.
  */
