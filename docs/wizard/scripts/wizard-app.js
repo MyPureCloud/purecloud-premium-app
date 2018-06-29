@@ -32,7 +32,8 @@ class WizardApp {
         this.platformClient = require('platformClient');
         this.purecloudClient = this.platformClient.ApiClient.instance;
         this.purecloudClient.setPersistSettings(true, 'premium_app');
-        this.redirectUri = "https://localhost/wizard/index.html";
+        //this.redirectUri = "https://localhost/wizard/index.html";
+        this.redirectUri = "https://princemerluza.github.io/purecloud-premium-app/wizard/index.html";
 
         // Permissions required for using the app 
         // TODO: store permissions on a separate file
