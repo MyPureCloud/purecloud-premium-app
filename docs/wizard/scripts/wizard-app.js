@@ -22,6 +22,7 @@ if((typeof $ === 'undefined') ||
  * @todo keep track of current main module(page) to check with inner modules before they're rendered
  * @todo keep track of current status with local storage to enable resuming
  * @todo move  Handlebar renderer functions to separate module.
+ * @todo Roles Creation
  */
 class WizardApp {
     constructor(){
@@ -315,9 +316,10 @@ class WizardApp {
         //Render controls
         .then(() => this._renderModule(hb['wizard-group-control'], {}, 'wizard-control'))
 
-        // If add Group Button pressed then stage the group name from the form input
-        // TODO: Input Validation
+        // TODO: Input Validation and Error Handling
         .then(() => {
+            // If add Group Button pressed then stage the group name 
+            // from the form input
             $('#btn-add-group').click($.proxy(() => {
                 let groupName = $('#txt-group-name').val();
                 this.stagingArea.groups.push(groupName);
@@ -325,7 +327,14 @@ class WizardApp {
                 this._renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
                 .then(() => console.log(this.stagingArea.groups));
             }, this));
+
+            // Next button to Apps Creation
+            $('btn-next').click($.proxy(this.loadAppsCreation, this));
         });
+    }
+
+    loadAppsCreation(){
+
     }
 
 
