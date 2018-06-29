@@ -118,11 +118,11 @@ clientApp.loadSupervisorView = function(){
 
         let dropdown = $('#ddlQueues');
         dropdown.empty();
-        dropdown.append('<option selected="true" disabled style="left: 0; width=100%">Queues</option>');
+        dropdown.append('<option selected="true" disabled">Queues</option>');
         dropdown.prop('selectedIndex', 0);
 
         for (var i = 1; i < queues.length; i++) {
-            dropdown.append($('<option style="left: 0; width=100%"></option>').attr('value', queues[i].id).text(queues[i].name));
+            dropdown.append($('<option></option>').attr('value', queues[i].id).text(queues[i].name));
         }
     })
 }
