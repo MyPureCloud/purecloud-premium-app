@@ -112,8 +112,10 @@ class WizardApp {
      * @param {string} page     contains filename of handlebars file
      * @param {object} context  context oject
      * @param {string} target   ID of element HTML where rendered module will be placed
+     * @param {*}  resolveData  Optional data to pass for resolve of the promise
+     * @returns Promise
      */
-    _renderModule(page, context, target) {
+    _renderModule(page, context, target, resolveData) {
         context = (typeof context !== 'undefined') ? context : {}; 
         target = (typeof target !== 'undefined') ? target : 'default-module'; 
 
@@ -136,7 +138,7 @@ class WizardApp {
                 let renderedHtml = template(context);
                 $('#' + target).html(renderedHtml);
 
-                resolve();
+                resolve(resolveData);
             })
             .fail(xhr => {
                 console.log('error', xhr);
@@ -369,33 +371,65 @@ class WizardApp {
         // Check existing groups
         groupsApi.postGroupsSearch(groupSearchBody)
         .then(data => {
-            let group = (typeof data.results !== 'undefined') ? data.results : {};
+            let group = (typeof data.results !== 'undefined') ? data.results : [];
             let context = {
-                panelHeading: 'Existing Groups (' + 
-                                Object.keys(group).length + ')',
+                panelHeading: 'Existing Groups (' + group.length + ')',
                 objType: 'groups',
                 pureCloudObjArr: group,
                 icon: 'fa-users'
             }
-            this._renderModule(hb['existing-objects'],
-                                context,
-                                'results-group');
-        }).catch(err => console.log(err));
+
+            return this._renderModule(hb['existing-objects'], context, 'results-group', group);
+        })
+
+        // Add delete button handlers
+        // data is the groups from PureCloud
+        .then((data) => {
+            data = data || [];
+            data.forEach((group) => {
+                let btnId = '#btn-delete-' + group.id;
+                $(btnId).click(
+                    $.proxy(() => {
+                    let groupsApi = new this.platformClient.GroupsApi();
+
+                    groupsApi.deleteGroup(group.id)
+                    .then((data) => this.loadCheckInstallationStatus())
+                    .catch(() => console.log(err));
+                } ,this));
+            })
+        })
+
+        //Error handler
+        .catch(err => console.log(err));
 
         // Check existing roles
         authApi.getAuthorizationRoles(authOpts)
         .then(data => {
             let roles = data.entities;
             let context = {
-                panelHeading: 'Existing Roles (' + 
-                                Object.keys(roles).length + ')',
+                panelHeading: 'Existing Roles (' + roles.length + ')',
                 objType: 'roles',
                 pureCloudObjArr: roles,
                 icon: 'fa-briefcase'
             }
-            this._renderModule(hb['existing-objects'],
-                                context,
-                                'results-role');
+
+            return this._renderModule(hb['existing-objects'], context, 'results-role', roles);
+        })
+        // Add delete button handlers
+        // data is the roles from PureCloud
+        .then((data) => {
+            data = data || [];
+            data.forEach((role) => {
+                let btnId = '#btn-delete-' + role.id;
+                $(btnId).click(
+                    $.proxy(() => {
+                    let authApi = new this.platformClient.AuthorizationApi();
+
+                    authApi.deleteAuthorizationRole(role.id)
+                    .then((data) => this.loadCheckInstallationStatus())
+                    .catch(() => console.log(err));
+                } ,this));
+            })
         })
         .catch(err => console.log(err));
 
@@ -404,16 +438,32 @@ class WizardApp {
         .then(data => {
             let integrations = data.entities.filter(entity => entity.name.startsWith(this.prefix));
             let context = {
-                panelHeading: 'Existing Integrations (' + 
-                            Object.keys(integrations).length + ')',
+                panelHeading: 'Existing Integrations (' + integrations.length + ')',
                 objType: 'integrations',
                 pureCloudObjArr: integrations,
                 icon: 'fa-cogs'
             }
-            this._renderModule(hb['existing-objects'],
-                                context,
-                                'results-integration');
+            return this._renderModule(hb['existing-objects'], context, 'results-integration', integrations);
         })
+
+        // Add delete button handlers
+        // data is the roles from PureCloud
+        .then((data) => {
+            data = data || [];
+            data.forEach((customApp) => {
+                let btnId = '#btn-delete-' + customApp.id;
+                $(btnId).click(
+                    $.proxy(() => {
+                    let integrationsApi = new this.platformClient.IntegrationsApi();
+
+                    integrationsApi.deleteIntegration(customApp.id)
+                    .then((data) => this.loadCheckInstallationStatus())
+                    .catch(() => console.log(err));
+                } ,this));
+            })
+        })
+        
+        //Error handler
         .catch(err => console.log(err));
     }
 
