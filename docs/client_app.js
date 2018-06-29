@@ -127,49 +127,49 @@ clientApp.loadSupervisorView = function(){
     })
 }
 
-clientApp.onPagLoad = function(){
-    console.log("PAGE LOAD");
+// clientApp.onPagLoad = function(){
+//     console.log("PAGE LOAD");
 
-    var body = 
-    {
-        interval: "2018-06-28T16:00:00.000Z/2018-06-29T16:00:00.000Z",
-        order: "asc",
-        orderBy: "conversationStart",
-        paging: {
-            pageSize: 25,
-            pageNumber: 1
-        },
-        conversationFilters: 
-        [
-            {
-                type: "or",
-                predicates: [
-                    {
-                        type: "dimension",
-                        dimension: "queueId",
-                        operator: "matches",
-                        value: "58a9de5b-499b-490e-a10d-6422c08b2a02"
-                    }
-                ]
-            }
-        ]
-    }
+//     var body = 
+//     {
+//         interval: "2018-06-28T16:00:00.000Z/2018-06-29T16:00:00.000Z",
+//         order: "asc",
+//         orderBy: "conversationStart",
+//         paging: {
+//             pageSize: 25,
+//             pageNumber: 1
+//         },
+//         conversationFilters: 
+//         [
+//             {
+//                 type: "or",
+//                 predicates: [
+//                     {
+//                         type: "dimension",
+//                         dimension: "queueId",
+//                         operator: "matches",
+//                         value: "58a9de5b-499b-490e-a10d-6422c08b2a02"
+//                     }
+//                 ]
+//             }
+//         ]
+//     }
 
-    client.callApi(
-        '/api/v2/analytics/conversations/details/query', 
-        'POST', 
-        {  }, 
-        {  }, 
-        {  }, 
-        {  }, 
-        body, 
-        ['PureCloud Auth'], 
-        ['application/json'], 
-        ['application/json']
-    ).then(data => {
-        console.log("CALL API || " + data);
-    }).catch( e => console.log(e) );
-}
+//     client.callApi(
+//         '/api/v2/analytics/conversations/details/query', 
+//         'POST', 
+//         {  }, 
+//         {  }, 
+//         {  }, 
+//         {  }, 
+//         body, 
+//         ['PureCloud Auth'], 
+//         ['application/json'], 
+//         ['application/json']
+//     ).then(data => {
+//         console.log("CALL API || " + data);
+//     }).catch( e => console.log(e) );
+// }
 
 clientApp.subscribeToQueue = function(queue){
     // Create a Notifications Channel
