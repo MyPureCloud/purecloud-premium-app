@@ -168,7 +168,7 @@ clientApp.onPagLoad = function(){
         ['application/json']
     ).then(data => {
         console.log("CALL API || " + data);
-    }).catch( e => console.log(e) );;
+    }).catch( e => console.log(e) );
 }
 
 clientApp.subscribeToQueue = function(queue){
