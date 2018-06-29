@@ -1,0 +1,44 @@
+{{#if fileName}}
+    <article style="margin-top: 20px;" class="message is-primary">
+        <div class="message-header">
+            <p>Default Installation Order Found</p>
+        </div>
+        <div class="message-body">
+            You're seeing this message because we have detected a default installation order from 
+            <strong>{{fileName}}</strong>.
+            We have prepopulated the page with the details but feel free to modify as you wish.
+        </div>
+    </article>
+{{/if}}
+
+<div id="purecloud-instances">
+    {{#each appInstances}}
+    <div class="box">
+        <nav class="level">
+            <div class="level-left">
+                <p>  
+                   <strong>{{name}}</strong> 
+                </p>
+            </div>
+            <div class="level-right">
+                <a class="delete"></a>
+            </div>
+        </nav>
+        <div class="media-content">
+            <p>  
+                <em>Type: </em> {{type}}
+            </p>
+            <p>  
+                <em>URL: </em> {{url}}
+            </p>
+            <p>  
+                <em>Groups: </em>
+                {{#each groups}}
+                    {{this}}
+                {{/each}}
+            </p>
+        </div>
+    </div>
+    {{/each}}
+</div>
+
