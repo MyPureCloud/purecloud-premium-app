@@ -1,23 +1,61 @@
-<div style="margin-top: 20px" class="columns">
-    <div class="column">
-        <div class="field">
-            <div class="control">
-                <input id="txt-group-name" type="text" class="input" placeholder="Group Name">
-            </div>
-        </div>
+<div style="margin-top: 20px;">
+    <div class="content">
+      <h3>Add New Instace</h3>
     </div>
-    <div class="column">
-        <div class="field">
-            <div class="control">
-                <button id="btn-add-group" class="button is-primary"> Add Group</button>
-            </div>
+
+    <div class="field">
+      <label class="label">Instance Name</label>
+      <div class="control">
+        <input class="input" type="text" placeholder="Instance Name">
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="control">
+        <label class="radio">
+          <input type="radio" name="question">
+          Stand Alone
+        </label>
+        <label class="radio">
+          <input type="radio" name="question">
+          Widget
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">URL</label>
+      <div class="control">
+        <input class="input" type="text" placeholder="https://yourdomain.com/endpoint">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Groups</label>
+      <div class="control">
+        <div class="select is-multiple">
+          <select multiple size="4">
+            {{#each groups}}
+              <option>{{this}}</option>
+            {{/each}}
+          </select>
         </div>
+      </div>
+    </div>
+
+    <div class="field is-grouped">
+      <div class="control">
+        <button class="button is-primary">Add Instance</button>
+      </div>
+      <div class="control">
+        <button class="button is-text">Clear</button>
+      </div>
     </div>
 </div>
 
 
 
-<nav style="border-top: 2px #CCC solid; padding-top: 20px;" class="level">
+<nav style="margin-top: 20px; border-top: 2px #CCC solid; padding-top: 20px;" class="level">
   <div class="level-left">
     <p class="level-item">
       <button id="btn-prev" class="button is-warning has-text-centered is-size-4">
