@@ -159,6 +159,8 @@ clientApp.onSocketMessageQueue = function(event){
     let topic = data.topicName;
     let eventBody = data.eventBody;
 
+    console.log("INITIAL LOAD || " + JSON.stringify(eventBody));
+
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
         let caller = eventBody.participants
@@ -175,67 +177,74 @@ clientApp.onSocketMessageQueue = function(event){
         let custConnectedDt = new Date(caller.connectedTime);
         let custEndDt = new Date(caller.endTime);
 
-        $("#callerName").text(caller.name);
-        $("#callerANI").text(caller.address);
-        $("#callerDNIS").text(caller.calls[0].other.addressNormalized);
+        $("#supName").text(caller.name);
+        $("#supANI").text(caller.address);
+        $("#supDNIS").text(caller.calls[0].other.addressNormalized);
 
         // If incoming call
-        if((acd.endTime === undefined) && (!clientApp.isCallActive)){
-            $("#callerState").text(agent.calls[0].state);
-            $("#callerDuration").text("00:00:00");
+        if((acd.endTime === undefined) && (!clientApp.isCallActiveSup)){
+            console.log("INCOMING CALL || " + JSON.stringify(eventBody));
+
+            $("#supState").text(agent.calls[0].state);
+            $("#supDuration").text("00:00:00");
 
             // Set timer for Caller Wait Time
             var intervalId1 = setInterval(function() {
                 var currentDate = new Date();        
-                $("#callerWaitTime").text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);
+                $("#supWaitTime").text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);
             }, 1000);
-            $("#callerWaitTime").attr("data-timer-id",intervalId1);
+            $("#supWaitTime").attr("data-timer-id",intervalId1);
 
             // Makes sure that the field only changes the first time. 
-            clientApp.isCallActive = true;
-        } else if((acd.endTime === undefined) && (caller.endTime === undefined) && (clientApp.isCallActive)) {
+            clientApp.isCallActiveSup = true;
+        } else if((acd.endTime === undefined) && (caller.endTime === undefined)) {
+            console.log("ACTIVE CALL || " + JSON.stringify(eventBody));
+
             // If active call
 
             // Stop timer for Caller Wait Time
-            window.clearInterval($("#callerWaitTime").attr("data-timer-id"));
+            window.clearInterval($("#supWaitTime").attr("data-timer-id"));
 
-            $("#callerState").text(agent.calls[0].state);
+            $("#supState").text(agent.calls[0].state);
+            $("#supWaitTime").text(new Date(custConnectedDt - acdConnectedDt).toISOString().slice(11, -1));
 
             // Start timer for Call Duration
             var intervalId2 = setInterval(function() {
                 var currentDate = new Date();        
-                $("#callerDuration").text(new Date(currentDate - custConnectedDt).toISOString().slice(11, -1).split('.')[0]);
+                $("#supDuration").text(new Date(currentDate - custConnectedDt).toISOString().slice(11, -1).split('.')[0]);
             }, 1000);
-            $("#callerDuration").attr("data-timer-id",intervalId2);
+            $("#supDuration").attr("data-timer-id",intervalId2);
 
             // Makes sure that the field only changes the first time. 
-            clientApp.isCallActive = true;
+            clientApp.isCallActiveSup = true;
         } else if(agent.calls[0].state === "disconnected") {
+            console.log("DISCONNECTED CALL || " + JSON.stringify(eventBody));
+
             // If disconnected call
 
             // Stop timer for Call Wait Time and Call Duration
-            window.clearInterval($("#callerWaitTime").attr("data-timer-id"));
-            window.clearInterval($("#callerDuration").attr("data-timer-id"));
+            window.clearInterval($("#supWaitTime").attr("data-timer-id"));
+            window.clearInterval($("#supDuration").attr("data-timer-id"));
 
-            $("#callerState").text(agent.calls[0].state);
-            $("#callerWaitTime").text(new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1));
-            $("#callerDuration").text(new Date(custEndDt - custConnectedDt).toISOString().slice(11, -1));
+            $("#supState").text(agent.calls[0].state);
+            $("#supWaitTime").text(new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1));
+            $("#supDuration").text(new Date(custEndDt - custConnectedDt).toISOString().slice(11, -1));
 
             // Makes sure that the field only changes the first time. 
-            clientApp.isCallActive = false;
-        } else if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
+            clientApp.isCallActiveSup = false;
+        } else if((caller.endTime !== undefined) && (!clientApp.isCallActiveSup)){
             // Stop timer for Call Wait Time and Call Duration
-            window.clearInterval($("#callerWaitTime").attr("data-timer-id"));
-            window.clearInterval($("#callerDuration").attr("data-timer-id"));
+            window.clearInterval($("#supWaitTime").attr("data-timer-id"));
+            window.clearInterval($("#supDuration").attr("data-timer-id"));
 
-            $("#callerName").text("");
-            $("#callerANI").text("");
-            $("#callerDNIS").text("");
-            $("#callerState").text("");
-            $("#callerWaitTime").text("");
-            $("#callerDuration").text("");
+            $("#supName").text("");
+            $("#supANI").text("");
+            $("#supDNIS").text("");
+            $("#supState").text("");
+            $("#supWaitTime").text("");
+            $("#supDuration").text("");
 
-            clientApp.isCallActive = false;
+            clientApp.isCallActiveSup = false;
         }
     }
 }
