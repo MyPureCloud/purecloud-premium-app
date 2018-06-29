@@ -136,7 +136,7 @@ class WizardApp {
             })
             .fail(xhr => {
                 console.log('error', xhr);
-                reject();
+                reject(xhr);
             });
         });
     }
@@ -354,7 +354,7 @@ class WizardApp {
         .then(() => this._renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content'))
         
         //Render controls 
-
+        .then(() => this._renderModule(hb['wizard-instance-control'], this.stagingArea, 'wizard-control'))
     }
 
 
