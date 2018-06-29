@@ -2,6 +2,7 @@
 *   NOTE: This sample uses ES6 features
 */
 import clientIDs from '../clientIDs.js'
+import hb from './template-references.js'
 
 // Requires jQuery and Handlebars from parent context
 const $ = window.$;
@@ -20,7 +21,7 @@ if((typeof $ === 'undefined') ||
  * @todo Change all members to static if more appropriate
  * @todo keep track of current main module(page) to check with inner modules before they're rendered
  * @todo keep track of current status with local storage to enable resuming
- * @todo separate some Handlebar utility functions to separate file.
+ * @todo move  Handlebar renderer functions to separate module.
  */
 class WizardApp {
     constructor(){
@@ -40,9 +41,9 @@ class WizardApp {
         // Prefix to add to all objects that will be added
         // (roles, groups, integrations, etc..)
         // as a result of this installatino wizard
-        this.prefix = '111';
+        this.prefix = '1111';
 
-        // JS object that will stage  information about the installation.
+        // JS object that will stage information about the installation.
         this.stagingArea = null;
 
         // Default order to prefill staging area
@@ -153,13 +154,14 @@ class WizardApp {
         bodyContext = (typeof bodyContext !== 'undefined') ? bodyContext : {};
 
         return new Promise((resolve, reject) => {
-            this._renderModule('root')
-            .then(() => this._renderModule('module-header', headerContext, 'root-header'))
+            this._renderModule(hb['root'])
+            .then(() => this._renderModule(hb['header'], headerContext, 'root-header'))
             .then(() => this._renderModule(bodyTemplate, bodyContext, 'root-body'))
             .then(() => resolve())
         })
         
     }
+
 
     /**
      * Loads the landing page of the app
@@ -183,7 +185,7 @@ class WizardApp {
                         features: orgFeature,
                         startWizardFunction: this.loadRolesPage
                     },
-                    'landing-page'
+                    hb['landing-page']
                 )
                 .then(() => {
                     $('#btn-check-installation').click($.proxy(this.loadCheckInstallationStatus, this));
@@ -207,7 +209,7 @@ class WizardApp {
             {
                 objectPrefix: this.prefix
             },
-            'check-installation'
+            hb['check-installation']
         )
         .then(() => {
             $('#btn-start-wizard').click($.proxy(this.loadGroupsCreation, this));
@@ -250,7 +252,7 @@ class WizardApp {
                 pureCloudObjArr: group,
                 icon: 'fa-users'
             }
-            this._renderModule('panel-existing-objects',
+            this._renderModule(hb['existing-objects'],
                                 context,
                                 'results-group');
         }).catch(err => console.log(err));
@@ -266,7 +268,7 @@ class WizardApp {
                 pureCloudObjArr: roles,
                 icon: 'fa-briefcase'
             }
-            this._renderModule('panel-existing-objects',
+            this._renderModule(hb['existing-objects'],
                                 context,
                                 'results-role');
         })
@@ -283,42 +285,49 @@ class WizardApp {
                 pureCloudObjArr: integrations,
                 icon: 'fa-cogs'
             }
-            this._renderModule('panel-existing-objects',
+            this._renderModule(hb['existing-objects'],
                                 context,
                                 'results-integration');
         })
         .catch(err => console.log(err));
     }
 
-
+    /**
+     * Stage the groups to be created.
+     * Thi is the First step of the installation wizard.
+     * @param {object} event 
+     */
     loadGroupsCreation(event){
         this._renderCompletePage(
             {
                 title: "Create groups",
                 subtitle: "Groups are required to filter which members will have access to specific instances of the App."
             },
-            null, "module-wizard"
+            null, hb["wizard-page"]
         )
 
         // Render left guide bar
-        .then(() => this._renderModule('module-wizard-sidebar', {"highlight1": true}, 'wizard-left'))
+        .then(() => this._renderModule(hb['wizard-group-left'], {"highlight1": true}, 'wizard-left'))
         
-        //Render actual content
-        .then(() => this._renderModule('wizard-groups', {
-                order: this.stagingArea,
-                orderFilename: this.defaultOrderFileName
-            }, 'wizard-right'))
+        //Render contents of staging area
+        .then(() => this._renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content'))
+        
+        //Render controls
+        .then(() => this._renderModule(hb['wizard-group-control'], {}, 'wizard-control'))
 
-        // Assign event handlers
+        // If add Group Button pressed then stage the group name from the form input
+        // TODO: Input Validation
         .then(() => {
-            $('#btn-add-group').click($.proxy(this.stageGroup, this));
+            $('#btn-add-group').click($.proxy(() => {
+                let groupName = $('#txt-group-name').val();
+                this.stagingArea.groups.push(groupName);
+
+                this._renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
+                .then(() => console.log(this.stagingArea.groups));
+            }, this));
         });
     }
 
-    stageGroup(event){
-        let groupName = $('#txt-group-name').val();
-        this.stagingArea.groups.push(groupName);
-    }
 
     /**
      * Load the default installation order for the wizard
@@ -330,6 +339,7 @@ class WizardApp {
         $.getJSON(fileUri)
         .done(data => {
             this.stagingArea = data;
+            this.stagingArea.fileName = fileUri;
         })
         .fail(xhr => console.log('error', xhr)); 
     }

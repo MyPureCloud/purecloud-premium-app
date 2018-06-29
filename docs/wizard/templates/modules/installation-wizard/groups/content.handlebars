@@ -1,42 +1,28 @@
-{{#if order}}
+{{#if fileName}}
     <article style="margin-top: 20px;" class="message is-primary">
         <div class="message-header">
             <p>Default Installation Order Found</p>
         </div>
         <div class="message-body">
             You're seeing this message because we have detected a default installation order from 
-            <strong>{{orderFilename}}.json</strong>.
+            <strong>{{fileName}}</strong>.
             We have prepopulated the page with the details but feel free to modify as you wish.
         </div>
     </article>
 {{/if}}
 
 <div id="purecloud-groups">
+    {{#each groups}}
     <div class="box">
         <nav class="level">
             <div class="level-left">
-                Group Name
+                {{this}}
             </div>
             <div class="level-right">
                 <a class="delete"></a>
             </div>
         </nav>
     </div>
+    {{/each}}
 </div>
 
-<div style="margin-top: 20px" class="columns">
-    <div class="column">
-        <div class="field">
-            <div class="control">
-                <input id="txt-group-name" type="text" class="input" placeholder="Group Name">
-            </div>
-        </div>
-    </div>
-    <div class="column">
-        <div class="field">
-            <div class="control">
-                <button id="btn-add-group" class="button is-primary"> Add Group</button>
-            </div>
-        </div>
-    </div>
-</div>
