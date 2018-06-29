@@ -8,9 +8,7 @@ import hb from './template-references.js'
 const $ = window.$;
 const jQuery = window.jQuery;
 const Handlebars = window.Handlebars;
-if((typeof $ === 'undefined') ||
-        (typeof jQuery === 'undefined') ||
-        (typeof Handlebars === 'undefined')){
+if((typeof $ === 'undefined') || (typeof jQuery === 'undefined') || (typeof Handlebars === 'undefined')){
     console.error("===== PREMIUM APP ERROR ====== \n" +
                   "A required library is missing. \n" +
                   "==============================");   
@@ -308,7 +306,7 @@ class WizardApp {
         )
 
         // Render left guide bar
-        .then(() => this._renderModule(hb['wizard-group-left'], {"highlight1": true}, 'wizard-left'))
+        .then(() => this._renderModule(hb['wizard-left'], {"highlight1": true}, 'wizard-left'))
         
         //Render contents of staging area
         .then(() => this._renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content'))
@@ -329,11 +327,33 @@ class WizardApp {
             }, this));
 
             // Next button to Apps Creation
-            $('btn-next').click($.proxy(this.loadAppsCreation, this));
+            $('#btn-next').click($.proxy(this.loadAppsCreation, this));
+
+            // Back to check Installation
+            $('#btn-prev').click($.proxy(this.loadCheckInstallationStatus, this));
         });
     }
 
-    loadAppsCreation(){
+
+    loadAppsCreation(event){
+        this._renderCompletePage(
+            {
+                title: "Create App Instances",
+                subtitle: "These is where you add instances of you app." +
+                          "You could specify the landing page of each instance " +
+                          "and the groups (must be created from the wizard) who " + 
+                          "will have access to them."
+            },
+            null, hb["wizard-page"]
+        )
+
+        // Render left guide bar
+        .then(() => this._renderModule(hb['wizard-left'], {"highlight2": true}, 'wizard-left'))
+        
+        //Render contents of staging area
+        .then(() => this._renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content'))
+        
+        //Render controls 
 
     }
 

@@ -11,13 +11,13 @@
             "name": "Agent Widget",
             "url": "https://localhost/index.html",
             "type": "standalone",
-            "group": "agents"
+            "groups": ["agents", "supervisors"]
         },
         {
             "name": "Supervisor Widget",
             "url": "https://localhost/supervisor.html",
             "type": "widget",
-            "group": "agents"
+            "groups": ["supervisors"]
         }
     ]
 }
