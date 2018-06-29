@@ -24,4 +24,8 @@ export default {
 
     // Not Authorized Page
     "not-authorized": "pages/not-authorized",
+
+
+    // This page intentionally left blank
+    "blank": "blank"
 }

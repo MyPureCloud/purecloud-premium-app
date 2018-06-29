@@ -21,6 +21,7 @@ if((typeof $ === 'undefined') || (typeof jQuery === 'undefined') || (typeof Hand
  * @todo keep track of current status with local storage to enable resuming
  * @todo move  Handlebar renderer functions to separate module.
  * @todo Roles Creation
+ * @todo For load page methods, check the event to make sure that it was invoked legally.
  */
 class WizardApp {
     constructor(){
@@ -193,6 +194,96 @@ class WizardApp {
         });
     }
 
+    /**
+     * Configure PureCloud and install everything as defined from the 
+     * stagingArea member. This should be the last step of the installation wizard.
+     * @param {*} event 
+     */
+    installAppConfigurations(event){
+        // Remove controls
+        this._renderModule(hb['blank'], this.stagingArea, 'wizard-content');
+        this._renderModule(hb['blank'], this.stagingArea, 'wizard-control');
+
+        // Api instances
+        let groupsApi = new this.platformClient.GroupsApi();
+        let authApi = new this.platformClient.AuthorizationApi();
+        let integrationsApi = new this.platformClient.IntegrationsApi();
+
+        // Keep the promises of the creation calls
+        // This will be used to keep track once a particular batch resolves
+        let groupPromises = [];
+        let integrationPromises = [];
+
+        // Once groups are created store the names and the ids
+        // object of (groupName: groupId) pairs
+        let groupData = {};
+
+        // Create the groups
+        this.stagingArea.groups.forEach((group) => {
+            let groupBody = {
+                "name": this.prefix + group,
+                "type": "official",
+                "rulesVisible": true,
+                "visibility": "members"
+             }
+
+            groupPromises.push(
+                groupsApi.postGroups(groupBody)
+                .then((data) => {
+                    groupData[group] = data.id;
+                })
+                .catch((err) => console.log(err))
+            );
+        });
+        
+        // After groups are created, create instances
+        // There are two steps for creating the app instances
+        // 1. Create instance of a custom-client-app
+        // 2. Configure the app
+        Promise.all(groupPromises)
+        .then(() => {
+            console.log(groupData);
+
+            this.stagingArea.appInstances.forEach((instance) => {
+                let integrationBody = {
+                    "body": {
+                        "integrationType": {
+                            "id": "embedded-client-app"
+                        }
+                    }
+                }
+
+                integrationPromises.push(
+                    integrationsApi.postIntegrations(integrationBody)
+                    .then((data) => {
+                        let integrationConfig = {
+                            "body": {
+                                "name": this.prefix + instance.name,
+                                "version": 1, 
+                                "properties": {
+                                    "url" : instance.url,
+                                    "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
+                                    "displayType": instance.type,
+                                    "featureCategory": "", 
+                                    "groups": instance.groups.map((groupName) => groupData[groupName])
+                                },
+                                "advanced": {},
+                                "notes": "",
+                                "credentials": {}
+                            }
+                        }
+
+                        return integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig)
+                    })
+                    .then((data) => console.log(data))
+                    .catch((err) => console.log(err))
+                );
+            });
+            return Promise.all(integrationPromises);
+        })
+        .then(() => console.log("Finished setting up App instances"))
+    }
+
 
     /**
      * Loads the landing page of the app
@@ -200,6 +291,7 @@ class WizardApp {
     loadLandingPage(event){
         this._pureCloudAuthenticate()
         .then(() => {
+            this._test();
             let organizationApi = new this.platformClient.OrganizationApi();
 
             // Get organization information
@@ -367,7 +459,10 @@ class WizardApp {
         });
     }
 
-
+    /**
+     * Creatino of App instances
+     * @param {event} event 
+     */
     loadAppsCreation(event){
         this._renderCompletePage(
             {
@@ -423,7 +518,12 @@ class WizardApp {
         });
     }
 
-    loadFinalizeInstallation(){
+    /**
+     * Installation page
+     * @param {event} event
+     * @todo Move actual PureCloud configuration and installation to separate method 
+     */
+    loadFinalizeInstallation(event){
         this._renderCompletePage(
             {
                 title: "Finalize",
@@ -439,7 +539,17 @@ class WizardApp {
         .then(() => this._renderModule(hb['wizard-final-content'], this.stagingArea, 'wizard-content'))
         
         //Render controls 
-        .then(() => this._renderModule(hb['wizard-final-control'], this.stagingArea, 'wizard-control'))        
+        .then(() => this._renderModule(hb['wizard-final-control'], this.stagingArea, 'wizard-control'))  
+        
+        // Assign Event Handlers
+        .then(() => {
+            // Back to groups Installation
+            $('#btn-prev').click($.proxy(this.loadAppsCreation, this));
+
+            // Start installing yeah!!!
+             // TODO: handle the possibility of rate limit being reached on the API calls
+            $('#btn-install').click($.proxy(this.installAppConfigurations, this));
+        });
     }
 
     /**
@@ -449,7 +559,15 @@ class WizardApp {
         this._setupClientApp();
         this.loadLandingPage();
     }
+
+
+    // This is called immediately after PureCloud and App SDK authentication
+    // For very quick and ugly tests
+    // TODO: Delete someday
+    _test(){
+
+    }
 }
-WizardApp.instance = null;
+
 
 export default WizardApp
