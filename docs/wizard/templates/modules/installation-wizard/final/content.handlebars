@@ -1,0 +1,57 @@
+<div id="purecloud-groups">
+    <div style="margin-top: 20px;">
+        <div class="content is-marginless">
+            <h3>Groups</h3>
+        </div>
+    </div>
+
+    {{#each groups}}
+    <div class="box is-radiusless is-marginless">
+        <nav class="level">
+            <div class="level-left">
+                {{this}}
+            </div>
+            <div class="level-right">
+            </div>
+        </nav>
+    </div>
+    {{/each}}
+</div>
+
+<div id="purecloud-instances">
+    <div style="margin-top: 20px;"></div>
+        <div class="content is-marginless">
+            <h3>App Instances</h3>
+        </div>
+    </div>
+    
+
+    {{#each appInstances}}
+    <div class="box is-radiusless is-marginless">
+        <nav class="level">
+            <div class="level-left">
+                <p>  
+                   <strong>{{name}}</strong> 
+                </p>
+            </div>
+            <div class="level-right">
+            </div>
+        </nav>
+        <div class="media-content">
+            <p>  
+                <em>Type: </em> {{type}}
+            </p>
+            <p>  
+                <em>URL: </em> {{url}}
+            </p>
+            <p>  
+                <em>Groups: </em>
+                {{#each groups}}
+                    {{this}}
+                {{/each}}
+            </p>
+        </div>
+    </div>
+    {{/each}}
+</div>
+

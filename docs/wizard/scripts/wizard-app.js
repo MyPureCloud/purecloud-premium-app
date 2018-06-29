@@ -416,7 +416,7 @@ class WizardApp {
             }, this));    
 
             // Next button to Final Page
-            $('#btn-next').click($.proxy(() => null, this));
+            $('#btn-next').click($.proxy(this.loadFinalizeInstallation, this));
 
             // Back to groups Installation
             $('#btn-prev').click($.proxy(this.loadGroupsCreation, this));
@@ -424,7 +424,22 @@ class WizardApp {
     }
 
     loadFinalizeInstallation(){
+        this._renderCompletePage(
+            {
+                title: "Finalize",
+                subtitle: "Please review the items below and press Install to " + 
+                          "install the apps and configuration."
+            },
+            null, hb["wizard-page"]
+        )
+         // Render left guide bar
+         .then(() => this._renderModule(hb['wizard-left'], {"highlight3": true}, 'wizard-left'))
 
+         //Render contents of staging area
+        .then(() => this._renderModule(hb['wizard-final-content'], this.stagingArea, 'wizard-content'))
+        
+        //Render controls 
+        .then(() => this._renderModule(hb['wizard-final-control'], this.stagingArea, 'wizard-control'))        
     }
 
     /**
