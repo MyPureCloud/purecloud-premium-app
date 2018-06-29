@@ -159,6 +159,8 @@ clientApp.onSocketMessageQueue = function(event){
     let topic = data.topicName;
     let eventBody = data.eventBody;
 
+    console.log("INITIAL LOAD || " + JSON.stringify(eventBody));
+
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
         let caller = eventBody.participants
@@ -181,6 +183,8 @@ clientApp.onSocketMessageQueue = function(event){
 
         // If incoming call
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup)){
+            console.log("INCOMING CALL || " + JSON.stringify(eventBody));
+
             $("#callerState").text(agent.calls[0].state);
             $("#callerDuration").text("00:00:00");
 
@@ -194,12 +198,15 @@ clientApp.onSocketMessageQueue = function(event){
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if((acd.endTime === undefined) && (caller.endTime === undefined) && (clientApp.isCallActiveSup)) {
+            console.log("ACTIVE CALL || " + JSON.stringify(eventBody));
+
             // If active call
 
             // Stop timer for Caller Wait Time
             window.clearInterval($("#callerWaitTime").attr("data-timer-id"));
 
             $("#callerState").text(agent.calls[0].state);
+            $("#callerWaitTime").text(new Date(custConnectedDt - acdConnectedDt).toISOString().slice(11, -1));
 
             // Start timer for Call Duration
             var intervalId2 = setInterval(function() {
@@ -211,6 +218,8 @@ clientApp.onSocketMessageQueue = function(event){
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent.calls[0].state === "disconnected") {
+            console.log("DISCONNECTED CALL || " + JSON.stringify(eventBody));
+
             // If disconnected call
 
             // Stop timer for Call Wait Time and Call Duration
