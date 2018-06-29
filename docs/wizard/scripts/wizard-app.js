@@ -43,11 +43,14 @@ class WizardApp {
         this.prefix = '1111';
 
         // JS object that will stage information about the installation.
-        this.stagingArea = null;
+        this.stagingArea = {
+            groups: [],
+            roles: [],
+            appInstances: []
+        };
 
         // Default order to prefill staging area
         this.defaultOrderFileName = 'sample-order';
-        this.loadOrderFile(this.defaultOrderFileName);
     }
 
     /**
@@ -163,6 +166,35 @@ class WizardApp {
 
 
     /**
+     * Load the default installation order for the wizard
+     * @param {string} fileName extensionless json filename  
+     */
+    _loadDefaultOrder(fileName){
+        let fileUri = fileName + ".json";
+
+        return new Promise((resolve, reject) => {
+            $.getJSON(fileUri)
+            .done(data => {
+                this.stagingArea = data;
+                this.stagingArea.fileName = fileUri;
+
+                resolve()
+            })
+            .fail(xhr => {
+                console.log('error', xhr)
+                this.stagingArea = {
+                    groups: [],
+                    roles: [],
+                    appInstances: []
+                }
+
+                resolve()
+            }); 
+        });
+    }
+
+
+    /**
      * Loads the landing page of the app
      */
     loadLandingPage(event){
@@ -200,6 +232,8 @@ class WizardApp {
      *          Get integration has max 100 before manual filter.
      */
     loadCheckInstallationStatus(event){
+        this._loadDefaultOrder(this.defaultOrderFileName)
+        .then(() => 
         this._renderCompletePage(
             {
                 "title": "Checking Installation",
@@ -209,7 +243,7 @@ class WizardApp {
                 objectPrefix: this.prefix
             },
             hb['check-installation']
-        )
+        ))
         .then(() => {
             $('#btn-start-wizard').click($.proxy(this.loadGroupsCreation, this));
         });
@@ -323,8 +357,7 @@ class WizardApp {
                 this.stagingArea.groups.push(groupName);
 
                 this._renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
-                .then(() => console.log(this.stagingArea.groups));
-            }, this));
+            }, this));      
 
             // Next button to Apps Creation
             $('#btn-next').click($.proxy(this.loadAppsCreation, this));
@@ -355,22 +388,35 @@ class WizardApp {
         
         //Render controls 
         .then(() => this._renderModule(hb['wizard-instance-control'], this.stagingArea, 'wizard-control'))
-    }
 
+        // Assign Event Handlers
+        .then(() => {
+            $('#add-instance').click($.proxy(() => {
+                let instanceName = $('#txt-instance-name').val();
+                let instanceType = $('input[name=instance-type]:checked', '#rad-instance-type').val();
+                let instanceUri = $('#txt-instance-uri').val();
+                let instanceGroups = $('#list-instance-groups').val();
 
-    /**
-     * Load the default installation order for the wizard
-     * @param {string} fileName extensionless json filename
-     * @todo have it called only when needed and set promises properly. Currently called at constructor.  
-     */
-    loadOrderFile(fileName){
-        let fileUri = fileName + ".json";
-        $.getJSON(fileUri)
-        .done(data => {
-            this.stagingArea = data;
-            this.stagingArea.fileName = fileUri;
-        })
-        .fail(xhr => console.log('error', xhr)); 
+                let instanceBody = {
+                    "name": instanceName,
+                    "url": instanceUri,
+                    "type": instanceType,
+                    "groups": instanceGroups
+                }
+                this.stagingArea.appInstances.push(instanceBody);
+
+                this._renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content')
+            }, this));    
+            
+            // Clear form content            
+            $('#clear-details').click($.proxy(this.loadAppsCreation, this));    
+
+            // Next button to Final Page
+            $('#btn-next').click($.proxy(() => null, this));
+
+            // Back to groups Installation
+            $('#btn-prev').click($.proxy(this.loadGroupsCreation, this));
+        });
     }
 
 

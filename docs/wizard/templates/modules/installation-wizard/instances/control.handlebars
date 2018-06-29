@@ -1,23 +1,23 @@
 <div style="margin-top: 20px;">
     <div class="content">
-      <h3>Add New Instace</h3>
+      <h3>Add New Instance</h3>
     </div>
 
     <div class="field">
       <label class="label">Instance Name</label>
       <div class="control">
-        <input class="input" type="text" placeholder="Instance Name">
+        <input id="txt-instance-name" class="input" type="text" placeholder="Instance Name">
       </div>
     </div>
 
     <div class="field">
-      <div class="control">
+      <div id="rad-instance-type" class="control">
         <label class="radio">
-          <input type="radio" name="question">
+          <input checked type="radio" value="standalone" name="instance-type">
           Stand Alone
         </label>
         <label class="radio">
-          <input type="radio" name="question">
+          <input type="radio" value="widget" name="instance-type">
           Widget
         </label>
       </div>
@@ -26,7 +26,7 @@
     <div class="field">
       <label class="label">URL</label>
       <div class="control">
-        <input class="input" type="text" placeholder="https://yourdomain.com/endpoint">
+        <input id="txt-instance-uri" class="input" type="text" placeholder="https://yourdomain.com/endpoint">
       </div>
     </div>
 
@@ -34,9 +34,11 @@
       <label class="label">Groups</label>
       <div class="control">
         <div class="select is-multiple">
-          <select multiple size="4">
+          <select id="list-instance-groups" multiple size="4">
             {{#each groups}}
-              <option>{{this}}</option>
+              <option value="{{this}}">
+                {{this}}
+              </option>
             {{/each}}
           </select>
         </div>
@@ -45,10 +47,10 @@
 
     <div class="field is-grouped">
       <div class="control">
-        <button class="button is-primary">Add Instance</button>
+        <button id="add-instance" class="button is-primary">Add Instance</button>
       </div>
       <div class="control">
-        <button class="button is-text">Clear</button>
+        <button id="clear-details" class="button is-text">Clear</button>
       </div>
     </div>
 </div>
