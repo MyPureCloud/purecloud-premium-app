@@ -409,7 +409,11 @@ class WizardApp {
             }, this));    
             
             // Clear form content            
-            $('#clear-details').click($.proxy(this.loadAppsCreation, this));    
+            $('#clear-details').click($.proxy(() => {
+                $('#txt-instance-name').val("");
+                $('#txt-instance-uri').val("");
+                $('#list-instance-groups').val("");
+            }, this));    
 
             // Next button to Final Page
             $('#btn-next').click($.proxy(() => null, this));
@@ -419,6 +423,9 @@ class WizardApp {
         });
     }
 
+    loadFinalizeInstallation(){
+
+    }
 
     /**
      * @description First thing that must be called to set-up the App
