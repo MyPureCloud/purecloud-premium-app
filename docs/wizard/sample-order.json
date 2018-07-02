@@ -2,8 +2,16 @@
     "groups": ["agents", "supervisors", "admin"],
     "roles": [
         {
-            "name": "agents",
-            "permissions": ["conversation:call:add,record"]
+            "name": "admin",
+            "permissions": ["admin", "premium_app_permission"]
+        },
+        {
+            "name": "supervisor",
+            "permissions": ["premium_app_permission"]
+        },
+        {
+            "name": "agent",
+            "permissions": ["premium_app_permission"]
         }
     ],
     "appInstances": [
@@ -11,13 +19,13 @@
             "name": "Agent Widget",
             "url": "https://localhost/index.html",
             "type": "standalone",
-            "groups": ["agents", "supervisors"]
+            "roles": "agent"
         },
         {
             "name": "Supervisor Widget",
             "url": "https://localhost/supervisor.html",
             "type": "widget",
-            "groups": ["supervisors"]
+            "roles": "supervisor"
         }
     ]
 }
