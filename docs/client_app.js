@@ -190,7 +190,7 @@ clientApp.subscribeToQueue = function(queue){
         if(Object.keys(data).length > 0) {
             console.log("CALL API || " + JSON.stringify(data));
 
-        let caller = conversations[0].participants
+        let caller = data.conversations[0].participants
             .filter(participant => participant.purpose === "external")[0];
 
         $("#supName").text(caller.participantName);
