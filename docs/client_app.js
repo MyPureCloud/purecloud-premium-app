@@ -202,7 +202,7 @@ clientApp.subscribeToQueue = function(queue){
             console.log("ACD || " + JSON.stringify(acd));
 
             let acdSegment = acd.sessions
-                .filter(session => session.segments.segmentType === "interact")[0];
+                .filter(session => session.segments[0].segmentType === "interact")[0];
             console.log("ACD SEGEMENT || " + JSON.stringify(acdSegment));
 
             let conversationStart = new Date(data.conversations[0].conversationStart);
