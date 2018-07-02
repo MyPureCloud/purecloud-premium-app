@@ -172,6 +172,35 @@ clientApp.loadSupervisorView = function(){
 // }
 
 clientApp.subscribeToQueue = function(queue){
+    // Check if there is an active call
+    var startDt = new Date();
+    var endDt = startDt.setDate(startDt.getDate() + 1);
+    var body = 
+    {
+        interval: startDt.toJSON() + "/" + endDt.toJSON,
+        order: "asc",
+        orderBy: "conversationStart",
+        paging: {
+            pageSize: 25,
+            pageNumber: 1
+        },
+        segmentFilters: [
+            {
+                type: "and",
+                predicates: [
+                    {
+                        type: "dimension",
+                        dimension: "queueId",
+                        operator: "matches",
+                        value: queue
+                    }
+                ]
+            }
+        ]
+    }
+
+    console.log("BODY || " + JSON.stringify(body));
+
     // Create a Notifications Channel
     client.callApi(
         '/api/v2/notifications/channels', 
