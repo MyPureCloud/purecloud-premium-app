@@ -248,7 +248,7 @@ clientApp.onSocketMessageQueue = function(event){
     let eventBody = data.eventBody;
 
     // Stop timer for on page load timer
-    window.clearInterval($("#supDuration").attr("onload-timer-id"));
+    // window.clearInterval($("#supDuration").attr("onload-timer-id"));
 
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
