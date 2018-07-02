@@ -131,8 +131,11 @@ clientApp.subscribeToQueue = function(queue){
     // Check if there is an active call
     var startDt = new Date();
     startDt.setHours(0,0,0,0);
-    var endDt = new Date(startDt.setDate(startDt.getDate() + 1));
+    startDt.toUTCString();
+    var endDt = new Date(startDt + 1);
     endDt.setHours(24,0,0,0);
+    endDt.toUTCString();
+
     var body = 
         {
             interval: startDt.toJSON() + "/" + endDt.toJSON(),
@@ -154,6 +157,19 @@ clientApp.subscribeToQueue = function(queue){
                         }
                     ]
                 }
+            ],
+            conversationFilters: [
+                {
+                    type: "or",
+                    predicates: [
+                        {
+                            type: "dimension",
+                            dimension: "conversationEnd",
+                            operator: "notExists",
+                            value: null
+                        }
+                    ]
+                }
             ]
         }
 
@@ -170,31 +186,39 @@ clientApp.subscribeToQueue = function(queue){
         ['PureCloud Auth'], 
         ['application/json'], 
         ['application/json']
-    ).then(//function() {
-    //     if(data.length > 0) {
-    //         console.log("CALL API || " + JSON.stringify(data));
+    ).then(data => {
+        if(Object.keys(data).length > 0) {
+            console.log("CALL API || " + JSON.stringify(data));
 
-    //     // let caller = eventBody.participants
-    //     // .filter(participant => participant.purpose === "customer")[0];
+        let caller = data.conversations[0].participants
+            .filter(participant => participant.purpose === "external")[0];
 
-    //     $("#supName").text("caller.name");
-    //     $("#supANI").text("caller.address");
-    //     $("#supDNIS").text("caller.calls[0].other.addressNormalized");
-    //     $("#supState").text("agent.calls[0].state");
-    //     $("#supDuration").text("00:00:00");
-    //     }
+        $("#supName").text(caller.participantName);
+        $("#supANI").text(caller.sessions[0].ani);
+        $("#supDNIS").text(caller.sessions[0].dnis);
+        $("#supState").text("connected");
+        $("#supWaitTime").text("");
+        $("#supDuration").text("");
+
+        // Start timer for Call Duration
+        var intervalId = setInterval(function() {
+            var currentDate = new Date();        
+            $("#supDuration").text(new Date(currentDate - caller.conversationStart).toISOString().slice(11, -1).split('.')[0]);
+        }, 1000);
+        $("#supDuration").attr("data-timer-id",intervalId);
+    }
     // }
-        data => {
-        console.log("CALL API || " + JSON.stringify(data));
+        // data => {
+        // console.log("CALL API || " + JSON.stringify(data));
 
-        // let caller = eventBody.participants
-        // .filter(participant => participant.purpose === "customer")[0];
+        // // let caller = eventBody.participants
+        // // .filter(participant => participant.purpose === "customer")[0];
 
-        $("#supName").text("caller.name");
-        $("#supANI").text("caller.address");
-        $("#supDNIS").text("caller.calls[0].other.addressNormalized");
-        $("#supState").text("agent.calls[0].state");
-        $("#supDuration").text("00:00:00");
+        // $("#supName").text("caller.name");
+        // $("#supANI").text("caller.address");
+        // $("#supDNIS").text("caller.calls[0].other.addressNormalized");
+        // $("#supState").text("agent.calls[0].state");
+        // $("#supDuration").text("00:00:00");
     }).catch(e => console.log(e));
 
     // Create a Notifications Channel
@@ -228,7 +252,8 @@ clientApp.onSocketMessageQueue = function(event){
     let topic = data.topicName;
     let eventBody = data.eventBody;
 
-    console.log("INITIAL LOAD || " + JSON.stringify(eventBody));
+    // Stop timer for on page load timer
+    window.clearInterval($("#supWaitTime").attr("data-timer-id"));
 
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
@@ -252,8 +277,6 @@ clientApp.onSocketMessageQueue = function(event){
 
         // If incoming call
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup)){
-            console.log("INCOMING CALL || " + JSON.stringify(eventBody));
-
             $("#supState").text(agent.calls[0].state);
             $("#supDuration").text("00:00:00");
 
@@ -267,8 +290,6 @@ clientApp.onSocketMessageQueue = function(event){
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if((acd.endTime === undefined) && (caller.endTime === undefined)) {
-            console.log("ACTIVE CALL || " + JSON.stringify(eventBody));
-
             // If active call
 
             // Stop timer for Caller Wait Time
@@ -287,8 +308,6 @@ clientApp.onSocketMessageQueue = function(event){
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent.calls[0].state === "disconnected") {
-            console.log("DISCONNECTED CALL || " + JSON.stringify(eventBody));
-
             // If disconnected call
 
             // Stop timer for Call Wait Time and Call Duration
