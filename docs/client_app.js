@@ -130,6 +130,7 @@ clientApp.loadSupervisorView = function(){
 clientApp.subscribeToQueue = function(queue){
     // Check if there is an active call
     var startDt = new Date();
+    startDt.setHours(0,0,0,0);
     var endDt = new Date(startDt.setDate(startDt.getDate() + 1));
     var body = 
         {
@@ -155,6 +156,8 @@ clientApp.subscribeToQueue = function(queue){
             ]
         }
 
+    console.log("BODY || " + JSON.stringify(body));
+
     client.callApi(
         '/api/v2/analytics/conversations/details/query', 
         'POST', 
@@ -166,7 +169,21 @@ clientApp.subscribeToQueue = function(queue){
         ['PureCloud Auth'], 
         ['application/json'], 
         ['application/json']
-    ).then(data => {
+    ).then(//function() {
+    //     if(data.length > 0) {
+    //         console.log("CALL API || " + JSON.stringify(data));
+
+    //     // let caller = eventBody.participants
+    //     // .filter(participant => participant.purpose === "customer")[0];
+
+    //     $("#supName").text("caller.name");
+    //     $("#supANI").text("caller.address");
+    //     $("#supDNIS").text("caller.calls[0].other.addressNormalized");
+    //     $("#supState").text("agent.calls[0].state");
+    //     $("#supDuration").text("00:00:00");
+    //     }
+    // }
+        data => {
         console.log("CALL API || " + JSON.stringify(data));
 
         // let caller = eventBody.participants
