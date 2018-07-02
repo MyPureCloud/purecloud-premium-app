@@ -198,8 +198,8 @@ clientApp.subscribeToQueue = function(queue){
                 .filter(participant => participant.purpose === "external")[0];
             
             let acd = data.conversations[0].participants
-                .filter(participant => participant.purpose === "acd")[0]
-                .filter(segment => segment.segmentType === "interact");
+                .filter(participant => participant.purpose === "acd")
+                .filter(segment => segment.segmentType === "interact")[0];
 
             let conversationStart = new Date(data.conversations[0].conversationStart);
             let acdStart = new Date(acd.segmentStart);
