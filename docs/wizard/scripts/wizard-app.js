@@ -1,7 +1,7 @@
 /*
 *   NOTE: This sample uses ES6 features
 */
-import clientIDs from '../clientIDs.js'
+import appConfig from './config.js'
 import hb from './template-references.js'
 
 // Requires jQuery and Handlebars from parent context
@@ -34,17 +34,15 @@ class WizardApp {
         this.platformClient = require('platformClient');
         this.purecloudClient = this.platformClient.ApiClient.instance;
         this.purecloudClient.setPersistSettings(true, 'premium_app');
-        //this.redirectUri = "https://localhost/wizard/index.html";
-        this.redirectUri = "https://princemerluza.github.io/purecloud-premium-app/wizard/index.html";
+        this.redirectUri = appConfig.redirectUri;
 
         // Permissions required for using the app 
-        // TODO: store permissions on a separate file
-        this.setupPermissionsRequired = ['admin'];
+        this.setupPermissionsRequired = appConfig.setupPermissionsRequired;
 
         // Prefix to add to all objects that will be added
         // (roles, groups, integrations, etc..)
-        // as a result of this installatino wizard
-        this.prefix = '1111';
+        // as a result of this installation wizard
+        this.prefix = appConfig.prefix;
 
         // JS object that will stage information about the installation.
         this.stagingArea = {
@@ -54,7 +52,7 @@ class WizardApp {
         };
 
         // Default order to prefill staging area
-        this.defaultOrderFileName = 'sample-order';
+        this.defaultOrderFileName = appConfig.defaultOrderFileName;
     }
 
     /**
@@ -82,7 +80,7 @@ class WizardApp {
     _pureCloudAuthenticate() {
         return new Promise((resolve, reject) => {
             // Authenticate through PureCloud
-            this.purecloudClient.loginImplicitGrant(clientIDs[this.pcApp.pcEnvironment], 
+            this.purecloudClient.loginImplicitGrant(appConfig.clientIDs[this.pcApp.pcEnvironment], 
                                     this.redirectUri, 
                                     {state: ('pcEnvironment=' + this.pcApp.pcEnvironment)})
             
