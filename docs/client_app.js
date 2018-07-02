@@ -131,8 +131,11 @@ clientApp.subscribeToQueue = function(queue){
     // Check if there is an active call
     var startDt = new Date();
     startDt.setHours(0,0,0,0);
-    var endDt = new Date(startDt.setDate(startDt.getDate() + 1));
+    startDt.toUTCString();
+    var endDt = new Date(startDt + 1);
     endDt.setHours(24,0,0,0);
+    endDt.toUTCString();
+
     var body = 
         {
             interval: startDt.toJSON() + "/" + endDt.toJSON(),
@@ -151,6 +154,19 @@ clientApp.subscribeToQueue = function(queue){
                             dimension: "queueId",
                             operator: "matches",
                             value: queue
+                        }
+                    ]
+                }
+            ],
+            conversationFilters: [
+                {
+                    type: "or",
+                    predicates: [
+                        {
+                            type: "dimension",
+                            dimension: "conversationEnd",
+                            operator: "notExists",
+                            value: null
                         }
                     ]
                 }
