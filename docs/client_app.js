@@ -205,8 +205,8 @@ clientApp.subscribeToQueue = function(queue){
             console.log("ACD SEGEMENT || " + acdSegment);
 
             let conversationStart = new Date(data.conversations[0].conversationStart);
-            let acdStart = new Date(acd.segmentStart);
-            let acdEnd = new Date(acd.segmentEnd);
+            let acdStart = new Date(acdSegment.segmentStart);
+            let acdEnd = new Date(acdSegment.segmentEnd);
 
             $("#supName").text(caller.participantName);
             $("#supANI").text(caller.sessions[0].ani);
