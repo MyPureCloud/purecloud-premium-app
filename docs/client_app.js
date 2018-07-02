@@ -201,7 +201,8 @@ clientApp.subscribeToQueue = function(queue){
                 .filter(participant => participant.purpose === "acd")[0];
             console.log("ACD || " + JSON.stringify(acd));
 
-            let acdSegment = acd.filter(session => session.segments.segmentType === "interact")[0];
+            let acdSegment = acd.sessions
+                .filter(session => session.segments.segmentType === "interact")[0];
             console.log("ACD SEGEMENT || " + JSON.stringify(acdSegment));
 
             let conversationStart = new Date(data.conversations[0].conversationStart);
