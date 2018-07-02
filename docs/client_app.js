@@ -177,7 +177,7 @@ clientApp.subscribeToQueue = function(queue){
     var endDt = startDt.setDate(startDt.getDate() + 1);
     var body = 
     {
-        interval: startDt.toJSON() + "/" + endDt.toJSON,
+        interval: startDt.toJSON() + "/" + endDt.toJSON(),
         order: "asc",
         orderBy: "conversationStart",
         paging: {
