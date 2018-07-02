@@ -175,8 +175,6 @@ clientApp.subscribeToQueue = function(queue){
             ]
         }
 
-    console.log("BODY || " + JSON.stringify(body));
-
     client.callApi(
         '/api/v2/analytics/conversations/details/query', 
         'POST', 
@@ -190,8 +188,6 @@ clientApp.subscribeToQueue = function(queue){
         ['application/json']
     ).then(data => {
         if(Object.keys(data).length > 0) {
-            console.log("CALL API || " + JSON.stringify(data));
-
             onloadConvID = data.conversationId;
 
             let caller = data.conversations[0].participants
@@ -199,11 +195,9 @@ clientApp.subscribeToQueue = function(queue){
             
             let acd = data.conversations[0].participants
                 .filter(participant => participant.purpose === "acd")[0];
-            console.log("ACD || " + JSON.stringify(acd));
 
             let acdSegment = acd.sessions[0].segments
                 .filter(segment => segment.segmentType === "interact")[0];
-            console.log("ACD SEGEMENT || " + JSON.stringify(acdSegment));
 
             let conversationStart = new Date(data.conversations[0].conversationStart);
             let acdStart = new Date(acdSegment.segmentStart);
@@ -222,7 +216,7 @@ clientApp.subscribeToQueue = function(queue){
             }, 1000);
             $("#supDuration").attr("onload-timer-id",intervalId);
         }
-    }).catch(e => console.log(e));
+    }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + body));
 
     // Create a Notifications Channel
     client.callApi(
@@ -260,6 +254,8 @@ clientApp.onSocketMessageQueue = function(event){
         // Stop timer for Call Duration
         window.clearInterval($("#supDuration").attr("onload-timer-id"));
     }
+
+    console.log("onloadConvID || " + onloadConvID + "eventBody.id || " + eventBody.id);
 
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
@@ -302,7 +298,7 @@ clientApp.onSocketMessageQueue = function(event){
             window.clearInterval($("#supWaitTime").attr("wait-timer-id"));
 
             $("#supState").text(agent.calls[0].state);
-            $("#supWaitTime").text(new Date(custConnectedDt - acdConnectedDt).toISOString().slice(11, -1));
+            $("#supWaitTime").text(new Date(acdConnectedDt - custConnectedDt).toISOString().slice(11, -1));
 
             // Start timer for Call Duration
             var intervalId2 = setInterval(function() {
