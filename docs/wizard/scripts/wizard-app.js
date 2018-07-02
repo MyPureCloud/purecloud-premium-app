@@ -340,7 +340,7 @@ class WizardApp {
             hb['check-installation']
         ))
         .then(() => {
-            $('#btn-start-wizard').click($.proxy(this.loadGroupsCreation, this));
+            $('#btn-start-wizard').click($.proxy(this.loadRolesCreation, this));
         });
 
         // PureCloud API instances
@@ -500,6 +500,49 @@ class WizardApp {
                 this.stagingArea.groups.push(groupName);
 
                 this._renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
+            }, this));      
+
+            // Next button to Apps Creation
+            $('#btn-next').click($.proxy(this.loadAppsCreation, this));
+
+            // Back to check Installation
+            $('#btn-prev').click($.proxy(this.loadCheckInstallationStatus, this));
+        });
+    }
+
+
+    loadRolesCreation(event){
+        this._renderCompletePage(
+            {
+                title: "Create Roles",
+                subtitle: "Roles are used to provide and determine access levels on the Premium App."
+            },
+            null, hb["wizard-page"]
+        )
+
+        // Render left guide bar
+        // TODO: Change to Roles in template
+        .then(() => this._renderModule(hb['wizard-left'], {"highlight1": true}, 'wizard-left'))
+
+        //Render contents of staging area
+        .then(() => this._renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content'))
+
+        //Render controls
+        .then(() => this._renderModule(hb['wizard-role-control'], {}, 'wizard-control'))
+
+        // Event Handlers
+        .then(() => {
+            // If add Role Button pressed then stage the role name 
+            // from the form input
+            $('#btn-add-role').click($.proxy(() => {
+                let roleName = $('#txt-role-name').val();
+                let tempRole = {
+                    "name": roleName,
+                    "permissions": [appConfig.premiumAppPermission]
+                };
+                this.stagingArea.roles.push(tempRole);
+
+                this._renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
             }, this));      
 
             // Next button to Apps Creation

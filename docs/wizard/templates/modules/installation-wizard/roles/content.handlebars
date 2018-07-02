@@ -1,0 +1,38 @@
+{{#if fileName}}
+    <article style="margin-top: 20px;" class="message is-primary">
+        <div class="message-header">
+            <p>Installation Order Found</p>
+        </div>
+        <div class="message-body">
+            <p>
+                You're seeing this message because we have detected an installation order from 
+                <strong>{{fileName}}</strong> and have prepopulated this page with the requested roles.
+            </p>
+            <p>
+                This usually means there is no further need to modify anything on this page. If you wish
+                to add additional roles, they would only contain the basic permission to access the App.
+            </p>
+        </div>
+    </article>
+{{/if}}
+
+<div id="purecloud-roles">
+    {{#each roles}}
+    <div class="box is-radiusless is-marginless">
+        <nav class="level">
+            <div class="level-left">
+                <strong>
+                    {{name}}
+                </strong>
+            </div>
+            <div class="level-right">
+                <a class="delete"></a>
+            </div>
+        </nav>
+        <div>
+            <em>Permissions:</em> {{#each permissions}} "{{this}}". {{/each}}
+        </div> 
+    </div>
+    {{/each}}
+</div>
+
