@@ -205,7 +205,7 @@ clientApp.subscribeToQueue = function(queue){
             // Start timer for Call Duration
             var intervalId = setInterval(function() {
                 var currentDate = new Date();        
-                $("#supDuration").text(new Date(currentDate - data.conversationStart).toISOString().slice(11, -1).split('.')[0]);
+                $("#supDuration").text(new Date(currentDate - new Date(data.conversationStart)).toISOString().slice(11, -1).split('.')[0]);
             }, 1000);
             $("#supDuration").attr("data-timer-id",intervalId);
         }
@@ -243,7 +243,7 @@ clientApp.onSocketMessageQueue = function(event){
     let eventBody = data.eventBody;
 
     // Stop timer for on page load timer
-    window.clearInterval($("#supWaitTime").attr("data-timer-id"));
+    window.clearInterval($("#supDuration").attr("data-timer-id"));
 
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
