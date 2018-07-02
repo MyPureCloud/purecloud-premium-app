@@ -196,6 +196,9 @@ clientApp.subscribeToQueue = function(queue){
             let acd = data.conversations[0].participants
                 .filter(participant => participant.purpose === "acd")[0];
 
+            let conversationStart = new Date(data.conversationStart);
+            console.log("CONVERSATION START || " + conversationStart);
+
             $("#supName").text(caller.participantName);
             $("#supANI").text(caller.sessions[0].ani);
             $("#supDNIS").text(caller.sessions[0].dnis);
@@ -205,7 +208,7 @@ clientApp.subscribeToQueue = function(queue){
             // Start timer for Call Duration
             var intervalId = setInterval(function() {
                 var currentDate = new Date();        
-                $("#supDuration").text(new Date(currentDate - new Date(data.conversationStart)).toISOString().slice(11, -1).split('.')[0]);
+                $("#supDuration").text(new Date(currentDate - conversationStart).toISOString().slice(11, -1).split('.')[0]);
             }, 1000);
             $("#supDuration").attr("data-timer-id",intervalId);
         }
