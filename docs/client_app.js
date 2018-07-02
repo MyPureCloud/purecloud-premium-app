@@ -190,35 +190,25 @@ clientApp.subscribeToQueue = function(queue){
         if(Object.keys(data).length > 0) {
             console.log("CALL API || " + JSON.stringify(data));
 
-        let caller = data.conversations[0].participants
-            .filter(participant => participant.purpose === "external")[0];
+            let caller = data.conversations[0].participants
+                .filter(participant => participant.purpose === "external")[0];
+            
+            let acd = data.conversations[0].participants
+                .filter(participant => participant.purpose === "acd")[0];
 
-        $("#supName").text(caller.participantName);
-        $("#supANI").text(caller.sessions[0].ani);
-        $("#supDNIS").text(caller.sessions[0].dnis);
-        $("#supState").text("connected");
-        $("#supWaitTime").text("");
-        $("#supDuration").text("");
+            $("#supName").text(caller.participantName);
+            $("#supANI").text(caller.sessions[0].ani);
+            $("#supDNIS").text(caller.sessions[0].dnis);
+            $("#supState").text("connected");
+            $("#supWaitTime").text("");
 
-        // Start timer for Call Duration
-        var intervalId = setInterval(function() {
-            var currentDate = new Date();        
-            $("#supDuration").text(new Date(currentDate - caller.conversationStart).toISOString().slice(11, -1).split('.')[0]);
-        }, 1000);
-        $("#supDuration").attr("data-timer-id",intervalId);
-    }
-    // }
-        // data => {
-        // console.log("CALL API || " + JSON.stringify(data));
-
-        // // let caller = eventBody.participants
-        // // .filter(participant => participant.purpose === "customer")[0];
-
-        // $("#supName").text("caller.name");
-        // $("#supANI").text("caller.address");
-        // $("#supDNIS").text("caller.calls[0].other.addressNormalized");
-        // $("#supState").text("agent.calls[0].state");
-        // $("#supDuration").text("00:00:00");
+            // Start timer for Call Duration
+            var intervalId = setInterval(function() {
+                var currentDate = new Date();        
+                $("#supDuration").text(new Date(currentDate - data.conversationStart).toISOString().slice(11, -1).split('.')[0]);
+            }, 1000);
+            $("#supDuration").attr("data-timer-id",intervalId);
+        }
     }).catch(e => console.log(e));
 
     // Create a Notifications Channel
