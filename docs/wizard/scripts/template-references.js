@@ -19,8 +19,11 @@ export default {
     "wizard-group-content": "modules/installation-wizard/groups/content",
     "wizard-group-control": "modules/installation-wizard/groups/control",
 
-    "wizard-role-control": "modules/installation-wizard/roles/control",
     "wizard-role-content": "modules/installation-wizard/roles/content",
+    "wizard-role-control": "modules/installation-wizard/roles/control",
+    
+    "wizard-role-assign-content": "modules/installation-wizard/roles-assignment/content",
+    "wizard-role-assign-control": "modules/installation-wizard/roles-assignment/control",
 
     "wizard-instance-content": "modules/installation-wizard/instances/content",
     "wizard-instance-control": "modules/installation-wizard/instances/control",

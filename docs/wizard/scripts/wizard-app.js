@@ -215,7 +215,33 @@ class WizardApp {
         // Keep the promises of the creation calls
         // This will be used to keep track once a particular batch resolves
         let groupPromises = [];
+        let authPromises = [];
         let integrationPromises = [];
+
+        this.stagingArea.roles.forEach((role) => {
+            // Add the premium app permission if not included in staging area
+            if(!role.permissions.includes(appConfig.premiumAppPermission))
+                role.permissions.push(appConfig.premiumAppPermission);
+
+            let roleBody = {
+                    "name": this.prefix + role.name,
+                    "description": "",
+                    "permissions": role.permissions
+            };
+
+            authPromises.push(
+                authApi.postAuthorizationRoles(roleBody)
+                .then((data) => {
+                    console.log("created role");
+                })
+                .catch((err) => console.log(err))
+            );
+        });
+
+        Promise.all(authPromises)
+        .then(() => console.log("DONE"));
+
+        /* TODO: Comment block temporarily disable creation of groups and app
 
         // Once groups are created store the names and the ids
         // object of (groupName: groupId) pairs
@@ -284,9 +310,8 @@ class WizardApp {
             });
             return Promise.all(integrationPromises);
         })
-        .then(() => console.log("Finished setting up App instances"))
+        .then(() => console.log("Finished setting up App instances")) */
     }
-
 
     /**
      * Loads the landing page of the app
@@ -468,7 +493,8 @@ class WizardApp {
         .catch(err => console.log(err));
     }
 
-    /**
+    /** 
+     * DEPRECATED
      * Stage the groups to be created.
      * Thi is the First step of the installation wizard.
      * @param {object} event 
@@ -510,7 +536,10 @@ class WizardApp {
         });
     }
 
-
+    /**
+     * Roles creation page
+     * @param {*} event 
+     */
     loadRolesCreation(event){
         this._renderCompletePage(
             {
@@ -546,11 +575,57 @@ class WizardApp {
             }, this));      
 
             // Next button to Apps Creation
-            $('#btn-next').click($.proxy(this.loadAppsCreation, this));
+            $('#btn-next').click($.proxy(this.loadRolesAssignment, this));
 
             // Back to check Installation
             $('#btn-prev').click($.proxy(this.loadCheckInstallationStatus, this));
         });
+    }
+
+    /**
+     * Page where user can choose which additional roles to assign to himself/herself
+     * @param {*} event 
+     */
+    loadRolesAssignment(event){
+        this._renderCompletePage(
+            {
+                title: "Assign Roles",
+                subtitle: "Assign roles to your current user."
+            },
+            null, hb["wizard-page"]
+        )
+        // Render left guide bar
+        // TODO: Change to Roles in template
+        .then(() => this._renderModule(hb['wizard-left'], {"highlight1": true}, 'wizard-left'))
+
+        //Render contents of staging area
+        .then(() => this._renderModule(hb['wizard-role-assign-content'], this.stagingArea, 'wizard-content'))
+
+        //Render controls
+        .then(() => this._renderModule(hb['wizard-role-assign-control'], {}, 'wizard-control'))
+
+        // Event Handlers
+        .then(() => {
+            // If add Role Button pressed then stage the role name 
+            // from the form input
+            $('#btn-add-role').click($.proxy(() => {
+                let roleName = $('#txt-role-name').val();
+                let tempRole = {
+                    "name": roleName,
+                    "permissions": [appConfig.premiumAppPermission]
+                };
+                this.stagingArea.roles.push(tempRole);
+
+                this._renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
+            }, this));      
+
+            // Next button to Apps Creation
+            $('#btn-next').click($.proxy(this.loadAppsCreation, this));
+
+            // Back to check Installation
+            $('#btn-prev').click($.proxy(this.loadRolesCreation, this));
+        });
+
     }
 
     /**
@@ -608,7 +683,7 @@ class WizardApp {
             $('#btn-next').click($.proxy(this.loadFinalizeInstallation, this));
 
             // Back to groups Installation
-            $('#btn-prev').click($.proxy(this.loadGroupsCreation, this));
+            $('#btn-prev').click($.proxy(this.loadRolesCreation, this));
         });
     }
 
