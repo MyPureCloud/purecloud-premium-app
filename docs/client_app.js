@@ -155,53 +155,64 @@ clientApp.loadSupervisorView = function(){
 //         ]
 //     }
 
-//     client.callApi(
-//         '/api/v2/analytics/conversations/details/query', 
-//         'POST', 
-//         {  }, 
-//         {  }, 
-//         {  }, 
-//         {  }, 
-//         body, 
-//         ['PureCloud Auth'], 
-//         ['application/json'], 
-//         ['application/json']
-//     ).then(data => {
-//         console.log("CALL API || " + data);
-//     }).catch( e => console.log(e) );
+    // client.callApi(
+    //     '/api/v2/analytics/conversations/details/query', 
+    //     'POST', 
+    //     {  }, 
+    //     {  }, 
+    //     {  }, 
+    //     {  }, 
+    //     body, 
+    //     ['PureCloud Auth'], 
+    //     ['application/json'], 
+    //     ['application/json']
+    // ).then(data => {
+    //     console.log("CALL API || " + data);
+    // }).catch( e => console.log(e) );
 // }
 
 clientApp.subscribeToQueue = function(queue){
     // Check if there is an active call
     var startDt = new Date();
-    var endDt = startDt.setDate(startDt.getDate() + 1);
-    console.log("endDt" + endDt);
-    console.log("endDt JSON" + endDt.toJSON());
+    var endDt = new Date(startDt.setDate(startDt.getDate() + 1));
     var body = 
-    {
-        interval: startDt.toJSON() + "/" + endDt.toJSON(),
-        order: "asc",
-        orderBy: "conversationStart",
-        paging: {
-            pageSize: 25,
-            pageNumber: 1
-        },
-        segmentFilters: [
-            {
-                type: "and",
-                predicates: [
-                    {
-                        type: "dimension",
-                        dimension: "queueId",
-                        operator: "matches",
-                        value: queue
-                    }
-                ]
-            }
-        ]
-    }
+        {
+            interval: startDt.toJSON() + "/" + endDt.toJSON(),
+            order: "asc",
+            orderBy: "conversationStart",
+            paging: {
+                pageSize: 25,
+                pageNumber: 1
+            },
+            segmentFilters: [
+                {
+                    type: "and",
+                    predicates: [
+                        {
+                            type: "dimension",
+                            dimension: "queueId",
+                            operator: "matches",
+                            value: queue
+                        }
+                    ]
+                }
+            ]
+        }
 
-    console.log("BODY || " + JSON.stringify(body));
+    client.callApi(
+        '/api/v2/analytics/conversations/details/query', 
+        'POST', 
+        {  }, 
+        {  }, 
+        {  }, 
+        {  }, 
+        body, 
+        ['PureCloud Auth'], 
+        ['application/json'], 
+        ['application/json']
+    ).then(data => {
+        console.log("CALL API || " + data);
+    }).catch( e => console.log(e) );
 
     // Create a Notifications Channel
     client.callApi(
