@@ -47,7 +47,7 @@ clientApp.setup = function(pcEnv){
     }).then(data => console.log("Succesfully set-up Client App."))
 
     // Error Handling
-    .catch( e => console.log(e) );
+    .catch(e => console.log(e));
 }
 
 // Handler for every Websocket message
@@ -127,51 +127,76 @@ clientApp.loadSupervisorView = function(){
     })
 }
 
-// clientApp.onPagLoad = function(){
-//     console.log("PAGE LOAD");
-
-//     var body = 
-//     {
-//         interval: "2018-06-28T16:00:00.000Z/2018-06-29T16:00:00.000Z",
-//         order: "asc",
-//         orderBy: "conversationStart",
-//         paging: {
-//             pageSize: 25,
-//             pageNumber: 1
-//         },
-//         conversationFilters: 
-//         [
-//             {
-//                 type: "or",
-//                 predicates: [
-//                     {
-//                         type: "dimension",
-//                         dimension: "queueId",
-//                         operator: "matches",
-//                         value: "58a9de5b-499b-490e-a10d-6422c08b2a02"
-//                     }
-//                 ]
-//             }
-//         ]
-//     }
-
-//     client.callApi(
-//         '/api/v2/analytics/conversations/details/query', 
-//         'POST', 
-//         {  }, 
-//         {  }, 
-//         {  }, 
-//         {  }, 
-//         body, 
-//         ['PureCloud Auth'], 
-//         ['application/json'], 
-//         ['application/json']
-//     ).then(data => {
-//         console.log("CALL API || " + data);
-//     }).catch( e => console.log(e) );
-// }
-
 clientApp.subscribeToQueue = function(queue){
+    // Check if there is an active call
+    var startDt = new Date();
+    startDt.setHours(0,0,0,0);
+    var endDt = new Date(startDt.setDate(startDt.getDate() + 1));
+    endDt.setHours(24,0,0,0);
+    var body = 
+        {
+            interval: startDt.toJSON() + "/" + endDt.toJSON(),
+            order: "asc",
+            orderBy: "conversationStart",
+            paging: {
+                pageSize: 25,
+                pageNumber: 1
+            },
+            segmentFilters: [
+                {
+                    type: "and",
+                    predicates: [
+                        {
+                            type: "dimension",
+                            dimension: "queueId",
+                            operator: "matches",
+                            value: queue
+                        }
+                    ]
+                }
+            ]
+        }
+
+    console.log("BODY || " + JSON.stringify(body));
+
+    client.callApi(
+        '/api/v2/analytics/conversations/details/query', 
+        'POST', 
+        {  }, 
+        {  }, 
+        {  }, 
+        {  }, 
+        body, 
+        ['PureCloud Auth'], 
+        ['application/json'], 
+        ['application/json']
+    ).then(//function() {
+    //     if(data.length > 0) {
+    //         console.log("CALL API || " + JSON.stringify(data));
+
+    //     // let caller = eventBody.participants
+    //     // .filter(participant => participant.purpose === "customer")[0];
+
+    //     $("#supName").text("caller.name");
+    //     $("#supANI").text("caller.address");
+    //     $("#supDNIS").text("caller.calls[0].other.addressNormalized");
+    //     $("#supState").text("agent.calls[0].state");
+    //     $("#supDuration").text("00:00:00");
+    //     }
+    // }
+        data => {
+        console.log("CALL API || " + JSON.stringify(data));
+
+        // let caller = eventBody.participants
+        // .filter(participant => participant.purpose === "customer")[0];
+
+        $("#supName").text("caller.name");
+        $("#supANI").text("caller.address");
+        $("#supDNIS").text("caller.calls[0].other.addressNormalized");
+        $("#supState").text("agent.calls[0].state");
+        $("#supDuration").text("00:00:00");
+    }).catch(e => console.log(e));
+
     // Create a Notifications Channel
     client.callApi(
         '/api/v2/notifications/channels', 
