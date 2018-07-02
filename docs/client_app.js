@@ -175,6 +175,8 @@ clientApp.subscribeToQueue = function(queue){
     // Check if there is an active call
     var startDt = new Date();
     var endDt = startDt.setDate(startDt.getDate() + 1);
+    console.log("endDt" + endDt);
+    console.log("endDt JSON" + endDt.toJSON());
     var body = 
     {
         interval: startDt.toJSON() + "/" + endDt.toJSON(),
