@@ -129,8 +129,10 @@ clientApp.loadSupervisorView = function(){
 
 clientApp.subscribeToQueue = function(queue){
     // Check if there is an active call
-    var startDt = new Date().setHours(0,0,0,0);
-    var endDt = new Date(startDt.setDate(startDt.getDate() + 1).setHours(24,0,0,0));
+    var startDt = new Date();
+    startDt.setHours(0,0,0,0);
+    var endDt = new Date(startDt.setDate(startDt.getDate() + 1));
+    endDt.setHours(24,0,0,0);
     var body = 
         {
             interval: startDt.toJSON() + "/" + endDt.toJSON(),
