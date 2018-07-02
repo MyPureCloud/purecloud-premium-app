@@ -15,10 +15,16 @@ export default {
     // Wizard Pages
     "wizard-page": "pages/wizard-page",
     "wizard-left": "modules/installation-wizard/module-wizard-sidebar",
+
     "wizard-group-content": "modules/installation-wizard/groups/content",
     "wizard-group-control": "modules/installation-wizard/groups/control",
+
+    "wizard-role-control": "modules/installation-wizard/roles/control",
+    "wizard-role-content": "modules/installation-wizard/roles/content",
+
     "wizard-instance-content": "modules/installation-wizard/instances/content",
     "wizard-instance-control": "modules/installation-wizard/instances/control",
+    
     "wizard-final-content": "modules/installation-wizard/final/content",
     "wizard-final-control": "modules/installation-wizard/final/control",
 
