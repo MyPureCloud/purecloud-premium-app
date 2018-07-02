@@ -1,3 +1,32 @@
+{{#if roles}}
+<div id="purecloud-roles">
+    <div style="margin-top: 20px;">
+        <div class="content is-marginless">
+            <h3>Roles</h3>
+        </div>
+    </div>
+
+    {{#each roles}}
+    <div class="box is-radiusless is-marginless">
+        <nav class="level">
+            <div class="level-left">
+                <strong>
+                    {{name}}
+                </strong>
+            </div>
+            <div class="level-right">
+            </div>
+        </nav>
+        <div>
+            <em>Permissions:</em> {{#each permissions}} "{{this}}". {{/each}}
+        </div> 
+    </div>
+    {{/each}}
+</div>
+{{/if}}
+
+
+{{#if groups}}
 <div id="purecloud-groups">
     <div style="margin-top: 20px;">
         <div class="content is-marginless">
@@ -17,7 +46,9 @@
     </div>
     {{/each}}
 </div>
+{{/if}}
 
+{{#if appInstances}}
 <div id="purecloud-instances">
     <div style="margin-top: 20px;"></div>
         <div class="content is-marginless">
@@ -54,4 +85,4 @@
     </div>
     {{/each}}
 </div>
-
+{{/if}}
