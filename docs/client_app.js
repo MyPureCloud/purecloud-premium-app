@@ -15,7 +15,7 @@ const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
 const usersApi = new platformClient.UsersApi();
 const notificationsApi = new platformClient.NotificationsApi();
 
-var onloadConvID = null;
+var onloadConvID;
 
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
 clientApp.setup = function(pcEnv){
@@ -189,6 +189,7 @@ clientApp.subscribeToQueue = function(queue){
     ).then(data => {
         if(Object.keys(data).length > 0) {
             onloadConvID = data.conversationId;
+            console.log("onloadConvID || " + onloadConvID);
 
             let caller = data.conversations[0].participants
                 .filter(participant => participant.purpose === "external")[0];
@@ -255,7 +256,7 @@ clientApp.onSocketMessageQueue = function(event){
         window.clearInterval($("#supDuration").attr("onload-timer-id"));
     }
 
-    console.log("onloadConvID || " + onloadConvID + "eventBody.id || " + eventBody.id);
+    console.log("onloadConvID || " + onloadConvID + " eventBody.id || " + eventBody.id);
 
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
