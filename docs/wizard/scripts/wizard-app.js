@@ -436,7 +436,38 @@ class WizardApp {
      */
     loadRolesCreation(event){
         let assignEventHandler = function(){
-            
+            console.log("Called");
+            // If add Role Button pressed then stage the role name 
+            // from the form input
+            $('#btn-add-role').click($.proxy(() => {
+                let roleName = $('#txt-role-name').val();
+                let roleDescription = $('#txt-role-description').val();
+                let tempRole = {
+                    "name": roleName,
+                    "description": roleDescription,
+                    "permissions": [appConfig.premiumAppPermission]
+                };
+                this.stagingArea.roles.push(tempRole);
+
+                _renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
+                .then($.proxy(assignEventHandler, this));
+            }, this));      
+
+            // Next button to Apps Creation
+            $('#btn-next').click($.proxy(this.loadRolesAssignment, this));
+
+            // Back to check Installation
+            $('#btn-prev').click($.proxy(this.loadCheckInstallationStatus, this));
+
+            // Assign deletion for each role entry
+            for(let i = 0; i < this.stagingArea.roles.length; i++){
+                let btnId = '#btn-delete-' + (i).toString();
+                $(btnId).click($.proxy(() => {
+                    this.stagingArea.roles.splice(i, 1);
+                    _renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
+                    .then($.proxy(assignEventHandler, this));
+                } ,this));
+            }
         }
 
         _renderCompletePage(
@@ -458,38 +489,7 @@ class WizardApp {
         .then(() => _renderModule(hb['wizard-role-control'], {}, 'wizard-control'))
 
         // Event Handlers
-        .then(() => {
-            // If add Role Button pressed then stage the role name 
-            // from the form input
-            $('#btn-add-role').click($.proxy(() => {
-                let roleName = $('#txt-role-name').val();
-                let roleDescription = $('#txt-role-description').val();
-                let tempRole = {
-                    "name": roleName,
-                    "description": roleDescription,
-                    "permissions": [appConfig.premiumAppPermission]
-                };
-                this.stagingArea.roles.push(tempRole);
-
-                this.loadRolesCreation();
-                //_renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
-            }, this));      
-
-            // Next button to Apps Creation
-            $('#btn-next').click($.proxy(this.loadRolesAssignment, this));
-
-            // Back to check Installation
-            $('#btn-prev').click($.proxy(this.loadCheckInstallationStatus, this));
-
-            // Assign deletion for each role entry
-            for(let i = 0; i < this.stagingArea.roles.length; i++){
-                let btnId = '#btn-delete-' + (i).toString();
-                $(btnId).click($.proxy(() => {
-                    this.stagingArea.roles.splice(i, 1);
-                    this.loadRolesCreation();
-                } ,this));
-            }
-        });
+        .then($.proxy(assignEventHandler, this));
     }
 
     /**

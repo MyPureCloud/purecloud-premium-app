@@ -12,7 +12,7 @@ export function _renderModule(page, context, target, resolveData) {
     context = (typeof context !== 'undefined') ? context : {}; 
     target = (typeof target !== 'undefined') ? target : 'default-module'; 
 
-    let templateUri = './views/' + page + '.handlebars';
+    let templateUri = './views/' + page + '.hbs';
     let templateSource;
     let template;
 
