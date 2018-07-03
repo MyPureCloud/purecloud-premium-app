@@ -120,7 +120,7 @@ class WizardApp {
         context = (typeof context !== 'undefined') ? context : {}; 
         target = (typeof target !== 'undefined') ? target : 'default-module'; 
 
-        let templateUri = 'templates/' + page + '.handlebars';
+        let templateUri = './views/' + page + '.handlebars';
         let templateSource;
         let template;
 
