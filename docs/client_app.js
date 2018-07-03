@@ -188,7 +188,7 @@ clientApp.subscribeToQueue = function(queue){
         ['application/json']
     ).then(data => {
         if(Object.keys(data).length > 0) {
-            onloadConvID = data.conversationId;
+            onloadConvID = data.conversations[0].conversationId;
             console.log("onloadConvID || " + onloadConvID);
 
             let caller = data.conversations[0].participants
