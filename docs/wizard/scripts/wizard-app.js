@@ -3,6 +3,7 @@
 */
 import appConfig from './config.js'
 import hb from './template-references.js'
+import { _renderModule, _renderCompletePage } from './handlebars-helper.js'
 
 // Requires jQuery and Handlebars from parent context
 const $ = window.$;
@@ -20,9 +21,7 @@ if((typeof $ === 'undefined') || (typeof jQuery === 'undefined') || (typeof Hand
  * @todo Change all members to static if more appropriate
  * @todo keep track of current main module(page) to check with inner modules before they're rendered
  * @todo keep track of current status with local storage to enable resuming
- * @todo move  Handlebar renderer functions to separate module.
  * @todo Separate functions for assigning event handlers
- * @todo Roles Creation
  * @todo For load page methods, check the event to make sure that it was invoked legally.
  */
 class WizardApp {
@@ -72,7 +71,6 @@ class WizardApp {
         console.log(this.pcApp.pcEnvironment);
     }
 
-
     /**
      * Authenticate to PureCloud (Implicit Grant)
      * @todo Assign default or notify user if can't determine purecloud environment
@@ -98,7 +96,7 @@ class WizardApp {
 
                 // Show appropriate elements based on qualification of user permissions.
                 if(!this.setupPermissionsRequired.every(perm => userMe.authorization.permissions.indexOf(perm) > -1)){
-                    this._renderModule('not-authorized');
+                    _renderModule('not-authorized');
                 }else{
                     resolve();
                 }
@@ -107,67 +105,6 @@ class WizardApp {
             }).catch(err => console.log(err));
         });
     }
-
-    /**
-     * Render the Handlebars template to the window
-     * @param {string} page     contains filename of handlebars file
-     * @param {object} context  context oject
-     * @param {string} target   ID of element HTML where rendered module will be placed
-     * @param {*}  resolveData  Optional data to pass for resolve of the promise
-     * @returns Promise
-     */
-    _renderModule(page, context, target, resolveData) {
-        context = (typeof context !== 'undefined') ? context : {}; 
-        target = (typeof target !== 'undefined') ? target : 'default-module'; 
-
-        let templateUri = './views/' + page + '.handlebars';
-        let templateSource;
-        let template;
-
-        return new Promise((resolve, reject) => {
-            // Async get the desired template file
-            $.ajax({
-                url: templateUri,
-                cache: true
-            })
-            .done(data => {
-                // Compile Handlebars template 
-                templateSource = data;
-                template = Handlebars.compile(templateSource);
-
-                // Render html and display to the target element
-                let renderedHtml = template(context);
-                $('#' + target).html(renderedHtml);
-
-                resolve(resolveData);
-            })
-            .fail(xhr => {
-                console.log('error', xhr);
-                reject(xhr);
-            });
-        });
-    }
-
-    /**
-     * Render a complete page with header and body
-     * @param {Object} headerContext    contains title and subtitle for header
-     * @param {Object} bodyContext      context for the body
-     * @param {string} bodyTemplate     filename of template for the body section
-     */
-    _renderCompletePage(headerContext, bodyContext, bodyTemplate){
-        // Default values
-        headerContext = (typeof headerContext !== 'undefined') ? headerContext : {};
-        bodyContext = (typeof bodyContext !== 'undefined') ? bodyContext : {};
-
-        return new Promise((resolve, reject) => {
-            this._renderModule(hb['root'])
-            .then(() => this._renderModule(hb['header'], headerContext, 'root-header'))
-            .then(() => this._renderModule(bodyTemplate, bodyContext, 'root-body'))
-            .then(() => resolve())
-        })
-        
-    }
-
 
     /**
      * Load the default installation order for the wizard
@@ -204,8 +141,8 @@ class WizardApp {
      */
     installAppConfigurations(event){
         // Remove controls
-        this._renderModule(hb['blank'], this.stagingArea, 'wizard-content');
-        this._renderModule(hb['blank'], this.stagingArea, 'wizard-control');
+        _renderModule(hb['blank'], this.stagingArea, 'wizard-content');
+        _renderModule(hb['blank'], this.stagingArea, 'wizard-control');
 
         // Api instances
         let groupsApi = new this.platformClient.GroupsApi();
@@ -327,8 +264,7 @@ class WizardApp {
             .then(orgData => {
                 let orgFeature = orgData.features;
     
-                this._renderCompletePage(
-                    {
+                _renderCompletePage({
                         "title": "App Setup Wizard",
                         "subtitle": "Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App."
                     }, 
@@ -354,7 +290,7 @@ class WizardApp {
     loadCheckInstallationStatus(event){
         this._loadDefaultOrder(this.defaultOrderFileName)
         .then(() => 
-        this._renderCompletePage(
+        _renderCompletePage(
             {
                 "title": "Checking Installation",
                 "subtitle": "Check any existing PureCloud Objects that is set up by the App"
@@ -405,7 +341,7 @@ class WizardApp {
                 icon: 'fa-users'
             }
 
-            return this._renderModule(hb['existing-objects'], context, 'results-group', group);
+            return _renderModule(hb['existing-objects'], context, 'results-group', group);
         })
 
         // Add delete button handlers
@@ -439,7 +375,7 @@ class WizardApp {
                 icon: 'fa-briefcase'
             }
 
-            return this._renderModule(hb['existing-objects'], context, 'results-role', roles);
+            return _renderModule(hb['existing-objects'], context, 'results-role', roles);
         })
         // Add delete button handlers
         // data is the roles from PureCloud
@@ -469,7 +405,7 @@ class WizardApp {
                 pureCloudObjArr: integrations,
                 icon: 'fa-cogs'
             }
-            return this._renderModule(hb['existing-objects'], context, 'results-integration', integrations);
+            return _renderModule(hb['existing-objects'], context, 'results-integration', integrations);
         })
 
         // Add delete button handlers
@@ -499,7 +435,11 @@ class WizardApp {
      * @param {*} event 
      */
     loadRolesCreation(event){
-        this._renderCompletePage(
+        let assignEventHandler = function(){
+            
+        }
+
+        _renderCompletePage(
             {
                 title: "Create Roles",
                 subtitle: "Roles are used to provide and determine access levels on the Premium App."
@@ -509,13 +449,13 @@ class WizardApp {
 
         // Render left guide bar
         // TODO: Change to Roles in template
-        .then(() => this._renderModule(hb['wizard-left'], {"highlight1": true}, 'wizard-left'))
+        .then(() => _renderModule(hb['wizard-left'], {"highlight1": true}, 'wizard-left'))
 
         //Render contents of staging area
-        .then(() => this._renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content'))
+        .then(() => _renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content'))
 
         //Render controls
-        .then(() => this._renderModule(hb['wizard-role-control'], {}, 'wizard-control'))
+        .then(() => _renderModule(hb['wizard-role-control'], {}, 'wizard-control'))
 
         // Event Handlers
         .then(() => {
@@ -532,7 +472,7 @@ class WizardApp {
                 this.stagingArea.roles.push(tempRole);
 
                 this.loadRolesCreation();
-                //this._renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
+                //_renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
             }, this));      
 
             // Next button to Apps Creation
@@ -557,7 +497,7 @@ class WizardApp {
      * @param {*} event 
      */
     loadRolesAssignment(event){
-        this._renderCompletePage(
+        _renderCompletePage(
             {
                 title: "Assign Roles",
                 subtitle: "Assign roles to your current user."
@@ -566,13 +506,13 @@ class WizardApp {
         )
         // Render left guide bar
         // TODO: Change to Roles in template
-        .then(() => this._renderModule(hb['wizard-left'], {"highlight1": true}, 'wizard-left'))
+        .then(() => _renderModule(hb['wizard-left'], {"highlight1": true}, 'wizard-left'))
 
         //Render contents of staging area
-        .then(() => this._renderModule(hb['wizard-role-assign-content'], this.stagingArea, 'wizard-content'))
+        .then(() => _renderModule(hb['wizard-role-assign-content'], this.stagingArea, 'wizard-content'))
 
         //Render controls
-        .then(() => this._renderModule(hb['wizard-role-assign-control'], {}, 'wizard-control'))
+        .then(() => _renderModule(hb['wizard-role-assign-control'], {}, 'wizard-control'))
 
         // Event Handlers
         .then(() => {
@@ -586,7 +526,7 @@ class WizardApp {
                 };
                 this.stagingArea.roles.push(tempRole);
 
-                this._renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
+                _renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
             }, this));      
 
             // Next button to Apps Creation
@@ -603,7 +543,7 @@ class WizardApp {
      * @param {object} event 
      */
     loadGroupsCreation(event){
-        this._renderCompletePage(
+        _renderCompletePage(
             {
                 title: "Create groups",
                 subtitle: "Groups are required to filter which members will have access to specific instances of the App."
@@ -612,13 +552,13 @@ class WizardApp {
         )
 
         // Render left guide bar
-        .then(() => this._renderModule(hb['wizard-left'], {"highlight2": true}, 'wizard-left'))
+        .then(() => _renderModule(hb['wizard-left'], {"highlight2": true}, 'wizard-left'))
         
         //Render contents of staging area
-        .then(() => this._renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content'))
+        .then(() => _renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content'))
         
         //Render controls
-        .then(() => this._renderModule(hb['wizard-group-control'], {}, 'wizard-control'))
+        .then(() => _renderModule(hb['wizard-group-control'], {}, 'wizard-control'))
 
         // TODO: Input Validation and Error Handling
         .then(() => {
@@ -628,7 +568,7 @@ class WizardApp {
                 let groupName = $('#txt-group-name').val();
                 this.stagingArea.groups.push(groupName);
 
-                this._renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
+                _renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
             }, this));      
 
             // Next button to Apps Creation
@@ -644,7 +584,7 @@ class WizardApp {
      * @param {event} event 
      */
     loadAppsCreation(event){
-        this._renderCompletePage(
+        _renderCompletePage(
             {
                 title: "Create App Instances",
                 subtitle: "These is where you add instances of you app." +
@@ -656,13 +596,13 @@ class WizardApp {
         )
 
         // Render left guide bar
-        .then(() => this._renderModule(hb['wizard-left'], {"highlight3": true}, 'wizard-left'))
+        .then(() => _renderModule(hb['wizard-left'], {"highlight3": true}, 'wizard-left'))
         
         //Render contents of staging area
-        .then(() => this._renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content'))
+        .then(() => _renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content'))
         
         //Render controls 
-        .then(() => this._renderModule(hb['wizard-instance-control'], this.stagingArea, 'wizard-control'))
+        .then(() => _renderModule(hb['wizard-instance-control'], this.stagingArea, 'wizard-control'))
 
         // Assign Event Handlers
         .then(() => {
@@ -680,7 +620,7 @@ class WizardApp {
                 }
                 this.stagingArea.appInstances.push(instanceBody);
 
-                this._renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content')
+                _renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content')
             }, this));    
             
             // Clear form content            
@@ -704,7 +644,7 @@ class WizardApp {
      * @todo Move actual PureCloud configuration and installation to separate method 
      */
     loadFinalizeInstallation(event){
-        this._renderCompletePage(
+        _renderCompletePage(
             {
                 title: "Finalize",
                 subtitle: "Please review the items below and press Install to " + 
@@ -713,13 +653,13 @@ class WizardApp {
             null, hb["wizard-page"]
         )
          // Render left guide bar
-         .then(() => this._renderModule(hb['wizard-left'], {"highlight4": true}, 'wizard-left'))
+         .then(() => _renderModule(hb['wizard-left'], {"highlight4": true}, 'wizard-left'))
 
          //Render contents of staging area
-        .then(() => this._renderModule(hb['wizard-final-content'], this.stagingArea, 'wizard-content'))
+        .then(() => _renderModule(hb['wizard-final-content'], this.stagingArea, 'wizard-content'))
         
         //Render controls 
-        .then(() => this._renderModule(hb['wizard-final-control'], this.stagingArea, 'wizard-control'))  
+        .then(() => _renderModule(hb['wizard-final-control'], this.stagingArea, 'wizard-control'))  
         
         // Assign Event Handlers
         .then(() => {
