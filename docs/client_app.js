@@ -189,7 +189,6 @@ clientApp.subscribeToQueue = function(queue){
     ).then(data => {
         if(Object.keys(data).length > 0) {
             onloadConvID = data.conversations[0].conversationId;
-            console.log("onloadConvID || " + onloadConvID);
 
             let caller = data.conversations[0].participants
                 .filter(participant => participant.purpose === "external")[0];
@@ -255,8 +254,6 @@ clientApp.onSocketMessageQueue = function(event){
         // Stop timer for Call Duration
         window.clearInterval($("#supDuration").attr("onload-timer-id"));
     }
-
-    console.log("onloadConvID || " + onloadConvID + " eventBody.id || " + eventBody.id);
 
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
