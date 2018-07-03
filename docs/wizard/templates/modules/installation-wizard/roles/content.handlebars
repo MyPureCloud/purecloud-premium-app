@@ -20,17 +20,20 @@
     {{#each roles}}
     <div class="box is-radiusless is-marginless">
         <nav class="level">
-            <div class="level-left">
+            <div class="level-left is-size-5">
                 <strong>
                     {{name}}
                 </strong>
             </div>
             <div class="level-right">
-                <a class="delete"></a>
+                <button id="btn-delete-{{name}}" class="delete"></button>
             </div>
         </nav>
         <div>
-            <em>Permissions:</em> {{#each permissions}} "{{this}}". {{/each}}
+            <em>Permissions: </em> {{#each permissions}} "{{this}}". {{/each}}
+        </div> 
+        <div>
+            <em>Description: </em> {{description}}
         </div> 
     </div>
     {{/each}}

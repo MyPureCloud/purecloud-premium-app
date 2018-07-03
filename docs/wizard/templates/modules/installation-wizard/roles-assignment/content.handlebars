@@ -1,21 +1,31 @@
 <div id="purecloud-roles">
+    <div style="margin-top: 20px; margin-bottom: 10px;" class="is-size-5">
+        Check the roles you wish to assign to yourself.
+    </div>
     {{#each roles}}
     <div class="box is-radiusless is-marginless">
-        <div>
-            <label for="" class="checkbox">
-                <input type="checkbox" name="" id="{{name}}" checked>
-                Assign to Me
-            </label>
-        </div>
+        <article class="media">
+            <div class="media-left">
+                <label for="" class="checkbox">
+                    <input type="checkbox" name="" id="{{name}}" checked>
+                </label>
+            </div>
+            <div class="media-content">
+                <div class="content">
+                    <div class="is-size-5">
+                        <strong>{{name}}</strong>
+                    </div>
+                    <div>
+                        <em>Permissions: </em> {{#each permissions}} "{{this}}". {{/each}}
+                    </div>
+                    <div>
+                        <em>Description: </em> {{description}}
+                    </div>  
+                </div>
+            </div>
+        </article>
         
-        <div>
-            <strong>
-                {{name}}
-            </strong>
-        </div>
-        <div>
-            <em>Permissions:</em> {{#each permissions}} "{{this}}". {{/each}}
-        </div> 
+        
     </div>
     {{/each}}
 </div>
