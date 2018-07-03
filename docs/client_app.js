@@ -15,6 +15,8 @@ const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
 const usersApi = new platformClient.UsersApi();
 const notificationsApi = new platformClient.NotificationsApi();
 
+var onloadConvID;
+
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
 clientApp.setup = function(pcEnv){
     let clientId = clientIDs[pcEnv] || clientIDs['mypurecloud.com'];
@@ -173,8 +175,6 @@ clientApp.subscribeToQueue = function(queue){
             ]
         }
 
-    console.log("BODY || " + JSON.stringify(body));
-
     client.callApi(
         '/api/v2/analytics/conversations/details/query', 
         'POST', 
@@ -188,38 +188,35 @@ clientApp.subscribeToQueue = function(queue){
         ['application/json']
     ).then(data => {
         if(Object.keys(data).length > 0) {
-            console.log("CALL API || " + JSON.stringify(data));
+            onloadConvID = data.conversations[0].conversationId;
 
-        let caller = data.conversations[0].participants
-            .filter(participant => participant.purpose === "external")[0];
+            let caller = data.conversations[0].participants
+                .filter(participant => participant.purpose === "external")[0];
+            
+            let acd = data.conversations[0].participants
+                .filter(participant => participant.purpose === "acd")[0];
 
-        $("#supName").text(caller.participantName);
-        $("#supANI").text(caller.sessions[0].ani);
-        $("#supDNIS").text(caller.sessions[0].dnis);
-        $("#supState").text("connected");
-        $("#supWaitTime").text("");
-        $("#supDuration").text("");
+            let acdSegment = acd.sessions[0].segments
+                .filter(segment => segment.segmentType === "interact")[0];
 
-        // Start timer for Call Duration
-        var intervalId = setInterval(function() {
-            var currentDate = new Date();        
-            $("#supDuration").text(new Date(currentDate - caller.conversationStart).toISOString().slice(11, -1).split('.')[0]);
-        }, 1000);
-        $("#supDuration").attr("data-timer-id",intervalId);
-    }
-    // }
-        // data => {
-        // console.log("CALL API || " + JSON.stringify(data));
+            let conversationStart = new Date(data.conversations[0].conversationStart);
+            let acdStart = new Date(acdSegment.segmentStart);
+            let acdEnd = new Date(acdSegment.segmentEnd);
 
-        // // let caller = eventBody.participants
-        // // .filter(participant => participant.purpose === "customer")[0];
+            $("#supName").text(caller.participantName);
+            $("#supANI").text(caller.sessions[0].ani);
+            $("#supDNIS").text(caller.sessions[0].dnis);
+            $("#supState").text("connected");
+            $("#supWaitTime").text(new Date(acdEnd - acdStart).toISOString().slice(11, -1));
 
-        // $("#supName").text("caller.name");
-        // $("#supANI").text("caller.address");
-        // $("#supDNIS").text("caller.calls[0].other.addressNormalized");
-        // $("#supState").text("agent.calls[0].state");
-        // $("#supDuration").text("00:00:00");
-    }).catch(e => console.log(e));
+            // Start timer for Call Duration
+            var intervalId = setInterval(function() {
+                var currentDate = new Date();        
+                $("#supDuration").text(new Date(currentDate - conversationStart).toISOString().slice(11, -1).split('.')[0]);
+            }, 1000);
+            $("#supDuration").attr("onload-timer-id",intervalId);
+        }
+    }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + body));
 
     // Create a Notifications Channel
     client.callApi(
@@ -252,8 +249,11 @@ clientApp.onSocketMessageQueue = function(event){
     let topic = data.topicName;
     let eventBody = data.eventBody;
 
-    // Stop timer for on page load timer
-    window.clearInterval($("#supWaitTime").attr("data-timer-id"));
+    // If new socket message for the active call on page load
+    if(onloadConvID === eventBody.id){
+        // Stop timer for Call Duration
+        window.clearInterval($("#supDuration").attr("onload-timer-id"));
+    }
 
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
@@ -285,7 +285,7 @@ clientApp.onSocketMessageQueue = function(event){
                 var currentDate = new Date();        
                 $("#supWaitTime").text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);
             }, 1000);
-            $("#supWaitTime").attr("data-timer-id",intervalId1);
+            $("#supWaitTime").attr("wait-timer-id",intervalId1);
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
@@ -293,17 +293,17 @@ clientApp.onSocketMessageQueue = function(event){
             // If active call
 
             // Stop timer for Caller Wait Time
-            window.clearInterval($("#supWaitTime").attr("data-timer-id"));
+            window.clearInterval($("#supWaitTime").attr("wait-timer-id"));
 
             $("#supState").text(agent.calls[0].state);
-            $("#supWaitTime").text(new Date(custConnectedDt - acdConnectedDt).toISOString().slice(11, -1));
+            $("#supWaitTime").text(new Date(acdConnectedDt - custConnectedDt).toISOString().slice(11, -1));
 
             // Start timer for Call Duration
             var intervalId2 = setInterval(function() {
                 var currentDate = new Date();        
                 $("#supDuration").text(new Date(currentDate - custConnectedDt).toISOString().slice(11, -1).split('.')[0]);
             }, 1000);
-            $("#supDuration").attr("data-timer-id",intervalId2);
+            $("#supDuration").attr("duration-timer-id",intervalId2);
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
@@ -311,8 +311,8 @@ clientApp.onSocketMessageQueue = function(event){
             // If disconnected call
 
             // Stop timer for Call Wait Time and Call Duration
-            window.clearInterval($("#supWaitTime").attr("data-timer-id"));
-            window.clearInterval($("#supDuration").attr("data-timer-id"));
+            window.clearInterval($("#supWaitTime").attr("wait-timer-id"));
+            window.clearInterval($("#supDuration").attr("duration-timer-id"));
 
             $("#supState").text(agent.calls[0].state);
             $("#supWaitTime").text(new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1));
@@ -322,8 +322,8 @@ clientApp.onSocketMessageQueue = function(event){
             clientApp.isCallActiveSup = false;
         } else if((caller.endTime !== undefined) && (!clientApp.isCallActiveSup)){
             // Stop timer for Call Wait Time and Call Duration
-            window.clearInterval($("#supWaitTime").attr("data-timer-id"));
-            window.clearInterval($("#supDuration").attr("data-timer-id"));
+            window.clearInterval($("#supWaitTime").attr("wait-timer-id"));
+            window.clearInterval($("#supDuration").attr("duration-timer-id"));
 
             $("#supName").text("");
             $("#supANI").text("");
