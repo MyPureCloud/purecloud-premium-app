@@ -2,15 +2,18 @@
     "groups": ["agents", "supervisors", "admin"],
     "roles": [
         {
-            "name": "admin",
+            "name": "Admin",
+            "description": "Admins will be able to access the Premium App installation wizard and make changes to the configurations.",
             "permissions": ["admin", "premium_app_permission"]
         },
         {
-            "name": "supervisor",
+            "name": "Supervisor",
+            "description": "Supervisors have the ability to watch a queue for ACD conversations.",
             "permissions": ["premium_app_permission"]
         },
         {
-            "name": "agent",
+            "name": "Agent",
+            "description": "Agents have access to a widget that gives US state information based on caller's number.",
             "permissions": ["premium_app_permission"]
         }
     ],
