@@ -1,5 +1,4 @@
 {
-    "groups": ["agents", "supervisors", "admin"],
     "roles": [
         {
             "name": "Admin",
@@ -17,18 +16,28 @@
             "permissions": ["premium_app_permission"]
         }
     ],
+    "groups": [
+        {
+            "name": "Agents",
+            "description": "Agents have access to a widget that gives US state information based on caller's number."
+        },
+        {
+            "name": "Supervisors",
+            "description": "Supervisors have the ability to watch a queue for ACD conversations."
+        }
+    ],
     "appInstances": [
         {
             "name": "Agent Widget",
             "url": "https://localhost/index.html",
             "type": "standalone",
-            "roles": "agent"
+            "groups": ["Agents"]
         },
         {
             "name": "Supervisor Widget",
             "url": "https://localhost/supervisor.html",
             "type": "widget",
-            "roles": "supervisor"
+            "groups": ["Supervisors"]
         }
     ]
 }
