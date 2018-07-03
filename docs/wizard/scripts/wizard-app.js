@@ -376,12 +376,12 @@ class WizardApp {
         // Query bodies
         var groupSearchBody = {
             "query": [
-            {
-                "fields": ["name"],
-                "value": this.prefix,
-                "operator": "OR",
-                "type": "STARTS_WITH"
-            }
+                {
+                    "fields": ["name"],
+                    "value": this.prefix,
+                    "operator": "OR",
+                    "type": "STARTS_WITH"
+                }
             ]
         };
 
@@ -565,8 +565,10 @@ class WizardApp {
             // from the form input
             $('#btn-add-role').click($.proxy(() => {
                 let roleName = $('#txt-role-name').val();
+                let roleDescription = $('#txt-role-description').val();
                 let tempRole = {
                     "name": roleName,
+                    "description": roleDescription,
                     "permissions": [appConfig.premiumAppPermission]
                 };
                 this.stagingArea.roles.push(tempRole);
@@ -579,6 +581,14 @@ class WizardApp {
 
             // Back to check Installation
             $('#btn-prev').click($.proxy(this.loadCheckInstallationStatus, this));
+
+            this.stagingArea.roles.forEach((role) => {
+                let btnId = '#btn-delete-' + role.name;
+                $(btnId).click($.proxy(() => {
+                    this.stagingArea.roles = this.stagingArea.roles.filter((innerRole) => innerRole.name !== role.name);
+                    this.loadRolesCreation();
+                } ,this));
+            })
         });
     }
 
