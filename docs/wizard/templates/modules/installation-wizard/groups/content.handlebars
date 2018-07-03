@@ -13,15 +13,20 @@
 
 <div id="purecloud-groups">
     {{#each groups}}
-    <div class="box is-radiusless is-marginless">
+     <div class="box is-radiusless is-marginless">
         <nav class="level">
-            <div class="level-left">
-                {{this}}
+            <div class="level-left is-size-5">
+                <strong>
+                    {{name}}
+                </strong>
             </div>
             <div class="level-right">
-                <a class="delete"></a>
+                <button id="btn-delete-{{@index}}" class="delete"></button>
             </div>
         </nav>
+        <div>
+            <em>Description: </em> {{description}}
+        </div> 
     </div>
     {{/each}}
 </div>

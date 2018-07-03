@@ -493,48 +493,6 @@ class WizardApp {
         .catch(err => console.log(err));
     }
 
-    /** 
-     * DEPRECATED
-     * Stage the groups to be created.
-     * Thi is the First step of the installation wizard.
-     * @param {object} event 
-     */
-    loadGroupsCreation(event){
-        this._renderCompletePage(
-            {
-                title: "Create groups",
-                subtitle: "Groups are required to filter which members will have access to specific instances of the App."
-            },
-            null, hb["wizard-page"]
-        )
-
-        // Render left guide bar
-        .then(() => this._renderModule(hb['wizard-left'], {"highlight1": true}, 'wizard-left'))
-        
-        //Render contents of staging area
-        .then(() => this._renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content'))
-        
-        //Render controls
-        .then(() => this._renderModule(hb['wizard-group-control'], {}, 'wizard-control'))
-
-        // TODO: Input Validation and Error Handling
-        .then(() => {
-            // If add Group Button pressed then stage the group name 
-            // from the form input
-            $('#btn-add-group').click($.proxy(() => {
-                let groupName = $('#txt-group-name').val();
-                this.stagingArea.groups.push(groupName);
-
-                this._renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
-            }, this));      
-
-            // Next button to Apps Creation
-            $('#btn-next').click($.proxy(this.loadAppsCreation, this));
-
-            // Back to check Installation
-            $('#btn-prev').click($.proxy(this.loadCheckInstallationStatus, this));
-        });
-    }
 
     /**
      * Roles creation page
@@ -573,7 +531,8 @@ class WizardApp {
                 };
                 this.stagingArea.roles.push(tempRole);
 
-                this._renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
+                this.loadRolesCreation();
+                //this._renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
             }, this));      
 
             // Next button to Apps Creation
@@ -582,13 +541,14 @@ class WizardApp {
             // Back to check Installation
             $('#btn-prev').click($.proxy(this.loadCheckInstallationStatus, this));
 
-            this.stagingArea.roles.forEach((role) => {
-                let btnId = '#btn-delete-' + role.name;
+            // Assign deletion for each role entry
+            for(let i = 0; i < this.stagingArea.roles.length; i++){
+                let btnId = '#btn-delete-' + (i).toString();
                 $(btnId).click($.proxy(() => {
-                    this.stagingArea.roles = this.stagingArea.roles.filter((innerRole) => innerRole.name !== role.name);
+                    this.stagingArea.roles.splice(i, 1);
                     this.loadRolesCreation();
                 } ,this));
-            })
+            }
         });
     }
 
@@ -630,12 +590,53 @@ class WizardApp {
             }, this));      
 
             // Next button to Apps Creation
-            $('#btn-next').click($.proxy(this.loadAppsCreation, this));
+            $('#btn-next').click($.proxy(this.loadGroupsCreation, this));
 
             // Back to check Installation
             $('#btn-prev').click($.proxy(this.loadRolesCreation, this));
         });
+    }
 
+    /** 
+     * Stage the groups to be created.
+     * Thi is the First step of the installation wizard.
+     * @param {object} event 
+     */
+    loadGroupsCreation(event){
+        this._renderCompletePage(
+            {
+                title: "Create groups",
+                subtitle: "Groups are required to filter which members will have access to specific instances of the App."
+            },
+            null, hb["wizard-page"]
+        )
+
+        // Render left guide bar
+        .then(() => this._renderModule(hb['wizard-left'], {"highlight2": true}, 'wizard-left'))
+        
+        //Render contents of staging area
+        .then(() => this._renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content'))
+        
+        //Render controls
+        .then(() => this._renderModule(hb['wizard-group-control'], {}, 'wizard-control'))
+
+        // TODO: Input Validation and Error Handling
+        .then(() => {
+            // If add Group Button pressed then stage the group name 
+            // from the form input
+            $('#btn-add-group').click($.proxy(() => {
+                let groupName = $('#txt-group-name').val();
+                this.stagingArea.groups.push(groupName);
+
+                this._renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
+            }, this));      
+
+            // Next button to Apps Creation
+            $('#btn-next').click($.proxy(this.loadAppsCreation, this));
+
+            // Back to check Installation
+            $('#btn-prev').click($.proxy(this.loadRolesAssignment, this));
+        });
     }
 
     /**
@@ -655,7 +656,7 @@ class WizardApp {
         )
 
         // Render left guide bar
-        .then(() => this._renderModule(hb['wizard-left'], {"highlight2": true}, 'wizard-left'))
+        .then(() => this._renderModule(hb['wizard-left'], {"highlight3": true}, 'wizard-left'))
         
         //Render contents of staging area
         .then(() => this._renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content'))
@@ -693,7 +694,7 @@ class WizardApp {
             $('#btn-next').click($.proxy(this.loadFinalizeInstallation, this));
 
             // Back to groups Installation
-            $('#btn-prev').click($.proxy(this.loadRolesCreation, this));
+            $('#btn-prev').click($.proxy(this.loadGroupsCreation, this));
         });
     }
 
@@ -712,7 +713,7 @@ class WizardApp {
             null, hb["wizard-page"]
         )
          // Render left guide bar
-         .then(() => this._renderModule(hb['wizard-left'], {"highlight3": true}, 'wizard-left'))
+         .then(() => this._renderModule(hb['wizard-left'], {"highlight4": true}, 'wizard-left'))
 
          //Render contents of staging area
         .then(() => this._renderModule(hb['wizard-final-content'], this.stagingArea, 'wizard-content'))
