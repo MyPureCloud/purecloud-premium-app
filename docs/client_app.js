@@ -293,10 +293,14 @@ clientApp.onSocketMessageQueue = function(event){
     if(topic === clientApp.topicId){
         // Check to see if Conversation details is already displayed in the view
         if (conversationIDs.includes(eventBody.id)) {
-            clientApp.updateTableRow(data);           
+            clientApp.updateTableRow(data);
+            console.log("UPDATE TABLE ROW");
         } else {
             // Add to pool of Conversations already displayed in the view
             conversationIDs.push(eventBody.id);
+            console.log("ADD TABLE ROW");
+            console.log("DATA || " + JSON.stringify(data));
+            console.log("CONVERSATION IDS || " + conversationIDs.toString());
 
             // Call addTableRow function
             clientApp.addTableRow(data);
@@ -454,7 +458,7 @@ clientApp.updateTableRow = function(data) {
         .filter(participant => participant.purpose === "acd")[0];
 
     // Find Conversation ID in the table
-    var numberCell = $("td:contains('" + eventBody.id + "')");
+    var numberCell = $("td:contains('" + data.eventBody.id + "')");
     var row = numberCell.parent();
 
     // Update State column
