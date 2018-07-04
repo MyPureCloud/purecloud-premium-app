@@ -305,6 +305,8 @@ clientApp.onSocketMessageQueue = function(event){
         //     clientApp.addTableRow(data);
         // }    
     
+        console.log("WEB SOCKET || " + JSON.stringify(data));
+
         // If new socket message for the active call on page load
         if(onloadConvID === eventBody.id){
             // Stop timer for Call Duration
@@ -331,7 +333,7 @@ clientApp.onSocketMessageQueue = function(event){
 
         // If incoming call
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup)){
-            console.log("INCOMING CALL || " + JSON.stringify(data));
+            console.log("INCOMING CALL");
             $("#supState").text(agent.calls[0].state);
             $("#supDuration").text("00:00:00");
 
@@ -345,7 +347,7 @@ clientApp.onSocketMessageQueue = function(event){
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if((acd.endTime === undefined) && (caller.endTime === undefined)) {
-            console.log("ACTIVE CALL || " + JSON.stringify(data));
+            console.log("ACTIVE CALL");
             // If active call
 
             // Stop timer for Caller Wait Time
@@ -364,7 +366,7 @@ clientApp.onSocketMessageQueue = function(event){
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent.calls[0].state === "disconnected") {
-            console.log("DISCONNECTED CALL || " + JSON.stringify(data));
+            console.log("DISCONNECTED CALL");
             // If disconnected call
 
             // Stop timer for Call Wait Time and Call Duration
