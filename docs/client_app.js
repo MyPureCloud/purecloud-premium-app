@@ -9,8 +9,8 @@ let conversationIDs = [];
 // PureCloud OAuth information
 const platformClient = require('platformClient');
 const client = platformClient.ApiClient.instance;
-const redirectUri = "http://localhost:3000";
-// const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
+// const redirectUri = "http://localhost:3000";
+const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
 
 // API instances
 const usersApi = new platformClient.UsersApi();
