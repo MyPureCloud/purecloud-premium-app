@@ -15,13 +15,13 @@
     {{#each appInstances}}
     <div class="box is-radiusless is-marginless">
         <nav class="level">
-            <div class="level-left">
-                <p>  
-                   <strong>{{name}}</strong> 
-                </p>
+            <div class="level-left is-size-5">
+                <strong>
+                    {{name}}
+                </strong>
             </div>
             <div class="level-right">
-                <a class="delete"></a>
+                <button id="btn-delete-{{@index}}" class="delete"></button>
             </div>
         </nav>
         <div class="media-content">
