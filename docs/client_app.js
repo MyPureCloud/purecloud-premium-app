@@ -401,29 +401,32 @@ clientApp.addTableRow = function(data) {
     var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
     var newRow   = tableRef.insertRow(tableRef.rows.length);
 
+    // Hide Conversation ID column
+    tableRef.column[0].style.display = "none";
+
     // Populate Conversation ID column
     var idCell  = newRow.insertCell(0);
-    var idText  = document.createTextNode(data.eventBody.id)
+    var idText  = document.createTextNode(data.eventBody.id);
     idCell.appendChild(idText);
 
     // Populate Name column
     var nameCell  = newRow.insertCell(1);
-    var nameText  = document.createTextNode(caller.name)
+    var nameText  = document.createTextNode(caller.name);
     nameCell.appendChild(nameText);
 
     // Populate ANI column
     var aniCell  = newRow.insertCell(2);
-    var aniText  = document.createTextNode(caller.address)
+    var aniText  = document.createTextNode(caller.address);
     aniCell.appendChild(aniText);
 
     // Populate DNIS column
     var dnisCell  = newRow.insertCell(3);
-    var dnisText  = document.createTextNode(caller.calls[0].other.addressNormalized)
+    var dnisText  = document.createTextNode(caller.calls[0].other.addressNormalized);
     dnisCell.appendChild(dnisText);
 
     // Populate State column
     var stateCell  = newRow.insertCell(4);
-    var stateText  = document.createTextNode(agent.calls[0].state)
+    var stateText  = document.createTextNode(agent.calls[0].state);
     stateCell.appendChild(stateText);
 
     // Populate Wait Time column
