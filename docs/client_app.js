@@ -402,7 +402,7 @@ clientApp.addTableRow = function(data) {
     var newRow   = tableRef.insertRow(tableRef.rows.length);
 
     // Hide Conversation ID column
-    tableRef.column[0].style.display = "none";
+    $('td:nth-child(1),th:nth-child(1)').hide();
 
     // Populate Conversation ID column
     var idCell  = newRow.insertCell(0);
