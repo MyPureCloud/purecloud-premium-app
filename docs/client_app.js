@@ -192,17 +192,52 @@ clientApp.subscribeToQueue = function(queue){
             onloadConvID = data.conversations[0].conversationId;
             conversationIDs.push(onloadConvID);
 
-            // Call addTableRow function
-            clientApp.addTableRow(data);
-
-            // let caller = data.conversations[0].participants
-            //     .filter(participant => participant.purpose === "external")[0];
+            let caller = data.conversations[0].participants
+                .filter(participant => participant.purpose === "external")[0];
             
-            // let acd = data.conversations[0].participants
-            //     .filter(participant => participant.purpose === "acd")[0];
+            let acd = data.conversations[0].participants
+                .filter(participant => participant.purpose === "acd")[0];
 
-            // let acdSegment = acd.sessions[0].segments
-            //     .filter(segment => segment.segmentType === "interact")[0];
+            let acdSegment = acd.sessions[0].segments
+                .filter(segment => segment.segmentType === "interact")[0];
+            
+            var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
+            var newRow   = tableRef.insertRow(tableRef.rows.length);
+        
+            // Populate Conversation ID column
+            var idCell  = newRow.insertCell(0);
+            var idText  = document.createTextNode(onloadConvID);
+            idCell.appendChild(idText);
+        
+            // Populate Name column
+            var nameCell  = newRow.insertCell(1);
+            var nameText  = document.createTextNode(caller.participantName);
+            nameCell.appendChild(nameText);
+        
+            // Populate ANI column
+            var aniCell  = newRow.insertCell(2);
+            var aniText  = document.createTextNode(caller.sessions[0].ani);
+            aniCell.appendChild(aniText);
+        
+            // Populate DNIS column
+            var dnisCell  = newRow.insertCell(3);
+            var dnisText  = document.createTextNode(caller.sessions[0].dnis);
+            dnisCell.appendChild(dnisText);
+        
+            // Populate State column
+            var stateCell  = newRow.insertCell(4);
+            var stateText  = document.createTextNode("connected");
+            stateCell.appendChild(stateText);
+        
+            // Populate Wait Time column
+            var waitCell  = newRow.insertCell(5);
+            var waitText  = document.createTextNode((new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1));
+            waitCell.appendChild(waitText);
+        
+            // Populate Duration column
+            var durationCell  = newRow.insertCell(6);
+            var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+            durationCell.appendChild(durationText);
 
             // let conversationStart = new Date(data.conversations[0].conversationStart);
             // let acdStart = new Date(acdSegment.segmentStart);
