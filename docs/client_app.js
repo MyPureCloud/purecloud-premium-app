@@ -291,19 +291,19 @@ clientApp.onSocketMessageQueue = function(event){
 
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
-        // // Check to see if Conversation details is already displayed in the view
-        // if (conversationIDs.includes(eventBody.id)) {
-        //     console.log("UPDATE TABLE ROW || " + JSON.stringify(data));
-        //     clientApp.updateTableRow(data);            
-        // } else {
-        //     // Add to pool of Conversations already displayed in the view
-        //     conversationIDs.push(eventBody.id);
-        //     console.log("ADD TABLE ROW || " + JSON.stringify(data));
-        //     console.log("CONVERSATION IDS || " + conversationIDs.toString());
+        // Check to see if Conversation details is already displayed in the view
+        if (conversationIDs.includes(eventBody.id)) {
+            console.log("UPDATE TABLE ROW || " + JSON.stringify(data));
+            clientApp.updateTableRow(data);            
+        } else {
+            // Add to pool of Conversations already displayed in the view
+            conversationIDs.push(eventBody.id);
+            console.log("ADD TABLE ROW || " + JSON.stringify(data));
+            console.log("CONVERSATION IDS || " + conversationIDs.toString());
 
-        //     // Call addTableRow function
-        //     clientApp.addTableRow(data);
-        // }    
+            // Call addTableRow function
+            clientApp.addTableRow(data);
+        }    
     
         console.log("WEB SOCKET || " + JSON.stringify(data));
 
@@ -454,6 +454,9 @@ clientApp.addTableRow = function(data) {
         var stateCell  = newRow.insertCell(4);
         var stateText  = document.createTextNode(agent.calls[0].state);
         stateCell.appendChild(stateText);
+
+        // Makes sure that the field only changes the first time. 
+        clientApp.isCallActiveSup = true;
     } else if((acd.endTime === undefined) && (caller.endTime === undefined)) {
         // If active call
         // Populate State column
@@ -465,6 +468,9 @@ clientApp.addTableRow = function(data) {
         var waitCell  = newRow.insertCell(5);
         var waitText  = document.createTextNode((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
         waitCell.appendChild(waitText);
+
+        // Makes sure that the field only changes the first time. 
+        clientApp.isCallActiveSup = true;
     } else if(agent.calls[0].state === "disconnected") {
         // If disconnected call
         // Populate State column
@@ -481,6 +487,9 @@ clientApp.addTableRow = function(data) {
         var durationCell  = newRow.insertCell(6);
         var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
         durationCell.appendChild(durationText);
+
+        // Makes sure that the field only changes the first time. 
+        clientApp.isCallActiveSup = false;
     }
 }
 
@@ -519,6 +528,9 @@ clientApp.updateTableRow = function(data) {
         // Update Wait Time column
         var waitCell = row.children()[5];
         waitCell.html((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+
+        // Makes sure that the field only changes the first time. 
+        clientApp.isCallActiveSup = true;
     } else if(agent.calls[0].state === "disconnected") {
         // If disconnected call
         // Update State column
@@ -532,6 +544,9 @@ clientApp.updateTableRow = function(data) {
         // Update Duration column
         var durationCell = row.children()[6];
         durationCell.html((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+
+        // Makes sure that the field only changes the first time. 
+        clientApp.isCallActiveSup = false;
     }
 }
 
