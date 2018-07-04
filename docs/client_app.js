@@ -4,7 +4,6 @@
 import clientIDs from './clientIDs.js';
 
 let clientApp = {};
-let conversationIDs = [];
 
 // PureCloud OAuth information
 const platformClient = require('platformClient');
@@ -190,7 +189,6 @@ clientApp.subscribeToQueue = function(queue){
     ).then(data => {
         if(Object.keys(data).length > 0) {
             onloadConvID = data.conversations[0].conversationId;
-            conversationIDs.push(onloadConvID);
 
             let caller = data.conversations[0].participants
                 .filter(participant => participant.purpose === "external")[0];
@@ -292,14 +290,11 @@ clientApp.onSocketMessageQueue = function(event){
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
         // Check to see if Conversation details is already displayed in the view
-        if (conversationIDs.includes(eventBody.id)) {
+        if ($('#tblCallerDetails td:contains(' + data.eventBody.id + ')').length) {
             console.log("UPDATE TABLE ROW || " + JSON.stringify(data));
             clientApp.updateTableRow(data);            
         } else {
-            // Add to pool of Conversations already displayed in the view
-            conversationIDs.push(eventBody.id);
             console.log("ADD TABLE ROW || " + JSON.stringify(data));
-            console.log("CONVERSATION IDS || " + conversationIDs.toString());
 
             // Call addTableRow function
             clientApp.addTableRow(data);
