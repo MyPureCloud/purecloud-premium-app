@@ -443,7 +443,7 @@ clientApp.addTableRow = function(data) {
     // var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
     // durationCell.appendChild(durationText);
     
-    if((acd.endTime === undefined) && (!clientApp.isCallActiveSup)){
+    if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
         // If incoming call
         // Populate State column
         var stateCell  = newRow.insertCell(4);
