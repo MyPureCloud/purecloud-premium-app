@@ -192,31 +192,34 @@ clientApp.subscribeToQueue = function(queue){
             onloadConvID = data.conversations[0].conversationId;
             conversationIDs.push(onloadConvID);
 
-            let caller = data.conversations[0].participants
-                .filter(participant => participant.purpose === "external")[0];
+            // Call addTableRow function
+            clientApp.addTableRow(data);
+
+            // let caller = data.conversations[0].participants
+            //     .filter(participant => participant.purpose === "external")[0];
             
-            let acd = data.conversations[0].participants
-                .filter(participant => participant.purpose === "acd")[0];
+            // let acd = data.conversations[0].participants
+            //     .filter(participant => participant.purpose === "acd")[0];
 
-            let acdSegment = acd.sessions[0].segments
-                .filter(segment => segment.segmentType === "interact")[0];
+            // let acdSegment = acd.sessions[0].segments
+            //     .filter(segment => segment.segmentType === "interact")[0];
 
-            let conversationStart = new Date(data.conversations[0].conversationStart);
-            let acdStart = new Date(acdSegment.segmentStart);
-            let acdEnd = new Date(acdSegment.segmentEnd);
+            // let conversationStart = new Date(data.conversations[0].conversationStart);
+            // let acdStart = new Date(acdSegment.segmentStart);
+            // let acdEnd = new Date(acdSegment.segmentEnd);
 
-            $("#supName").text(caller.participantName);
-            $("#supANI").text(caller.sessions[0].ani);
-            $("#supDNIS").text(caller.sessions[0].dnis);
-            $("#supState").text("connected");
-            $("#supWaitTime").text(new Date(acdEnd - acdStart).toISOString().slice(11, -1));
+            // $("#supName").text(caller.participantName);
+            // $("#supANI").text(caller.sessions[0].ani);
+            // $("#supDNIS").text(caller.sessions[0].dnis);
+            // $("#supState").text("connected");
+            // $("#supWaitTime").text(new Date(acdEnd - acdStart).toISOString().slice(11, -1));
 
-            // Start timer for Call Duration
-            var intervalId = setInterval(function() {
-                var currentDate = new Date();        
-                $("#supDuration").text(new Date(currentDate - conversationStart).toISOString().slice(11, -1).split('.')[0]);
-            }, 1000);
-            $("#supDuration").attr("onload-timer-id",intervalId);
+            // // Start timer for Call Duration
+            // var intervalId = setInterval(function() {
+            //     var currentDate = new Date();        
+            //     $("#supDuration").text(new Date(currentDate - conversationStart).toISOString().slice(11, -1).split('.')[0]);
+            // }, 1000);
+            // $("#supDuration").attr("onload-timer-id",intervalId);
         }
     }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + body));
 
