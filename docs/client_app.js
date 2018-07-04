@@ -519,8 +519,6 @@ clientApp.updateTableRow = function(data) {
     var numberCell = $("td:contains('" + data.eventBody.id + "')");
     var row = numberCell.parent();
 
-    console.log("NUMBER CELL || " + numberCell.toString() + " || ROW || " + row.toString());
-
     // // Update State column
     // var stateCell = row.children()[4];
     // stateCell.html(agent.calls[0].state);
@@ -537,11 +535,11 @@ clientApp.updateTableRow = function(data) {
         // If active call
         // Update State column
         var stateCell = row.children()[4];
-        stateCell.html("connected");
+        stateCell.text("connected");
 
         // Update Wait Time column
         var waitCell = row.children()[5];
-        waitCell.html((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+        waitCell.text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
 
         // Makes sure that the field only changes the first time. 
         clientApp.isCallActiveSup = true;
@@ -550,15 +548,15 @@ clientApp.updateTableRow = function(data) {
             // If disconnected call
             // Update State column
             var stateCell = row.children()[4];
-            stateCell.html("disconnected");
+            stateCell.text("disconnected");
 
             // Update Wait Time column
             var waitCell = row.children()[5];
-            waitCell.html((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+            waitCell.text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
 
             // Update Duration column
             var durationCell = row.children()[6];
-            durationCell.html((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+            durationCell.text((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
