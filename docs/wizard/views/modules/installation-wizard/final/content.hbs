@@ -1,15 +1,15 @@
 {{#if roles}}
-<div id="purecloud-roles">
-    <div style="margin-top: 20px;">
+<div id="purecloud-roles" class="margin-bottom: 20px;">
+    <div style="margin-top: 20px; ">
         <div class="content is-marginless">
-            <h3>Roles</h3>
+            <h2>Roles</h2>
         </div>
     </div>
 
     {{#each roles}}
     <div class="box is-radiusless is-marginless">
         <nav class="level">
-            <div class="level-left">
+            <div class="level-left is-size-5">
                 <strong>
                     {{name}}
                 </strong>
@@ -18,7 +18,10 @@
             </div>
         </nav>
         <div>
-            <em>Permissions:</em> {{#each permissions}} "{{this}}". {{/each}}
+            <em>Permissions: </em> {{#each permissions}} "{{this}}". {{/each}}
+        </div> 
+        <div>
+            <em>Description: </em> {{description}}
         </div> 
     </div>
     {{/each}}
@@ -27,32 +30,37 @@
 
 
 {{#if groups}}
-<div id="purecloud-groups">
+<div id="purecloud-groups" class="margin-bottom: 20px;">
     <div style="margin-top: 20px;">
         <div class="content is-marginless">
-            <h3>Groups</h3>
+            <h2>Groups</h2>
         </div>
     </div>
 
     {{#each groups}}
-    <div class="box is-radiusless is-marginless">
+     <div class="box is-radiusless is-marginless">
         <nav class="level">
-            <div class="level-left">
-                {{this}}
+            <div class="level-left is-size-5">
+                <strong>
+                    {{name}}
+                </strong>
             </div>
             <div class="level-right">
             </div>
         </nav>
+        <div>
+            <em>Description: </em> {{description}}
+        </div> 
     </div>
     {{/each}}
 </div>
 {{/if}}
 
 {{#if appInstances}}
-<div id="purecloud-instances">
+<div id="purecloud-instances" class="margin-bottom: 20px;">
     <div style="margin-top: 20px;"></div>
         <div class="content is-marginless">
-            <h3>App Instances</h3>
+            <h2>App Instances</h2>
         </div>
     </div>
     
@@ -60,10 +68,10 @@
     {{#each appInstances}}
     <div class="box is-radiusless is-marginless">
         <nav class="level">
-            <div class="level-left">
-                <p>  
-                   <strong>{{name}}</strong> 
-                </p>
+            <div class="level-left is-size-5">
+                <strong>
+                    {{name}}
+                </strong>
             </div>
             <div class="level-right">
             </div>
