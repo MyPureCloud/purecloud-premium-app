@@ -466,25 +466,27 @@ clientApp.addTableRow = function(data) {
 
         // Makes sure that the field only changes the first time. 
         clientApp.isCallActiveSup = true;
-    } else if((agent.calls[0].state === "disconnected") && (agent !== undefined)) {
-        // If disconnected call
-        // Populate State column
-        var stateCell  = newRow.insertCell(4);
-        var stateText  = document.createTextNode(agent.calls[0].state);
-        stateCell.appendChild(stateText);
+    } else if(agent !== undefined) {
+        if (agent.calls[0].state === "disconnected") {
+            // If disconnected call
+            // Populate State column
+            var stateCell  = newRow.insertCell(4);
+            var stateText  = document.createTextNode(agent.calls[0].state);
+            stateCell.appendChild(stateText);
 
-        // Populate Wait Time column
-        var waitCell  = newRow.insertCell(5);
-        var waitText  = document.createTextNode((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
-        waitCell.appendChild(waitText);
+            // Populate Wait Time column
+            var waitCell  = newRow.insertCell(5);
+            var waitText  = document.createTextNode((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+            waitCell.appendChild(waitText);
 
-        // Populate Duration column
-        var durationCell  = newRow.insertCell(6);
-        var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
-        durationCell.appendChild(durationText);
+            // Populate Duration column
+            var durationCell  = newRow.insertCell(6);
+            var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+            durationCell.appendChild(durationText);
 
-        // Makes sure that the field only changes the first time. 
-        clientApp.isCallActiveSup = false;
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActiveSup = false;
+        }        
     }
 }
 
@@ -528,22 +530,24 @@ clientApp.updateTableRow = function(data) {
 
         // Makes sure that the field only changes the first time. 
         clientApp.isCallActiveSup = true;
-    } else if((agent.calls[0].state === "disconnected") && (agent !== undefined)) {
-        // If disconnected call
-        // Update State column
-        var stateCell = row.children()[4];
-        stateCell.html(agent.calls[0].state);
+    } else if(agent !== undefined) {
+        if (agent.calls[0].state === "disconnected") {
+            // If disconnected call
+            // Update State column
+            var stateCell = row.children()[4];
+            stateCell.html(agent.calls[0].state);
 
-        // Update Wait Time column
-        var waitCell = row.children()[5];
-        waitCell.html((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+            // Update Wait Time column
+            var waitCell = row.children()[5];
+            waitCell.html((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
 
-        // Update Duration column
-        var durationCell = row.children()[6];
-        durationCell.html((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+            // Update Duration column
+            var durationCell = row.children()[6];
+            durationCell.html((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
 
-        // Makes sure that the field only changes the first time. 
-        clientApp.isCallActiveSup = false;
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActiveSup = false;
+        }        
     }
 }
 
