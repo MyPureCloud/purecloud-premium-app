@@ -367,6 +367,7 @@ class WizardApp {
             data.forEach((group) => {
                 let btnId = '#btn-delete-' + group.id;
                 setButtonClick(this, btnId, () => {
+                    $('#modal-deleting').addClass('is-active');
                     let groupsApi = new this.platformClient.GroupsApi();
 
                     groupsApi.deleteGroup(group.id)
@@ -399,6 +400,7 @@ class WizardApp {
             data.forEach((role) => {
                 let btnId = '#btn-delete-' + role.id;
                 setButtonClick(this, btnId, () => {
+                    $('#modal-deleting').addClass('is-active');
                     let authApi = new this.platformClient.AuthorizationApi();
 
                     authApi.deleteAuthorizationRole(role.id)
@@ -429,6 +431,7 @@ class WizardApp {
             data.forEach((customApp) => {
                 let btnId = '#btn-delete-' + customApp.id;
                 setButtonClick(this, btnId, () => {
+                    $('#modal-deleting').addClass('is-active');
                     let integrationsApi = new this.platformClient.IntegrationsApi();
 
                     integrationsApi.deleteIntegration(customApp.id)
