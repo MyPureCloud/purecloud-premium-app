@@ -4,6 +4,7 @@
 import appConfig from './config.js'
 import hb from './template-references.js'
 import { _renderModule, _renderCompletePage } from './handlebars-helper.js'
+import { setButtonClick } from './util.js'
 
 // Requires jQuery and Handlebars from parent context
 const $ = window.$;
@@ -129,7 +130,7 @@ class WizardApp {
                     appInstances: []
                 }
 
-                resolve()
+                resolve();
             }); 
         });
     }
@@ -275,7 +276,7 @@ class WizardApp {
                     hb['landing-page']
                 )
                 .then(() => {
-                    $('#btn-check-installation').off('click').click($.proxy(this.loadCheckInstallationStatus, this));
+                    setButtonClick(this, '#btn-check-installation', this.loadCheckInstallationStatus);
                 });
             });
         });
@@ -301,7 +302,7 @@ class WizardApp {
             hb['check-installation']
         ))
         .then(() => {
-            $('#btn-start-wizard').off('click').click($.proxy(this.loadRolesCreation, this));
+            setButtonClick(this, '#btn-start-wizard', this.loadRolesCreation);
         });
 
         // PureCloud API instances
@@ -350,14 +351,13 @@ class WizardApp {
             data = data || [];
             data.forEach((group) => {
                 let btnId = '#btn-delete-' + group.id;
-                $(btnId).off('click').click(
-                    $.proxy(() => {
+                setButtonClick(this, btnId, () => {
                     let groupsApi = new this.platformClient.GroupsApi();
 
                     groupsApi.deleteGroup(group.id)
                     .then((data) => this.loadCheckInstallationStatus())
                     .catch(() => console.log(err));
-                } ,this));
+                });
             })
         })
 
@@ -383,14 +383,13 @@ class WizardApp {
             data = data || [];
             data.forEach((role) => {
                 let btnId = '#btn-delete-' + role.id;
-                $(btnId).off('click').click(
-                    $.proxy(() => {
+                setButtonClick(this, btnId, () => {
                     let authApi = new this.platformClient.AuthorizationApi();
 
                     authApi.deleteAuthorizationRole(role.id)
                     .then((data) => this.loadCheckInstallationStatus())
                     .catch(() => console.log(err));
-                } ,this));
+                });
             })
         })
         .catch(err => console.log(err));
@@ -414,14 +413,13 @@ class WizardApp {
             data = data || [];
             data.forEach((customApp) => {
                 let btnId = '#btn-delete-' + customApp.id;
-                $(btnId).off('click').click(
-                    $.proxy(() => {
+                setButtonClick(this, btnId, () => {
                     let integrationsApi = new this.platformClient.IntegrationsApi();
 
                     integrationsApi.deleteIntegration(customApp.id)
                     .then((data) => this.loadCheckInstallationStatus())
                     .catch(() => console.log(err));
-                } ,this));
+                });
             })
         })
         
@@ -437,7 +435,7 @@ class WizardApp {
         let assignEventHandler = function(){
             // If add Role Button pressed then stage the role name 
             // from the form input
-            $('#btn-add-role').off('click').click($.proxy(() => {
+            setButtonClick(this, '#btn-add-role', () => {
                 let roleName = $('#txt-role-name').val();
                 let roleDescription = $('#txt-role-description').val();
                 let tempRole = {
@@ -450,22 +448,23 @@ class WizardApp {
 
                 _renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
                 .then($.proxy(assignEventHandler, this));
-            }, this));      
+            });
+    
 
             // Next button to Apps Creation
-            $('#btn-next').off('click').click($.proxy(this.loadRolesAssignment, this));
+            setButtonClick(this, '#btn-next', this.loadRolesAssignment);
 
             // Back to check Installation
-            $('#btn-prev').off('click').click($.proxy(this.loadCheckInstallationStatus, this));
+            setButtonClick(this, '#btn-prev', this.loadCheckInstallationStatus);
 
             // Assign deletion for each role entry
             for(let i = 0; i < this.stagingArea.roles.length; i++){
                 let btnId = '#btn-delete-' + (i).toString();
-                $(btnId).off('click').click($.proxy(() => {
+                setButtonClick(this, btnId, () => {
                     this.stagingArea.roles.splice(i, 1);
                     _renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
                     .then($.proxy(assignEventHandler, this));
-                } ,this));
+                });
             }
         }
 
@@ -516,7 +515,7 @@ class WizardApp {
         // Event Handlers
         .then(() => {
             // Take note of which roles to add to user after creation
-            $('#btn-next').off('click').click(() => {
+            setButtonClick(this, '#btn-next', () => {
                 for(let i = 0; i < this.stagingArea.roles.length; i++){
                     if($('#check-' + i.toString()).prop("checked") == true){
                         this.stagingArea.roles[i].assignToSelf = true;
@@ -530,7 +529,7 @@ class WizardApp {
             });
 
             // Back to Roles Creation
-            $('#btn-prev').off('click').click($.proxy(this.loadRolesCreation, this));
+            setButtonClick(this, '#btn-prev', this.loadRolesCreation);
         });
     }
 
@@ -543,7 +542,7 @@ class WizardApp {
         let assignEventHandler = function(){
             // If add Group Button pressed then stage the group name 
             // from the form input
-            $('#btn-add-group').off('click').click($.proxy(() => {
+            setButtonClick(this, '#btn-add-group', () => {
                 let tempGroup = {
                     "name": $('#txt-group-name').val(), 
                     "description": $('#txt-group-description').val(),
@@ -554,22 +553,22 @@ class WizardApp {
 
                 _renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
                 .then($.proxy(assignEventHandler, this));
-            }, this));      
+            })    
 
             // Next button to Apps Creation
-            $('#btn-next').off('click').click($.proxy(this.loadAppsCreation, this));
+            setButtonClick(this, '#btn-next', this.loadAppsCreation);
 
             // Back to check Installation
-            $('#btn-prev').off('click').click($.proxy(this.loadRolesAssignment, this));
+            setButtonClick(this, '#btn-prev', this.loadRolesAssignment);
 
             // Assign deletion for each role entry
             for(let i = 0; i < this.stagingArea.groups.length; i++){
                 let btnId = '#btn-delete-' + (i).toString();
-                $(btnId).off('click').click($.proxy(() => {
+                setButtonClick(this, btnId, () => {
                     this.stagingArea.groups.splice(i, 1);
                     _renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
                     .then($.proxy(assignEventHandler, this));
-                } ,this));
+                });
             }
         }
 
@@ -600,7 +599,7 @@ class WizardApp {
      */
     loadAppsCreation(event){
         let assignEventHandler = function(){
-            $('#add-instance').off('click').click($.proxy(() => {
+            setButtonClick(this, '#add-instance', () => {
                 let instanceName = $('#txt-instance-name').val();
                 let instanceType = $('input[name=instance-type]:checked', '#rad-instance-type').val();
                 let instanceUri = $('#txt-instance-uri').val();
@@ -616,29 +615,30 @@ class WizardApp {
 
                 _renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content')
                 .then($.proxy(assignEventHandler, this));
-            }, this));    
+            });
+ 
             
-            // Clear form content            
-            $('#clear-details').off('click').click($.proxy(() => {
+            // Clear form content      
+            setButtonClick(this, '#clear-details', () => {
                 $('#txt-instance-name').val("");
                 $('#txt-instance-uri').val("");
                 $('#list-instance-groups').val("");
-            }, this));    
+            })       
 
             // Next button to Final Page
-            $('#btn-next').off('click').click($.proxy(this.loadFinalizeInstallation, this));
+            setButtonClick(this, '#btn-next', this.loadFinalizeInstallation);
 
             // Back to groups Installation
-            $('#btn-prev').off('click').click($.proxy(this.loadGroupsCreation, this));
+            setButtonClick(this, '#btn-prev', this.loadGroupsCreation);
 
             // Assign deletion for each instance entry
             for(let i = 0; i < this.stagingArea.appInstances.length; i++){
                 let btnId = '#btn-delete-' + (i).toString();
-                $(btnId).off('click').click($.proxy(() => {
+                setButtonClick(this, btnId, () => {
                     this.stagingArea.appInstances.splice(i, 1);
                     _renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content')
                     .then($.proxy(assignEventHandler, this));
-                } ,this));
+                });
             }
         }
 
@@ -692,11 +692,11 @@ class WizardApp {
         // Assign Event Handlers
         .then(() => {
             // Back to groups Installation
-            $('#btn-prev').off('click').click($.proxy(this.loadAppsCreation, this));
+            setButtonClick(this, '#btn-prev', this.loadAppsCreation);
 
             // Start installing yeah!!!
              // TODO: handle the possibility of rate limit being reached on the API calls
-            $('#btn-install').off('click').click($.proxy(this.installAppConfigurations, this));
+            setButtonClick(this, '#btn-install', this.installAppConfigurations);
         });
     }
 
