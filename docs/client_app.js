@@ -389,6 +389,8 @@ clientApp.onSocketMessageQueue = function(event){
 }
 
 clientApp.addTableRow = function(data) {
+    console.log("DATA || " + data);
+
     let caller = data.eventBody.participants
         .filter(participant => participant.purpose === "customer")[0];
     
