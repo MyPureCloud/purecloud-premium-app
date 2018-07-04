@@ -402,7 +402,7 @@ clientApp.addTableRow = function(data) {
         .filter(participant => participant.purpose === "acd")[0];
 
     var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
-    var newRow   = tableRef.insertRow(tableRef.rows.length);
+    // var newRow   = tableRef.insertRow(tableRef.rows.length);
 
     // // Populate Conversation ID column
     // var idCell  = newRow.insertCell(0);
@@ -442,6 +442,8 @@ clientApp.addTableRow = function(data) {
     
     if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
         // If incoming call
+        var newRow   = tableRef.insertRow(tableRef.rows.length);
+
         // Populate Conversation ID column
         var idCell  = newRow.insertCell(0);
         var idText  = document.createTextNode(data.eventBody.id);
@@ -470,18 +472,20 @@ clientApp.addTableRow = function(data) {
 
         // Populate Wait Time column
         var waitCell  = newRow.insertCell(5);
-        var waitText  = document.createTextNode("");
+        var waitText  = document.createTextNode("--");
         waitCell.appendChild(waitText);
 
         // Populate Duration column
         var durationCell  = newRow.insertCell(6);
-        var durationText  = document.createTextNode("");
+        var durationText  = document.createTextNode("--");
         durationCell.appendChild(durationText);
 
         // Makes sure that the field only changes the first time. 
         clientApp.isCallActiveSup = true;
     } else if((acd.endTime === undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
         // If active call
+        var newRow   = tableRef.insertRow(tableRef.rows.length);
+
         // Populate Conversation ID column
         var idCell  = newRow.insertCell(0);
         var idText  = document.createTextNode(data.eventBody.id);
@@ -515,7 +519,7 @@ clientApp.addTableRow = function(data) {
 
         // Populate Duration column
         var durationCell  = newRow.insertCell(6);
-        var durationText  = document.createTextNode("");
+        var durationText  = document.createTextNode("--");
         durationCell.appendChild(durationText);
 
         // Makes sure that the field only changes the first time. 
@@ -523,6 +527,8 @@ clientApp.addTableRow = function(data) {
     } else if(agent !== undefined) {
         if (agent.calls[0].state === "disconnected") {
             // If disconnected call
+            var newRow   = tableRef.insertRow(tableRef.rows.length);
+
             // Populate Conversation ID column
             var idCell  = newRow.insertCell(0);
             var idText  = document.createTextNode(data.eventBody.id);
@@ -575,9 +581,9 @@ clientApp.updateTableRow = function(data) {
     let acd = data.eventBody.participants
         .filter(participant => participant.purpose === "acd")[0];
 
-    // Find Conversation ID in the table
-    var numberCell = $("td:contains('" + data.eventBody.id + "')");
-    var row = numberCell.parent();
+    // // Find Conversation ID in the table
+    // var numberCell = $("td:contains('" + data.eventBody.id + "')");
+    // var row = numberCell.parent();
 
     // // Update State column
     // var stateCell = row.children()[4];
@@ -593,6 +599,10 @@ clientApp.updateTableRow = function(data) {
 
     if((acd.endTime === undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
         // If active call
+        // Find Conversation ID in the table
+        var numberCell = $("td:contains('" + data.eventBody.id + "')");
+        var row = numberCell.parent();
+
         // Update State column
         var stateCell = row.children()[4];
         stateCell.text("connected");
@@ -606,6 +616,10 @@ clientApp.updateTableRow = function(data) {
     } else if(agent !== undefined) {
         if (agent.calls[0].state === "disconnected") {
             // If disconnected call
+            // Find Conversation ID in the table
+            var numberCell = $("td:contains('" + data.eventBody.id + "')");
+            var row = numberCell.parent();
+
             // Update State column
             var stateCell = row.children()[4];
             stateCell.text("disconnected");
