@@ -452,7 +452,7 @@ clientApp.addTableRow = function(data) {
 
         // Makes sure that the field only changes the first time. 
         clientApp.isCallActiveSup = true;
-    } else if((acd.endTime === undefined) && (caller.endTime === undefined)) {
+    } else if((acd.endTime === undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
         // If active call
         // Populate State column
         var stateCell  = newRow.insertCell(4);
@@ -466,7 +466,7 @@ clientApp.addTableRow = function(data) {
 
         // Makes sure that the field only changes the first time. 
         clientApp.isCallActiveSup = true;
-    } else if(agent.calls[0].state === "disconnected") {
+    } else if((agent.calls[0].state === "disconnected") && (agent !== undefined)) {
         // If disconnected call
         // Populate State column
         var stateCell  = newRow.insertCell(4);
@@ -516,7 +516,7 @@ clientApp.updateTableRow = function(data) {
     // var durationCell = row.children()[6];
     // durationCell.html((new Date(caller.endTime)) - (new Date(caller.connectedTime)));  
 
-    if((acd.endTime === undefined) && (caller.endTime === undefined)) {
+    if((acd.endTime === undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
         // If active call
         // Update State column
         var stateCell = row.children()[4];
@@ -528,7 +528,7 @@ clientApp.updateTableRow = function(data) {
 
         // Makes sure that the field only changes the first time. 
         clientApp.isCallActiveSup = true;
-    } else if(agent.calls[0].state === "disconnected") {
+    } else if((agent.calls[0].state === "disconnected") && (agent !== undefined)) {
         // If disconnected call
         // Update State column
         var stateCell = row.children()[4];
