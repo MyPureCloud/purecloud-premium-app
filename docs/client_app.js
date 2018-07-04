@@ -291,19 +291,19 @@ clientApp.onSocketMessageQueue = function(event){
 
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
-        // Check to see if Conversation details is already displayed in the view
-        if (conversationIDs.includes(eventBody.id)) {
-            console.log("UPDATE TABLE ROW || " + JSON.stringify(data));
-            clientApp.updateTableRow(data);            
-        } else {
-            // Add to pool of Conversations already displayed in the view
-            conversationIDs.push(eventBody.id);
-            console.log("ADD TABLE ROW || " + JSON.stringify(data));
-            console.log("CONVERSATION IDS || " + conversationIDs.toString());
+        // // Check to see if Conversation details is already displayed in the view
+        // if (conversationIDs.includes(eventBody.id)) {
+        //     console.log("UPDATE TABLE ROW || " + JSON.stringify(data));
+        //     clientApp.updateTableRow(data);            
+        // } else {
+        //     // Add to pool of Conversations already displayed in the view
+        //     conversationIDs.push(eventBody.id);
+        //     console.log("ADD TABLE ROW || " + JSON.stringify(data));
+        //     console.log("CONVERSATION IDS || " + conversationIDs.toString());
 
-            // Call addTableRow function
-            clientApp.addTableRow(data);
-        }    
+        //     // Call addTableRow function
+        //     clientApp.addTableRow(data);
+        // }    
     
         // If new socket message for the active call on page load
         if(onloadConvID === eventBody.id){
