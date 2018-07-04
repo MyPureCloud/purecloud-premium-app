@@ -507,6 +507,8 @@ clientApp.updateTableRow = function(data) {
     var numberCell = $("td:contains('" + data.eventBody.id + "')");
     var row = numberCell.parent();
 
+    console.log("NUMBER CELL || " + numberCell + " || ROW || " + row);
+
     // // Update State column
     // var stateCell = row.children()[4];
     // stateCell.html(agent.calls[0].state);
