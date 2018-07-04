@@ -48,3 +48,17 @@ h1.title{
 option{
     left:0;
 }
+
+table {
+    border-collapse: collapse;
+  }
+  
+  table, th, td {
+    border: 1px solid #9aa;
+    font-size: 12px;
+  }
+  
+  th, td {
+    padding: 5px;
+    text-align: center;
+  }
