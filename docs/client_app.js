@@ -433,20 +433,55 @@ clientApp.addTableRow = function(data) {
     var dnisText  = document.createTextNode(caller.calls[0].other.addressNormalized);
     dnisCell.appendChild(dnisText);
 
-    // Populate State column
-    var stateCell  = newRow.insertCell(4);
-    var stateText  = document.createTextNode(agent.calls[0].state);
-    stateCell.appendChild(stateText);
+    // // Populate State column
+    // var stateCell  = newRow.insertCell(4);
+    // var stateText  = document.createTextNode(agent.calls[0].state);
+    // stateCell.appendChild(stateText);
 
-    // Populate Wait Time column
-    var waitCell  = newRow.insertCell(5);
-    var waitText  = document.createTextNode((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
-    waitCell.appendChild(waitText);
+    // // Populate Wait Time column
+    // var waitCell  = newRow.insertCell(5);
+    // var waitText  = document.createTextNode((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+    // waitCell.appendChild(waitText);
 
-    // Populate Duration column
-    var durationCell  = newRow.insertCell(6);
-    var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
-    durationCell.appendChild(durationText);
+    // // Populate Duration column
+    // var durationCell  = newRow.insertCell(6);
+    // var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+    // durationCell.appendChild(durationText);
+    
+    if((acd.endTime === undefined) && (!clientApp.isCallActiveSup)){
+        // If incoming call
+        // Populate State column
+        var stateCell  = newRow.insertCell(4);
+        var stateText  = document.createTextNode(agent.calls[0].state);
+        stateCell.appendChild(stateText);
+    } else if((acd.endTime === undefined) && (caller.endTime === undefined)) {
+        // If active call
+        // Populate State column
+        var stateCell  = newRow.insertCell(4);
+        var stateText  = document.createTextNode(agent.calls[0].state);
+        stateCell.appendChild(stateText);
+
+        // Populate Wait Time column
+        var waitCell  = newRow.insertCell(5);
+        var waitText  = document.createTextNode((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+        waitCell.appendChild(waitText);
+    } else if(agent.calls[0].state === "disconnected") {
+        // If disconnected call
+        // Populate State column
+        var stateCell  = newRow.insertCell(4);
+        var stateText  = document.createTextNode(agent.calls[0].state);
+        stateCell.appendChild(stateText);
+
+        // Populate Wait Time column
+        var waitCell  = newRow.insertCell(5);
+        var waitText  = document.createTextNode((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+        waitCell.appendChild(waitText);
+
+        // Populate Duration column
+        var durationCell  = newRow.insertCell(6);
+        var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+        durationCell.appendChild(durationText);
+    }
 }
 
 clientApp.updateTableRow = function(data) {
@@ -463,17 +498,41 @@ clientApp.updateTableRow = function(data) {
     var numberCell = $("td:contains('" + data.eventBody.id + "')");
     var row = numberCell.parent();
 
-    // Update State column
-    var stateCell = row.children()[4];
-    stateCell.html(agent.calls[0].state);
+    // // Update State column
+    // var stateCell = row.children()[4];
+    // stateCell.html(agent.calls[0].state);
 
-    // Update Wait Time column
-    var waitCell = row.children()[5];
-    waitCell.html((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+    // // Update Wait Time column
+    // var waitCell = row.children()[5];
+    // waitCell.html((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
 
-    // Update Duration column
-    var durationCell = row.children()[6];
-    durationCell.html((new Date(caller.endTime)) - (new Date(caller.connectedTime)));  
+    // // Update Duration column
+    // var durationCell = row.children()[6];
+    // durationCell.html((new Date(caller.endTime)) - (new Date(caller.connectedTime)));  
+
+    if((acd.endTime === undefined) && (caller.endTime === undefined)) {
+        // If active call
+        // Update State column
+        var stateCell = row.children()[4];
+        stateCell.html(agent.calls[0].state);
+
+        // Update Wait Time column
+        var waitCell = row.children()[5];
+        waitCell.html((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+    } else if(agent.calls[0].state === "disconnected") {
+        // If disconnected call
+        // Update State column
+        var stateCell = row.children()[4];
+        stateCell.html(agent.calls[0].state);
+
+        // Update Wait Time column
+        var waitCell = row.children()[5];
+        waitCell.html((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+
+        // Update Duration column
+        var durationCell = row.children()[6];
+        durationCell.html((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+    }
 }
 
 export default clientApp
