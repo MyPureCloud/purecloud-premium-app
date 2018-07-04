@@ -396,6 +396,7 @@ clientApp.addTableRow = function(data) {
     
     let agent = data.eventBody.participants
         .filter(participant => participant.purpose === "agent")[0];
+    console.log("AGENT || " + JSON.stringify(agent));
     
     let acd = data.eventBody.participants
         .filter(participant => participant.purpose === "acd")[0];
