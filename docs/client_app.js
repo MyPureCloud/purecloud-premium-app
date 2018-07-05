@@ -187,7 +187,6 @@ clientApp.subscribeToQueue = function(queue){
     ).then(data => {
         if(Object.keys(data).length > 0) {
             (data.conversations).forEach(function(conversation) {
-                console.log("CONVERSATION || " + JSON.stringify(conversation));
                 let caller = conversation.participants
                     .filter(participant => participant.purpose === "external")[0];
             
@@ -359,14 +358,29 @@ clientApp.updateTableRow = function(data) {
     let acd = data.eventBody.participants
         .filter(participant => participant.purpose === "acd")[0];
 
-    if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
+    if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
+        // If incoming call
+        // Update State column
+        $('#tblCallerDetails > tbody> tr').each(function() {
+            var firstTd = $(this).find('td:first');
+            if ($(firstTd).text() == data.eventBody.id) {
+                $(this).find('td:eq(4)').text(agent.calls[0].state);
+                $(this).find('td:eq(5)').text("--");
+                $(this).find('td:eq(6)').text("--");
+            }
+        })
+
+        // Makes sure that the field only changes the first time. 
+        clientApp.isCallActiveSup = false;
+    } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
         // If active call
         // Update State and Wait Time columns
-        $('#tblCallerDetails > tbody> tr').each(function(index) {
+        $('#tblCallerDetails > tbody> tr').each(function() {
             var firstTd = $(this).find('td:first');
             if ($(firstTd).text() == data.eventBody.id) {
                 $(this).find('td:eq(4)').text(agent.calls[0].state);
                 $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                $(this).find('td:eq(6)').text("--");
             }
         })
 
@@ -376,7 +390,7 @@ clientApp.updateTableRow = function(data) {
         if (agent.calls[0].state === "disconnected") {
             // If disconnected call
             // Update State, Wait Time and Duration columns
-            $('#tblCallerDetails > tbody> tr').each(function(index) {
+            $('#tblCallerDetails > tbody> tr').each(function() {
                 var firstTd = $(this).find('td:first');
                 if ($(firstTd).text() == data.eventBody.id) {
                     $(this).find('td:eq(4)').text(agent.calls[0].state);
