@@ -4,7 +4,6 @@
 import clientIDs from './clientIDs.js';
 
 let clientApp = {};
-let conversationIDs = [];
 
 // PureCloud OAuth information
 const platformClient = require('platformClient');
@@ -15,8 +14,6 @@ const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
 // API instances
 const usersApi = new platformClient.UsersApi();
 const notificationsApi = new platformClient.NotificationsApi();
-
-var onloadConvID;
 
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
 clientApp.setup = function(pcEnv){
@@ -189,74 +186,63 @@ clientApp.subscribeToQueue = function(queue){
         ['application/json']
     ).then(data => {
         if(Object.keys(data).length > 0) {
-            onloadConvID = data.conversations[0].conversationId;
-            conversationIDs.push(onloadConvID);
-
-            let caller = data.conversations[0].participants
-                .filter(participant => participant.purpose === "external")[0];
+            (data.conversations).forEach(function(conversation) {
+                let caller = conversation.participants
+                    .filter(participant => participant.purpose === "external")[0];
             
-            let acd = data.conversations[0].participants
-                .filter(participant => participant.purpose === "acd")[0];
+                let acd = conversation.participants
+                    .filter(participant => participant.purpose === "acd")[0];
 
-            let acdSegment = acd.sessions[0].segments
-                .filter(segment => segment.segmentType === "interact")[0];
-            
-            var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
-            var newRow   = tableRef.insertRow(tableRef.rows.length);
-        
-            // Populate Conversation ID column
-            var idCell  = newRow.insertCell(0);
-            var idText  = document.createTextNode(onloadConvID);
-            idCell.appendChild(idText);
-        
-            // Populate Name column
-            var nameCell  = newRow.insertCell(1);
-            var nameText  = document.createTextNode(caller.participantName);
-            nameCell.appendChild(nameText);
-        
-            // Populate ANI column
-            var aniCell  = newRow.insertCell(2);
-            var aniText  = document.createTextNode(caller.sessions[0].ani);
-            aniCell.appendChild(aniText);
-        
-            // Populate DNIS column
-            var dnisCell  = newRow.insertCell(3);
-            var dnisText  = document.createTextNode(caller.sessions[0].dnis);
-            dnisCell.appendChild(dnisText);
-        
-            // Populate State column
-            var stateCell  = newRow.insertCell(4);
-            var stateText  = document.createTextNode("connected");
-            stateCell.appendChild(stateText);
-        
-            // Populate Wait Time column
-            var waitCell  = newRow.insertCell(5);
-            var waitText  = document.createTextNode((new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1));
-            waitCell.appendChild(waitText);
-        
-            // Populate Duration column
-            var durationCell  = newRow.insertCell(6);
-            var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
-            durationCell.appendChild(durationText);
+                let acdSegment = acd.sessions[0].segments
+                    .filter(segment => segment.segmentType === "interact")[0];
 
-            // let conversationStart = new Date(data.conversations[0].conversationStart);
-            // let acdStart = new Date(acdSegment.segmentStart);
-            // let acdEnd = new Date(acdSegment.segmentEnd);
+                let agent = conversation.participants
+                    .filter(participant => participant.purpose === "agent")[0];
+                
+                var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
+                var newRow   = tableRef.insertRow(tableRef.rows.length);
 
-            // $("#supName").text(caller.participantName);
-            // $("#supANI").text(caller.sessions[0].ani);
-            // $("#supDNIS").text(caller.sessions[0].dnis);
-            // $("#supState").text("connected");
-            // $("#supWaitTime").text(new Date(acdEnd - acdStart).toISOString().slice(11, -1));
+                // Create cell columns
+                var idCell  = newRow.insertCell(0);
+                var nameCell  = newRow.insertCell(1);
+                var aniCell  = newRow.insertCell(2);
+                var dnisCell  = newRow.insertCell(3);
+                var stateCell  = newRow.insertCell(4);
+                var waitCell  = newRow.insertCell(5);
+                var durationCell  = newRow.insertCell(6);
 
-            // // Start timer for Call Duration
-            // var intervalId = setInterval(function() {
-            //     var currentDate = new Date();        
-            //     $("#supDuration").text(new Date(currentDate - conversationStart).toISOString().slice(11, -1).split('.')[0]);
-            // }, 1000);
-            // $("#supDuration").attr("onload-timer-id",intervalId);
+                // Create text nodes
+                var idText  = document.createTextNode(conversation.conversationId);
+                var nameText  = document.createTextNode(caller.participantName);
+                var aniText  = document.createTextNode(caller.sessions[0].ani);
+                var dnisText  = document.createTextNode(caller.sessions[0].dnis);
+
+                if(agent !== undefined) {
+                    // If active call
+                    var stateText  = document.createTextNode("connected");
+                    var waitText  = document.createTextNode(new Date(new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1));
+                    var durationText  = document.createTextNode("--");
+                } else {
+                    // Caller on queue
+                    var stateText  = document.createTextNode("on queue");
+                    var waitText  = document.createTextNode("--");
+                    var durationText  = document.createTextNode("--");
+                }
+                
+                // Append text nodes to cell columns
+                idCell.appendChild(idText);
+                nameCell.appendChild(nameText);
+                aniCell.appendChild(aniText);
+                dnisCell.appendChild(dnisText);
+                stateCell.appendChild(stateText);
+                waitCell.appendChild(waitText);
+                durationCell.appendChild(durationText);
+
+                // Make sure Conversation ID column is always hidden
+                idCell.hidden = true;
+            });            
         }
-    }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + body));
+    }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + JSON.stringify(body)));
 
     // Create a Notifications Channel
     client.callApi(
@@ -287,111 +273,14 @@ clientApp.subscribeToQueue = function(queue){
 clientApp.onSocketMessageQueue = function(event){
     let data = JSON.parse(event.data);
     let topic = data.topicName;
-    let eventBody = data.eventBody;
 
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
         // Check to see if Conversation details is already displayed in the view
-        if (conversationIDs.includes(eventBody.id)) {
-            console.log("UPDATE TABLE ROW || " + JSON.stringify(data));
+        if ($('#tblCallerDetails td:contains(' + data.eventBody.id + ')').length) {
             clientApp.updateTableRow(data);            
         } else {
-            // Add to pool of Conversations already displayed in the view
-            conversationIDs.push(eventBody.id);
-            console.log("ADD TABLE ROW || " + JSON.stringify(data));
-            console.log("CONVERSATION IDS || " + conversationIDs.toString());
-
-            // Call addTableRow function
             clientApp.addTableRow(data);
-        }    
-    
-        console.log("WEB SOCKET || " + JSON.stringify(data));
-
-        // If new socket message for the active call on page load
-        if(onloadConvID === eventBody.id){
-            // Stop timer for Call Duration
-            window.clearInterval($("#supDuration").attr("onload-timer-id"));
-        }
-
-        let caller = eventBody.participants
-                .filter(participant => participant.purpose === "customer")[0];
-        
-        let agent = eventBody.participants
-                .filter(participant => participant.purpose === "agent")[0];
-        
-        let acd = eventBody.participants
-                .filter(participant => participant.purpose === "acd")[0];
-        
-        let acdConnectedDt = new Date(acd.connectedTime);
-        let acdEndDt = new Date(acd.endTime);
-        let custConnectedDt = new Date(caller.connectedTime);
-        let custEndDt = new Date(caller.endTime);
-
-        $("#supName").text(caller.name);
-        $("#supANI").text(caller.address);
-        $("#supDNIS").text(caller.calls[0].other.addressNormalized);
-
-        // If incoming call
-        if((acd.endTime === undefined) && (!clientApp.isCallActiveSup)){
-            console.log("INCOMING CALL");
-            $("#supState").text(agent.calls[0].state);
-            $("#supDuration").text("00:00:00");
-
-            // Set timer for Caller Wait Time
-            var intervalId1 = setInterval(function() {
-                var currentDate = new Date();        
-                $("#supWaitTime").text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);
-            }, 1000);
-            $("#supWaitTime").attr("wait-timer-id",intervalId1);
-
-            // Makes sure that the field only changes the first time. 
-            clientApp.isCallActiveSup = true;
-        } else if((acd.endTime === undefined) && (caller.endTime === undefined)) {
-            console.log("ACTIVE CALL");
-            // If active call
-
-            // Stop timer for Caller Wait Time
-            window.clearInterval($("#supWaitTime").attr("wait-timer-id"));
-
-            $("#supState").text(agent.calls[0].state);
-            $("#supWaitTime").text(new Date(acdConnectedDt - custConnectedDt).toISOString().slice(11, -1));
-
-            // Start timer for Call Duration
-            var intervalId2 = setInterval(function() {
-                var currentDate = new Date();        
-                $("#supDuration").text(new Date(currentDate - custConnectedDt).toISOString().slice(11, -1).split('.')[0]);
-            }, 1000);
-            $("#supDuration").attr("duration-timer-id",intervalId2);
-
-            // Makes sure that the field only changes the first time. 
-            clientApp.isCallActiveSup = true;
-        } else if(agent.calls[0].state === "disconnected") {
-            console.log("DISCONNECTED CALL");
-            // If disconnected call
-
-            // Stop timer for Call Wait Time and Call Duration
-            window.clearInterval($("#supWaitTime").attr("wait-timer-id"));
-            window.clearInterval($("#supDuration").attr("duration-timer-id"));
-
-            $("#supState").text(agent.calls[0].state);
-            $("#supWaitTime").text(new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1));
-            $("#supDuration").text(new Date(custEndDt - custConnectedDt).toISOString().slice(11, -1));
-
-            // Makes sure that the field only changes the first time. 
-            clientApp.isCallActiveSup = false;
-        } else if((caller.endTime !== undefined) && (!clientApp.isCallActiveSup)){
-            // Stop timer for Call Wait Time and Call Duration
-            window.clearInterval($("#supWaitTime").attr("wait-timer-id"));
-            window.clearInterval($("#supDuration").attr("duration-timer-id"));
-
-            $("#supName").text("");
-            $("#supANI").text("");
-            $("#supDNIS").text("");
-            $("#supState").text("");
-            $("#supWaitTime").text("");
-            $("#supDuration").text("");
-
-            clientApp.isCallActiveSup = false;
         }
     }
 }
@@ -407,90 +296,90 @@ clientApp.addTableRow = function(data) {
         .filter(participant => participant.purpose === "acd")[0];
 
     var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
-    var newRow   = tableRef.insertRow(tableRef.rows.length);
-
-    // Hide Conversation ID column
-    $('td:nth-child(1),th:nth-child(1)').hide();
-
-    // Populate Conversation ID column
-    var idCell  = newRow.insertCell(0);
-    var idText  = document.createTextNode(data.eventBody.id);
-    idCell.appendChild(idText);
-    idCell.hidden = true;
-
-    // Populate Name column
-    var nameCell  = newRow.insertCell(1);
-    var nameText  = document.createTextNode(caller.name);
-    nameCell.appendChild(nameText);
-
-    // Populate ANI column
-    var aniCell  = newRow.insertCell(2);
-    var aniText  = document.createTextNode(caller.address);
-    aniCell.appendChild(aniText);
-
-    // Populate DNIS column
-    var dnisCell  = newRow.insertCell(3);
-    var dnisText  = document.createTextNode(caller.calls[0].other.addressNormalized);
-    dnisCell.appendChild(dnisText);
-
-    // // Populate State column
-    // var stateCell  = newRow.insertCell(4);
-    // var stateText  = document.createTextNode(agent.calls[0].state);
-    // stateCell.appendChild(stateText);
-
-    // // Populate Wait Time column
-    // var waitCell  = newRow.insertCell(5);
-    // var waitText  = document.createTextNode((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
-    // waitCell.appendChild(waitText);
-
-    // // Populate Duration column
-    // var durationCell  = newRow.insertCell(6);
-    // var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
-    // durationCell.appendChild(durationText);
     
-    if((acd.endTime === undefined) && (!clientApp.isCallActiveSup)){
-        // If incoming call
-        // Populate State column
-        var stateCell  = newRow.insertCell(4);
-        var stateText  = document.createTextNode(agent.calls[0].state);
-        stateCell.appendChild(stateText);
+    if ((agent === undefined) && (acd.calls[0].state === "connected")) {
+        // Caller on queue
+        var newRow   = tableRef.insertRow(tableRef.rows.length);
 
-        // Makes sure that the field only changes the first time. 
-        clientApp.isCallActiveSup = true;
-    } else if((acd.endTime === undefined) && (caller.endTime === undefined)) {
-        // If active call
-        // Populate State column
+        // Create Cell columns
+        var idCell  = newRow.insertCell(0);
+        var nameCell  = newRow.insertCell(1);
+        var aniCell  = newRow.insertCell(2);
+        var dnisCell  = newRow.insertCell(3);
         var stateCell  = newRow.insertCell(4);
-        var stateText  = document.createTextNode(agent.calls[0].state);
-        stateCell.appendChild(stateText);
-
-        // Populate Wait Time column
         var waitCell  = newRow.insertCell(5);
-        var waitText  = document.createTextNode((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
-        waitCell.appendChild(waitText);
-
-        // Makes sure that the field only changes the first time. 
-        clientApp.isCallActiveSup = true;
-    } else if(agent.calls[0].state === "disconnected") {
-        // If disconnected call
-        // Populate State column
-        var stateCell  = newRow.insertCell(4);
-        var stateText  = document.createTextNode(agent.calls[0].state);
-        stateCell.appendChild(stateText);
-
-        // Populate Wait Time column
-        var waitCell  = newRow.insertCell(5);
-        var waitText  = document.createTextNode((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
-        waitCell.appendChild(waitText);
-
-        // Populate Duration column
         var durationCell  = newRow.insertCell(6);
-        var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+
+        // Create text nodes
+        var idText  = document.createTextNode(data.eventBody.id);
+        var nameText  = document.createTextNode(caller.name);
+        var aniText  = document.createTextNode(caller.address);
+        var dnisText  = document.createTextNode(caller.calls[0].other.addressNormalized);
+        var stateText  = document.createTextNode("on queue");
+        var waitText  = document.createTextNode("--");
+        var durationText  = document.createTextNode("--");
+
+        // Append text nodes to cell columns
+        idCell.appendChild(idText);
+        nameCell.appendChild(nameText);
+        aniCell.appendChild(aniText);
+        dnisCell.appendChild(dnisText);
+        stateCell.appendChild(stateText);
+        waitCell.appendChild(waitText);
         durationCell.appendChild(durationText);
+
+        // Make sure Conversation ID column is always hidden
+        idCell.hidden = true;
 
         // Makes sure that the field only changes the first time. 
         clientApp.isCallActiveSup = false;
+    } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
+        // If incoming call
+        var newRow   = tableRef.insertRow(tableRef.rows.length);
+
+        // Create Cell columns
+        var idCell  = newRow.insertCell(0);
+        var nameCell  = newRow.insertCell(1);
+        var aniCell  = newRow.insertCell(2);
+        var dnisCell  = newRow.insertCell(3);
+        var stateCell  = newRow.insertCell(4);
+        var waitCell  = newRow.insertCell(5);
+        var durationCell  = newRow.insertCell(6);
+
+        // Create text nodes
+        var idText  = document.createTextNode(data.eventBody.id);
+        var nameText  = document.createTextNode(caller.name);
+        var aniText  = document.createTextNode(caller.address);
+        var dnisText  = document.createTextNode(caller.calls[0].other.addressNormalized);
+        var stateText  = document.createTextNode(agent.calls[0].state);
+        var waitText  = document.createTextNode("--");
+        var durationText  = document.createTextNode("--");
+
+        // Append text nodes to cell columns
+        idCell.appendChild(idText);
+        nameCell.appendChild(nameText);
+        aniCell.appendChild(aniText);
+        dnisCell.appendChild(dnisText);
+        stateCell.appendChild(stateText);
+        waitCell.appendChild(waitText);
+        durationCell.appendChild(durationText);
+
+        // Make sure Conversation ID column is always hidden
+        idCell.hidden = true;
+
+        // Makes sure that the field only changes the first time. 
+        clientApp.isCallActiveSup = true;
     }
+
+    // Set timer for Caller Wait Time
+    //     var intervalId1 = setInterval(function() {
+    //         var currentDate = new Date();        
+    //         $("#supWaitTime").text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);
+    //     }, 1000);
+    //     $("#supWaitTime").attr("wait-timer-id",intervalId1);
+
+    // Stop timer for Caller Wait Time
+    //     window.clearInterval($("#supWaitTime").attr("wait-timer-id"));
 }
 
 clientApp.updateTableRow = function(data) {
@@ -503,52 +392,50 @@ clientApp.updateTableRow = function(data) {
     let acd = data.eventBody.participants
         .filter(participant => participant.purpose === "acd")[0];
 
-    // Find Conversation ID in the table
-    var numberCell = $("td:contains('" + data.eventBody.id + "')");
-    var row = numberCell.parent();
-
-    console.log("NUMBER CELL || " + numberCell.toString() + " || ROW || " + row.toString());
-
-    // // Update State column
-    // var stateCell = row.children()[4];
-    // stateCell.html(agent.calls[0].state);
-
-    // // Update Wait Time column
-    // var waitCell = row.children()[5];
-    // waitCell.html((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
-
-    // // Update Duration column
-    // var durationCell = row.children()[6];
-    // durationCell.html((new Date(caller.endTime)) - (new Date(caller.connectedTime)));  
-
-    if((acd.endTime === undefined) && (caller.endTime === undefined)) {
-        // If active call
+    if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
+        // If incoming call
         // Update State column
-        var stateCell = row.children()[4];
-        stateCell.html(agent.calls[0].state);
-
-        // Update Wait Time column
-        var waitCell = row.children()[5];
-        waitCell.html((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
-
-        // Makes sure that the field only changes the first time. 
-        clientApp.isCallActiveSup = true;
-    } else if(agent.calls[0].state === "disconnected") {
-        // If disconnected call
-        // Update State column
-        var stateCell = row.children()[4];
-        stateCell.html(agent.calls[0].state);
-
-        // Update Wait Time column
-        var waitCell = row.children()[5];
-        waitCell.html((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
-
-        // Update Duration column
-        var durationCell = row.children()[6];
-        durationCell.html((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+        $('#tblCallerDetails > tbody> tr').each(function() {
+            var firstTd = $(this).find('td:first');
+            if ($(firstTd).text() == data.eventBody.id) {
+                $(this).find('td:eq(4)').text(agent.calls[0].state);
+                $(this).find('td:eq(5)').text("--");
+                $(this).find('td:eq(6)').text("--");
+            }
+        })
 
         // Makes sure that the field only changes the first time. 
         clientApp.isCallActiveSup = false;
+    } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
+        // If active call
+        // Update State and Wait Time columns
+        $('#tblCallerDetails > tbody> tr').each(function() {
+            var firstTd = $(this).find('td:first');
+            if ($(firstTd).text() == data.eventBody.id) {
+                $(this).find('td:eq(4)').text(agent.calls[0].state);
+                $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                $(this).find('td:eq(6)').text("--");
+            }
+        })
+
+        // Makes sure that the field only changes the first time. 
+        clientApp.isCallActiveSup = true;
+    } else if(agent !== undefined) {
+        if (agent.calls[0].state === "disconnected") {
+            // If disconnected call
+            // Update State, Wait Time and Duration columns
+            $('#tblCallerDetails > tbody> tr').each(function() {
+                var firstTd = $(this).find('td:first');
+                if ($(firstTd).text() == data.eventBody.id) {
+                    $(this).find('td:eq(4)').text(agent.calls[0].state);
+                    $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                    $(this).find('td:eq(6)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                }
+            })
+
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActiveSup = false;
+        }        
     }
 }
 
