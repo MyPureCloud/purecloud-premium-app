@@ -620,9 +620,11 @@ clientApp.updateTableRow = function(data) {
         // waitCell.text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
 
         // Update State and Wait Time columns
-        $('#data > tbody> tr').each(function(index) {
+        $('#tblCallerDetails > tbody> tr').each(function(index) {
+            console.log(index);
             var firstTd = $(this).find('td:first');
             if ($(firstTd).text() == data.eventBody.id) {
+                console.log("found: " + index + ":" + data.eventBody.id);
                 $(this).find('td:eq(4)').text("connected");
                 $(this).find('td:eq(5)').text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
             }
@@ -650,9 +652,11 @@ clientApp.updateTableRow = function(data) {
             // durationCell.text((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
 
             // Update State, Wait Time and Duration columns
-            $('#data > tbody> tr').each(function(index) {
+            $('#tblCallerDetails > tbody> tr').each(function(index) {
+                console.log(index);
                 var firstTd = $(this).find('td:first');
                 if ($(firstTd).text() == data.eventBody.id) {
+                    console.log("found: " + index + ":" + data.eventBody.id);
                     $(this).find('td:eq(4)').text("disconnected");
                     $(this).find('td:eq(5)').text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
                     $(this).find('td:eq(6)').text((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
