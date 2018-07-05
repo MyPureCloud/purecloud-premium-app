@@ -299,7 +299,43 @@ clientApp.addTableRow = function(data) {
 
     var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
     
-    if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
+    if ((agent !== undefined) && (agent.connectedTime === undefined)) {
+        // Caller on queue
+        var newRow   = tableRef.insertRow(tableRef.rows.length);
+
+        // Create Cell columns
+        var idCell  = newRow.insertCell(0);
+        var nameCell  = newRow.insertCell(1);
+        var aniCell  = newRow.insertCell(2);
+        var dnisCell  = newRow.insertCell(3);
+        var stateCell  = newRow.insertCell(4);
+        var waitCell  = newRow.insertCell(5);
+        var durationCell  = newRow.insertCell(6);
+
+        // Create text nodes
+        var idText  = document.createTextNode(data.eventBody.id);
+        var nameText  = document.createTextNode(caller.name);
+        var aniText  = document.createTextNode(caller.address);
+        var dnisText  = document.createTextNode(caller.calls[0].other.addressNormalized);
+        var stateText  = document.createTextNode("on queue");
+        var waitText  = document.createTextNode("--");
+        var durationText  = document.createTextNode("--");
+
+        // Append text nodes to cell columns
+        idCell.appendChild(idText);
+        nameCell.appendChild(nameText);
+        aniCell.appendChild(aniText);
+        dnisCell.appendChild(dnisText);
+        stateCell.appendChild(stateText);
+        waitCell.appendChild(waitText);
+        durationCell.appendChild(durationText);
+
+        // Make sure Conversation ID column is always hidden
+        idCell.hidden = true;
+
+        // Makes sure that the field only changes the first time. 
+        clientApp.isCallActiveSup = true;
+    } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
         // If incoming call
         var newRow   = tableRef.insertRow(tableRef.rows.length);
 
