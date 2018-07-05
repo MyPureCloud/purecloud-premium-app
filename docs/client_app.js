@@ -299,7 +299,7 @@ clientApp.addTableRow = function(data) {
 
     var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
     
-    if ((agent !== undefined) && (agent.connectedTime === undefined) && (acd.calls[0].state === "connected")) {
+    if ((agent === undefined) && (acd.calls[0].state === "connected")) {
         // Caller on queue
         var newRow   = tableRef.insertRow(tableRef.rows.length);
 
