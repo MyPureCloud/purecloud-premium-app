@@ -187,6 +187,7 @@ clientApp.subscribeToQueue = function(queue){
     ).then(data => {
         if(Object.keys(data).length > 0) {
             (data.conversations).forEach(function(conversation) {
+                console.log("CONVERSATION || " + JSON.stringify(conversation));
                 let caller = conversation.participants
                     .filter(participant => participant.purpose === "external")[0];
             
@@ -195,6 +196,9 @@ clientApp.subscribeToQueue = function(queue){
 
                 let acdSegment = acd.sessions[0].segments
                     .filter(segment => segment.segmentType === "interact")[0];
+
+                let agent = conversation.participants
+                    .filter(participant => participant.purpose === "agent")[0];
                 
                 var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
                 var newRow   = tableRef.insertRow(tableRef.rows.length);
@@ -213,10 +217,19 @@ clientApp.subscribeToQueue = function(queue){
                 var nameText  = document.createTextNode(caller.participantName);
                 var aniText  = document.createTextNode(caller.sessions[0].ani);
                 var dnisText  = document.createTextNode(caller.sessions[0].dnis);
-                var stateText  = document.createTextNode("connected");
-                var waitText  = document.createTextNode(new Date(new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1));
-                var durationText  = document.createTextNode("--");
 
+                if(agent !== undefined) {
+                    // If active call
+                    var stateText  = document.createTextNode("connected");
+                    var waitText  = document.createTextNode(new Date(new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1));
+                    var durationText  = document.createTextNode("--");
+                } else {
+                    // Caller on queue
+                    var stateText  = document.createTextNode("on queue");
+                    var waitText  = document.createTextNode("--");
+                    var durationText  = document.createTextNode("--");
+                }
+                
                 // Append text nodes to cell columns
                 idCell.appendChild(idText);
                 nameCell.appendChild(nameText);
@@ -230,7 +243,7 @@ clientApp.subscribeToQueue = function(queue){
                 idCell.hidden = true;
             });            
         }
-    }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + body));
+    }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + JSON.stringify(body)));
 
     // Create a Notifications Channel
     client.callApi(
@@ -261,6 +274,8 @@ clientApp.subscribeToQueue = function(queue){
 clientApp.onSocketMessageQueue = function(event){
     let data = JSON.parse(event.data);
     let topic = data.topicName;
+
+    console.log("WEB SOCKET || " + JSON.stringify(data));
 
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
