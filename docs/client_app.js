@@ -595,42 +595,69 @@ clientApp.updateTableRow = function(data) {
 
     // // Update Duration column
     // var durationCell = row.children()[6];
-    // durationCell.html((new Date(caller.endTime)) - (new Date(caller.connectedTime)));  
+    // durationCell.html((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+    
+    // $('#data > tbody> tr').each(function(index) {
+    //     var firstTd = $(this).find('td:first');
+    //     if ($(firstTd).text() == data.eventBody.id) {
+    //         $(this).find('td:eq(1)').text($('#item').val());
+    //         $(this).find('td:eq(2)').text($('#color').val());
+    //     }
+    // })
 
     if((acd.endTime === undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
         // If active call
-        // Find Conversation ID in the table
-        var numberCell = $("td:contains('" + data.eventBody.id + "')");
-        var row = numberCell.parent();
+        // // Find Conversation ID in the table
+        // var numberCell = $("td:contains('" + data.eventBody.id + "')");
+        // var row = numberCell.parent();
 
-        // Update State column
-        var stateCell = row.children()[4];
-        stateCell.text("connected");
+        // // Update State column
+        // var stateCell = row.children()[4];
+        // stateCell.text("connected");
 
-        // Update Wait Time column
-        var waitCell = row.children()[5];
-        waitCell.text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+        // // Update Wait Time column
+        // var waitCell = row.children()[5];
+        // waitCell.text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+
+        // Update State and Wait Time columns
+        $('#data > tbody> tr').each(function(index) {
+            var firstTd = $(this).find('td:first');
+            if ($(firstTd).text() == data.eventBody.id) {
+                $(this).find('td:eq(4)').text("connected");
+                $(this).find('td:eq(5)').text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+            }
+        })
 
         // Makes sure that the field only changes the first time. 
         clientApp.isCallActiveSup = true;
     } else if(agent !== undefined) {
         if (agent.calls[0].state === "disconnected") {
             // If disconnected call
-            // Find Conversation ID in the table
-            var numberCell = $("td:contains('" + data.eventBody.id + "')");
-            var row = numberCell.parent();
+            // // Find Conversation ID in the table
+            // var numberCell = $("td:contains('" + data.eventBody.id + "')");
+            // var row = numberCell.parent();
 
-            // Update State column
-            var stateCell = row.children()[4];
-            stateCell.text("disconnected");
+            // // Update State column
+            // var stateCell = row.children()[4];
+            // stateCell.text("disconnected");
 
-            // Update Wait Time column
-            var waitCell = row.children()[5];
-            waitCell.text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+            // // Update Wait Time column
+            // var waitCell = row.children()[5];
+            // waitCell.text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
 
-            // Update Duration column
-            var durationCell = row.children()[6];
-            durationCell.text((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+            // // Update Duration column
+            // var durationCell = row.children()[6];
+            // durationCell.text((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+
+            // Update State, Wait Time and Duration columns
+            $('#data > tbody> tr').each(function(index) {
+                var firstTd = $(this).find('td:first');
+                if ($(firstTd).text() == data.eventBody.id) {
+                    $(this).find('td:eq(4)').text("disconnected");
+                    $(this).find('td:eq(5)').text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+                    $(this).find('td:eq(6)').text((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+                }
+            })
 
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
