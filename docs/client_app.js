@@ -15,8 +15,6 @@ const redirectUri = "https://princemerluza.github.io/purecloud-premium-app/";
 const usersApi = new platformClient.UsersApi();
 const notificationsApi = new platformClient.NotificationsApi();
 
-var onloadConvID;
-
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
 clientApp.setup = function(pcEnv){
     let clientId = clientIDs[pcEnv] || clientIDs['mypurecloud.com'];
@@ -188,9 +186,6 @@ clientApp.subscribeToQueue = function(queue){
         ['application/json']
     ).then(data => {
         if(Object.keys(data).length > 0) {
-            console.log("DATA || " + JSON.stringify(data));
-            onloadConvID = data.conversations[0].conversationId;
-
             let caller = data.conversations[0].participants
                 .filter(participant => participant.purpose === "external")[0];
             
@@ -213,13 +208,13 @@ clientApp.subscribeToQueue = function(queue){
             var durationCell  = newRow.insertCell(6);
 
             // Create text nodes
-            var idText  = document.createTextNode(onloadConvID);
+            var idText  = document.createTextNode(data.conversations[0].conversationId);
             var nameText  = document.createTextNode(caller.participantName);
             var aniText  = document.createTextNode(caller.sessions[0].ani);
             var dnisText  = document.createTextNode(caller.sessions[0].dnis);
             var stateText  = document.createTextNode("connected");
             var waitText  = document.createTextNode(new Date(new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1));
-            var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+            var durationText  = document.createTextNode("--");
 
             // Append text nodes to cell columns
             idCell.appendChild(idText);
@@ -269,10 +264,8 @@ clientApp.onSocketMessageQueue = function(event){
     if(topic === clientApp.topicId){
         // Check to see if Conversation details is already displayed in the view
         if ($('#tblCallerDetails td:contains(' + data.eventBody.id + ')').length) {
-            console.log("UPDATE TABLE ROW || " + JSON.stringify(data));
             clientApp.updateTableRow(data);            
         } else {
-            console.log("ADD TABLE ROW || " + JSON.stringify(data));
             clientApp.addTableRow(data);
         }
     }
@@ -353,10 +346,8 @@ clientApp.updateTableRow = function(data) {
         // If active call
         // Update State and Wait Time columns
         $('#tblCallerDetails > tbody> tr').each(function(index) {
-            console.log(index);
             var firstTd = $(this).find('td:first');
             if ($(firstTd).text() == data.eventBody.id) {
-                console.log("found: " + index + ":" + data.eventBody.id);
                 $(this).find('td:eq(4)').text(agent.calls[0].state);
                 $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
             }
@@ -369,10 +360,8 @@ clientApp.updateTableRow = function(data) {
             // If disconnected call
             // Update State, Wait Time and Duration columns
             $('#tblCallerDetails > tbody> tr').each(function(index) {
-                console.log(index);
                 var firstTd = $(this).find('td:first');
                 if ($(firstTd).text() == data.eventBody.id) {
-                    console.log("found: " + index + ":" + data.eventBody.id);
                     $(this).find('td:eq(4)').text(agent.calls[0].state);
                     $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
                     $(this).find('td:eq(6)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
