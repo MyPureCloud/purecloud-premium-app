@@ -188,6 +188,7 @@ clientApp.subscribeToQueue = function(queue){
         ['application/json']
     ).then(data => {
         if(Object.keys(data).length > 0) {
+            console.log("DATA || " + JSON.stringify(data));
             onloadConvID = data.conversations[0].conversationId;
 
             let caller = data.conversations[0].participants
@@ -217,7 +218,7 @@ clientApp.subscribeToQueue = function(queue){
             var aniText  = document.createTextNode(caller.sessions[0].ani);
             var dnisText  = document.createTextNode(caller.sessions[0].dnis);
             var stateText  = document.createTextNode("connected");
-            var waitText  = document.createTextNode((new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1));
+            var waitText  = document.createTextNode(new Date(new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1));
             var durationText  = document.createTextNode((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
 
             // Append text nodes to cell columns
