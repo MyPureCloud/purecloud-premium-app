@@ -369,7 +369,7 @@ clientApp.onSocketMessageQueue = function(event){
         //     window.clearInterval($("#supDuration").attr("duration-timer-id"));
 
         //     $("#supState").text(agent.calls[0].state);
-        //     $("#supWaitTime").text(new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1));
+            // $("#supWaitTime").text(new Date(acdEndDt - acdConnectedDt).toISOString().slice(11, -1));
         //     $("#supDuration").text(new Date(custEndDt - custConnectedDt).toISOString().slice(11, -1));
 
         //     // Makes sure that the field only changes the first time. 
@@ -626,7 +626,7 @@ clientApp.updateTableRow = function(data) {
             if ($(firstTd).text() == data.eventBody.id) {
                 console.log("found: " + index + ":" + data.eventBody.id);
                 $(this).find('td:eq(4)').text("connected");
-                $(this).find('td:eq(5)').text(((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
             }
         })
 
@@ -658,8 +658,8 @@ clientApp.updateTableRow = function(data) {
                 if ($(firstTd).text() == data.eventBody.id) {
                     console.log("found: " + index + ":" + data.eventBody.id);
                     $(this).find('td:eq(4)').text("disconnected");
-                    $(this).find('td:eq(5)').text(((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                    $(this).find('td:eq(6)').text(((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                    $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                    $(this).find('td:eq(6)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
                 }
             })
 
