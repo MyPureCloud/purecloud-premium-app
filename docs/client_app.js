@@ -300,7 +300,7 @@ clientApp.onSocketMessageQueue = function(event){
             clientApp.addTableRow(data);
         }    
     
-        console.log("WEB SOCKET || " + JSON.stringify(data));
+        // console.log("WEB SOCKET || " + JSON.stringify(data));
 
         // // If new socket message for the active call on page load
         // if(onloadConvID === eventBody.id){
@@ -605,7 +605,7 @@ clientApp.updateTableRow = function(data) {
     //     }
     // })
 
-    if((acd.endTime === undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
+    if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
         // If active call
         // // Find Conversation ID in the table
         // var numberCell = $("td:contains('" + data.eventBody.id + "')");
@@ -626,7 +626,7 @@ clientApp.updateTableRow = function(data) {
             if ($(firstTd).text() == data.eventBody.id) {
                 console.log("found: " + index + ":" + data.eventBody.id);
                 $(this).find('td:eq(4)').text("connected");
-                $(this).find('td:eq(5)').text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
+                $(this).find('td:eq(5)').text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)).toISOString().slice(11, -1));
             }
         })
 
@@ -658,8 +658,8 @@ clientApp.updateTableRow = function(data) {
                 if ($(firstTd).text() == data.eventBody.id) {
                     console.log("found: " + index + ":" + data.eventBody.id);
                     $(this).find('td:eq(4)').text("disconnected");
-                    $(this).find('td:eq(5)').text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)));
-                    $(this).find('td:eq(6)').text((new Date(caller.endTime)) - (new Date(caller.connectedTime)));
+                    $(this).find('td:eq(5)').text((new Date(acd.connectedTime)) - (new Date(caller.connectedTime)).toISOString().slice(11, -1));
+                    $(this).find('td:eq(6)').text((new Date(caller.endTime)) - (new Date(caller.connectedTime)).toISOString().slice(11, -1));
                 }
             })
 
