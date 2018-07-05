@@ -31,10 +31,12 @@ export default {
     "wizard-final-content": "modules/installation-wizard/final/content",
     "wizard-final-control": "modules/installation-wizard/final/control",
 
+    "wizard-installing": "modules/installation-wizard/installing",
+
     // Not Authorized Page
     "not-authorized": "pages/not-authorized",
 
-
+    
     // This page intentionally left blank
     "blank": "blank"
 }

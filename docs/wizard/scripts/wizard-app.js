@@ -24,6 +24,8 @@ if((typeof $ === 'undefined') || (typeof jQuery === 'undefined') || (typeof Hand
  * @todo keep track of current status with local storage to enable resuming
  * @todo Separate functions for assigning event handlers
  * @todo For load page methods, check the event to make sure that it was invoked legally.
+ * @todo Determine app instance id of current app.
+ * @todo Input Validation
  */
 class WizardApp {
     constructor(){
@@ -139,132 +141,6 @@ class WizardApp {
         });
     }
 
-    /**
-     * Configure PureCloud and install everything as defined from the 
-     * stagingArea member. This should be the last step of the installation wizard.
-     * @param {*} event 
-     */
-    installAppConfigurations(event){
-        // Remove controls
-        _renderModule(hb['blank'], this.stagingArea, 'wizard-content');
-        _renderModule(hb['blank'], this.stagingArea, 'wizard-control');
-
-        // Api instances
-        let groupsApi = new this.platformClient.GroupsApi();
-        let authApi = new this.platformClient.AuthorizationApi();
-        let integrationsApi = new this.platformClient.IntegrationsApi();
-
-        // Keep the promises of the creation calls
-        // This will be used to keep track once a particular batch resolves
-        let groupPromises = [];
-        let authPromises = [];
-        let integrationPromises = [];
-
-        // Once groups are created store the names and the ids
-        // object of (groupName: groupId) pairs
-        let groupData = {};
-
-
-        // Create the roles
-        this.stagingArea.roles.forEach((role) => {
-            // Add the premium app permission if not included in staging area
-            if(!role.permissions.includes(appConfig.premiumAppPermission))
-                role.permissions.push(appConfig.premiumAppPermission);
-
-            let roleBody = {
-                    "name": this.prefix + role.name,
-                    "description": "",
-                    "permissions": role.permissions
-            };
-
-            authPromises.push(
-                authApi.postAuthorizationRoles(roleBody)
-                .then((data) => {
-                    console.log("created role");
-
-                    if(role.assignToSelf){
-                        return authApi.putAuthorizationRoleUsersAdd(data.id, [this.userId]);
-                    }else{
-                        resolve();
-                    }
-                })
-                .then((data) => {
-                    console.log("Assigned " + role.name + " to user");
-                })
-                .catch((err) => console.log(err))
-            );
-        });
-
-        // Create the groups
-        Promise.all(authPromises)
-        .then(() => {
-            this.stagingArea.groups.forEach((group) => {
-                let groupBody = {
-                    "name": this.prefix + group.name,
-                    "description": group.description,
-                    "type": "official",
-                    "rulesVisible": true,
-                    "visibility": "members"
-                 }
-    
-                groupPromises.push(
-                    groupsApi.postGroups(groupBody)
-                    .then((data) => {
-                        console.log("Created group");
-                        groupData[group.name] = data.id;
-                    })
-                    .catch((err) => console.log(err))
-                );
-            });
-
-            // After groups are created, create instances
-            // There are two steps for creating the app instances
-            // 1. Create instance of a custom-client-app
-            // 2. Configure the app
-            Promise.all(groupPromises)
-            .then(() => {
-                console.log(groupData);
-
-                this.stagingArea.appInstances.forEach((instance) => {
-                    let integrationBody = {
-                        "body": {
-                            "integrationType": {
-                                "id": "embedded-client-app"
-                            }
-                        }
-                    }
-
-                    integrationPromises.push(
-                        integrationsApi.postIntegrations(integrationBody)
-                        .then((data) => {
-                            let integrationConfig = {
-                                "body": {
-                                    "name": this.prefix + instance.name,
-                                    "version": 1, 
-                                    "properties": {
-                                        "url" : instance.url,
-                                        "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
-                                        "displayType": instance.type,
-                                        "featureCategory": "", 
-                                        "groups": instance.groups.map((groupName) => groupData[groupName])
-                                    },
-                                    "advanced": {},
-                                    "notes": "",
-                                    "credentials": {}
-                                }
-                            }
-
-                            return integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig)
-                        })
-                        .then((data) => console.log(data))
-                        .catch((err) => console.log(err))
-                    );
-                });
-                return Promise.all(integrationPromises);
-            })
-            .then(() => console.log("Finished setting up App instances"));
-        });
-    }
 
     /**
      * Loads the landing page of the app
@@ -717,6 +593,148 @@ class WizardApp {
             setButtonClick(this, '#btn-install', this.installAppConfigurations);
         });
     }
+
+
+    /**
+     * Configure PureCloud and install everything as defined from the 
+     * stagingArea member. This should be the last step of the installation wizard.
+     * @param {*} event 
+     */
+    installAppConfigurations(event){
+        let logInfo = (info) => {
+            console.log(info);
+            $("#install-log")
+            .append("<p class='has-text-grey is-marginless'><em>" +
+                        info + "</em></p>");
+        }
+
+
+        // Remove controls
+        _renderModule(hb['wizard-installing'], this.stagingArea, 'wizard-content')
+        _renderModule(hb['blank'], this.stagingArea, 'wizard-control');
+
+        // Api instances
+        let groupsApi = new this.platformClient.GroupsApi();
+        let authApi = new this.platformClient.AuthorizationApi();
+        let integrationsApi = new this.platformClient.IntegrationsApi();
+
+        // Keep the promises of the creation calls
+        // This will be used to keep track once a particular batch resolves
+        let groupPromises = [];
+        let authPromises = [];
+        let integrationPromises = [];
+
+        // Once groups are created store the names and the ids
+        // object of (groupName: groupId) pairs
+        let groupData = {};
+
+
+        // Create the roles
+        this.stagingArea.roles.forEach((role) => {
+            logInfo("Creating role: " + role.name);
+
+            // Add the premium app permission if not included in staging area
+            if(!role.permissions.includes(appConfig.premiumAppPermission))
+                role.permissions.push(appConfig.premiumAppPermission);
+
+            let roleBody = {
+                    "name": this.prefix + role.name,
+                    "description": "",
+                    "permissions": role.permissions
+            };
+
+            authPromises.push(
+                authApi.postAuthorizationRoles(roleBody)
+                .then((data) => {
+                    logInfo("Created role: " + role.name);
+
+                    if(role.assignToSelf){
+                        return authApi.putAuthorizationRoleUsersAdd(data.id, [this.userId]);
+                    }else{
+                        resolve();
+                    }
+                })
+                .then((data) => {
+                    logInfo("Assigned " + role.name + " to user");
+                })
+                .catch((err) => console.log(err))
+            );
+        });
+
+        // Create the groups
+        Promise.all(authPromises)
+        .then(() => {
+            this.stagingArea.groups.forEach((group) => {
+                logInfo("Creating group: " + group.name);
+
+                let groupBody = {
+                    "name": this.prefix + group.name,
+                    "description": group.description,
+                    "type": "official",
+                    "rulesVisible": true,
+                    "visibility": "members"
+                 }
+    
+                groupPromises.push(
+                    groupsApi.postGroups(groupBody)
+                    .then((data) => {
+                        logInfo("Created group: " + group.name);
+                        groupData[group.name] = data.id;
+                    })
+                    .catch((err) => console.log(err))
+                );
+            });
+
+            // After groups are created, create instances
+            // There are two steps for creating the app instances
+            // 1. Create instance of a custom-client-app
+            // 2. Configure the app
+            Promise.all(groupPromises)
+            .then(() => {
+                this.stagingArea.appInstances.forEach((instance) => {
+                    logInfo("Creating instance: " + instance.name);
+
+                    let integrationBody = {
+                        "body": {
+                            "integrationType": {
+                                "id": "embedded-client-app"
+                            }
+                        }
+                    }
+
+                    integrationPromises.push(
+                        integrationsApi.postIntegrations(integrationBody)
+                        .then((data) => {
+                            logInfo("Configuring instance: " + instance.name);
+                            let integrationConfig = {
+                                "body": {
+                                    "name": this.prefix + instance.name,
+                                    "version": 1, 
+                                    "properties": {
+                                        "url" : instance.url,
+                                        "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
+                                        "displayType": instance.type,
+                                        "featureCategory": "", 
+                                        "groups": instance.groups.map((groupName) => groupData[groupName])
+                                    },
+                                    "advanced": {},
+                                    "notes": "",
+                                    "credentials": {}
+                                }
+                            }
+
+                            return integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig)
+                        })
+                        .then((data) => logInfo("Configured instance: " + data.name))
+                        .catch((err) => console.log(err))
+                    );
+                });
+                return Promise.all(integrationPromises);
+            })
+            .then(() => logInfo("<strong>Installation Complete!</strong>"));
+        });
+    }
+
 
     /**
      * @description First thing that must be called to set-up the App
