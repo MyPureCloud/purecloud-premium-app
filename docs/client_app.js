@@ -334,7 +334,7 @@ clientApp.addTableRow = function(data) {
         idCell.hidden = true;
 
         // Makes sure that the field only changes the first time. 
-        clientApp.isCallActiveSup = true;
+        clientApp.isCallActiveSup = false;
     } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
         // If incoming call
         var newRow   = tableRef.insertRow(tableRef.rows.length);
