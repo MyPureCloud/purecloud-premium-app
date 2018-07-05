@@ -186,47 +186,49 @@ clientApp.subscribeToQueue = function(queue){
         ['application/json']
     ).then(data => {
         if(Object.keys(data).length > 0) {
-            let caller = data.conversations[0].participants
-                .filter(participant => participant.purpose === "external")[0];
+            (data.conversations).forEach(function(conversation) {
+                let caller = conversation.participants
+                    .filter(participant => participant.purpose === "external")[0];
             
-            let acd = data.conversations[0].participants
-                .filter(participant => participant.purpose === "acd")[0];
+                let acd = conversation.participants
+                    .filter(participant => participant.purpose === "acd")[0];
 
-            let acdSegment = acd.sessions[0].segments
-                .filter(segment => segment.segmentType === "interact")[0];
-            
-            var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
-            var newRow   = tableRef.insertRow(tableRef.rows.length);
+                let acdSegment = acd.sessions[0].segments
+                    .filter(segment => segment.segmentType === "interact")[0];
+                
+                var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
+                var newRow   = tableRef.insertRow(tableRef.rows.length);
 
-            // Create cell columns
-            var idCell  = newRow.insertCell(0);
-            var nameCell  = newRow.insertCell(1);
-            var aniCell  = newRow.insertCell(2);
-            var dnisCell  = newRow.insertCell(3);
-            var stateCell  = newRow.insertCell(4);
-            var waitCell  = newRow.insertCell(5);
-            var durationCell  = newRow.insertCell(6);
+                // Create cell columns
+                var idCell  = newRow.insertCell(0);
+                var nameCell  = newRow.insertCell(1);
+                var aniCell  = newRow.insertCell(2);
+                var dnisCell  = newRow.insertCell(3);
+                var stateCell  = newRow.insertCell(4);
+                var waitCell  = newRow.insertCell(5);
+                var durationCell  = newRow.insertCell(6);
 
-            // Create text nodes
-            var idText  = document.createTextNode(data.conversations[0].conversationId);
-            var nameText  = document.createTextNode(caller.participantName);
-            var aniText  = document.createTextNode(caller.sessions[0].ani);
-            var dnisText  = document.createTextNode(caller.sessions[0].dnis);
-            var stateText  = document.createTextNode("connected");
-            var waitText  = document.createTextNode(new Date(new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1));
-            var durationText  = document.createTextNode("--");
+                // Create text nodes
+                var idText  = document.createTextNode(conversation.conversationId);
+                var nameText  = document.createTextNode(caller.participantName);
+                var aniText  = document.createTextNode(caller.sessions[0].ani);
+                var dnisText  = document.createTextNode(caller.sessions[0].dnis);
+                var stateText  = document.createTextNode("connected");
+                var waitText  = document.createTextNode(new Date(new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1));
+                var durationText  = document.createTextNode("--");
 
-            // Append text nodes to cell columns
-            idCell.appendChild(idText);
-            nameCell.appendChild(nameText);
-            aniCell.appendChild(aniText);
-            dnisCell.appendChild(dnisText);
-            stateCell.appendChild(stateText);
-            waitCell.appendChild(waitText);
-            durationCell.appendChild(durationText);
+                // Append text nodes to cell columns
+                idCell.appendChild(idText);
+                nameCell.appendChild(nameText);
+                aniCell.appendChild(aniText);
+                dnisCell.appendChild(dnisText);
+                stateCell.appendChild(stateText);
+                waitCell.appendChild(waitText);
+                durationCell.appendChild(durationText);
 
-            // Make sure Conversation ID column is always hidden
-            idCell.hidden = true;
+                // Make sure Conversation ID column is always hidden
+                idCell.hidden = true;
+            });            
         }
     }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + body));
 
