@@ -18,10 +18,8 @@ export function setButtonClick(that, buttonId, callbackFunction){
 export function setValidateInput(id){
     $(id).off('input').on('input', function(){
         if(/^[a-zA-Z0-9_.!, ]+$/.test(this.value)){
-            console.log('YES');
             $(this).removeClass('is-danger');
         }else{
-            console.log('NO');
             $(this).addClass('is-danger');
         }
     });
