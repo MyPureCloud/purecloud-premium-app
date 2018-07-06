@@ -3,8 +3,7 @@
 */
 import appConfig from './config.js'
 import hb from './template-references.js'
-import { _renderModule, _renderCompletePage } from './handlebars-helper.js'
-import { setButtonClick, setValidateInput, setValidateURL } from './util.js'
+import PageManager from './page-manager.js'
 
 // Requires jQuery and Handlebars from parent context
 const $ = window.$;
@@ -21,6 +20,8 @@ if((typeof $ === 'undefined') || (typeof jQuery === 'undefined') || (typeof Hand
  * @todo keep track of current status with local storage to enable resuming
  * @todo Separate functions for assigning event handlers
  * @todo Determine app instance id of current app.
+ * @todo Maybe implement middleware between pages and App. RN Pages are directly invoking methods
+ *       and accessing stagearea property.
  */
 class WizardApp {
     constructor(){
@@ -36,10 +37,15 @@ class WizardApp {
         // Permissions required for using the app 
         this.setupPermissionsRequired = appConfig.setupPermissionsRequired;
 
+        // Default permission to add to new roles
+        this.premiumAppPermission = appConfig.premiumAppPermission;
+
         // Prefix to add to all objects that will be added
         // (roles, groups, integrations, etc..)
         // as a result of this installation wizard
         this.prefix = appConfig.prefix;
+
+
 
         // JS object that will stage information about the installation.
         this.stagingArea = {
@@ -53,6 +59,9 @@ class WizardApp {
 
         // User ID 
         this.userId = null;
+
+        // Asign to class so pages could call it
+        this.pageManager = new PageManager(this);
     }
 
     /**
@@ -136,81 +145,22 @@ class WizardApp {
         });
     }
 
-    stageRole(name, description, permissions, assignToSelf){
-        if((name === '') || (typeof name !== "string")) throw "Invalid role name.";
-
-        let role = {
-            "name": name,
-            "description": description,
-            "permissions": permissions,
-            "assignToSelf": assignToSelf
-        };
-
-        this.stagingArea.roles.push(role);
-    }
-
-    unstageRole(roleIndex){
-        this.stagingArea.roles.splice(roleIndex, 1);
-    }
-
-
     /**
-     * Loads the landing page of the app
+     * Gets the org info
      */
-    loadLandingPage(event){
-        this._pureCloudAuthenticate()
-        .then(() => {
-            let organizationApi = new this.platformClient.OrganizationApi();
+    getOrgInfo(){
+        let organizationApi = new this.platformClient.OrganizationApi();
 
-            // Get organization information
-            return organizationApi.getOrganizationsMe()
-            .then(orgData => {
-                let orgFeature = orgData.features;
-    
-                _renderCompletePage({
-                        "title": "App Setup Wizard",
-                        "subtitle": "Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App."
-                    }, 
-                    {
-                        features: orgFeature,
-                        startWizardFunction: this.loadRolesPage
-                    },
-                    hb['landing-page']
-                )
-                .then(() => {
-                    setButtonClick(this, '#btn-check-installation', this.loadCheckInstallationStatus);
-                });
-            });
-        });
-        
+        // Get organization information
+        return organizationApi.getOrganizationsMe()
     }
 
     /**
-     * Load the page to check for existing PureCloud objects
-     * @todo Reminder: Get roles and groups have max 25 after query. 
-     *          Get integration has max 100 before manual filter.
+     * Gets the existing groups on PureCloud based on Prefix
      */
-    loadCheckInstallationStatus(event){
-        this._loadDefaultOrder(this.defaultOrderFileName)
-        .then(() => 
-        _renderCompletePage(
-            {
-                "title": "Checking Installation",
-                "subtitle": "Check any existing PureCloud Objects that is set up by the App"
-            }, 
-            {
-                objectPrefix: this.prefix
-            },
-            hb['check-installation']
-        ))
-        .then(() => {
-            setButtonClick(this, '#btn-start-wizard', this.loadRolesCreation);
-        });
-
+    getExistingGroups(){
         // PureCloud API instances
-        let groupsApi = new this.platformClient.GroupsApi();
-        let authApi = new this.platformClient.AuthorizationApi();
-        let integrationApi = new this.platformClient.IntegrationsApi();
+        const groupsApi = new this.platformClient.GroupsApi();
 
         // Query bodies
         var groupSearchBody = {
@@ -224,457 +174,168 @@ class WizardApp {
             ]
         };
 
-        var authOpts = { 
+        return groupsApi.postGroupsSearch(groupSearchBody);
+    }
+
+    /**
+     * Delete Group from PureCloud org
+     * @param {String} groupId 
+     */
+    deletePureCloudGroup(groupId){
+        let groupsApi = new this.platformClient.GroupsApi();
+
+        return groupsApi.deleteGroup(groupId);
+    }
+
+    /**
+     * Get existing roles in purecloud based on prefix
+     * @todo Get role based on permission. NOTE: if permission is on permissionPolicy instead of General,
+     *       PureCloud don't have API to easily search using it.
+     */
+    getExistingRoles(){
+        const authApi = new this.platformClient.AuthorizationApi();
+
+        let authOpts = { 
             'name': this.prefix + "*", // Wildcard to work like STARTS_WITH 
             'userCount': false
         };
 
-        var integrationsOpts = {
+        return authApi.getAuthorizationRoles(authOpts);
+    }
+
+    /**
+     * Delete the specified role
+     * @param {String} roleId 
+     */
+    deletePureCloudRole(roleId){
+        let authApi = new this.platformClient.AuthorizationApi();
+
+        return authApi.deleteAuthorizationRole(roleId)
+    }
+
+    /**
+     * Get existing apps based on the prefix
+     * @todo Get instances of a particular type of app.
+     */
+    getExistingApps(){
+        const integrationApi = new this.platformClient.IntegrationsApi();
+        let integrationsOpts = {
             'pageSize': 100
         }
-        
-        // Check existing groups
-        groupsApi.postGroupsSearch(groupSearchBody)
-        .then(data => {
-            let group = (typeof data.results !== 'undefined') ? data.results : [];
-            let context = {
-                panelHeading: 'Existing Groups (' + group.length + ')',
-                objType: 'groups',
-                pureCloudObjArr: group,
-                icon: 'fa-users'
-            }
-
-            return _renderModule(hb['existing-objects'], context, 'results-group', group);
-        })
-
-        // Add delete button handlers
-        // data is the groups from PureCloud
-        .then((data) => {
-            data = data || [];
-            data.forEach((group) => {
-                let btnId = '#btn-delete-' + group.id;
-                setButtonClick(this, btnId, () => {
-                    $('#modal-deleting').addClass('is-active');
-                    let groupsApi = new this.platformClient.GroupsApi();
-
-                    groupsApi.deleteGroup(group.id)
-                    .then((data) => this.loadCheckInstallationStatus())
-                    .catch(() => console.log(err));
-                });
-            })
-        })
-
-        //Error handler
-        .catch(err => console.log(err));
-
-        // Check existing roles
-        authApi.getAuthorizationRoles(authOpts)
-        .then(data => {
-            let roles = data.entities;
-            let context = {
-                panelHeading: 'Existing Roles (' + roles.length + ')',
-                objType: 'roles',
-                pureCloudObjArr: roles,
-                icon: 'fa-briefcase'
-            }
-
-            return _renderModule(hb['existing-objects'], context, 'results-role', roles);
-        })
-        // Add delete button handlers
-        // data is the roles from PureCloud
-        .then((data) => {
-            data = data || [];
-            data.forEach((role) => {
-                let btnId = '#btn-delete-' + role.id;
-                setButtonClick(this, btnId, () => {
-                    $('#modal-deleting').addClass('is-active');
-                    let authApi = new this.platformClient.AuthorizationApi();
-
-                    authApi.deleteAuthorizationRole(role.id)
-                    .then((data) => this.loadCheckInstallationStatus())
-                    .catch(() => console.log(err));
-                });
-            })
-        })
-        .catch(err => console.log(err));
-
-        // Check existing Integrations
-        integrationApi.getIntegrations(integrationsOpts)
-        .then(data => {
-            let integrations = data.entities.filter(entity => entity.name.startsWith(this.prefix));
-            let context = {
-                panelHeading: 'Existing Integrations (' + integrations.length + ')',
-                objType: 'integrations',
-                pureCloudObjArr: integrations,
-                icon: 'fa-cogs'
-            }
-            return _renderModule(hb['existing-objects'], context, 'results-integration', integrations);
-        })
-
-        // Add delete button handlers
-        // data is the roles from PureCloud
-        .then((data) => {
-            data = data || [];
-            data.forEach((customApp) => {
-                let btnId = '#btn-delete-' + customApp.id;
-                setButtonClick(this, btnId, () => {
-                    $('#modal-deleting').addClass('is-active');
-                    let integrationsApi = new this.platformClient.IntegrationsApi();
-
-                    integrationsApi.deleteIntegration(customApp.id)
-                    .then((data) => this.loadCheckInstallationStatus())
-                    .catch(() => console.log(err));
-                });
-            })
-        })
-        
-        //Error handler
-        .catch(err => console.log(err));
+        return integrationApi.getIntegrations(integrationsOpts);
     }
 
     /**
-     * Roles creation page
-     * @param {*} event 
+     * Delete a PureCLoud instance
+     * @param {String} instanceId 
      */
-    loadRolesCreation(event){
-        let assignEventHandler = function(){
-            // If add Role Button pressed then stage the role name 
-            // from the form input
-            setButtonClick(this, '#btn-add-role', () => {
-                if ($('#txt-role-name').hasClass('is-danger')){
-                    alert('Check your inputs.');
-                    return;
-                }
+    deletePureCloudApp(instanceId){
+        let integrationsApi = new this.platformClient.IntegrationsApi();
 
-                let roleName = $('#txt-role-name').val().trim();
-                let roleDescription = $('#txt-role-description').val().trim();
-                let tempRole = {
-                    "name": roleName,
-                    "description": roleDescription,
-                    "permissions": [appConfig.premiumAppPermission],
-                    "assignToSelf": true
-                };
-                this.stagingArea.roles.push(tempRole);
-
-                // Clear fields
-                $('#txt-role-name').val('');
-                $('#txt-role-description').val('');
-
-                _renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
-                .then($.proxy(assignEventHandler, this));
-            });
-
-            // Input validation for txt role name
-            $('#txt-role-name').addClass('is-danger')
-            setValidateInput('#txt-role-name');
-
-            // Next button to Apps Creation
-            setButtonClick(this, '#btn-next', this.loadRolesAssignment);
-
-            // Back to check Installation
-            setButtonClick(this, '#btn-prev', this.loadCheckInstallationStatus);
-
-            // Assign deletion for each role entry
-            for(let i = 0; i < this.stagingArea.roles.length; i++){
-                let btnId = '#btn-delete-' + (i).toString();
-                setButtonClick(this, btnId, () => {
-                    this.stagingArea.roles.splice(i, 1);
-                    _renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
-                    .then($.proxy(assignEventHandler, this));
-                });
-            }
-        }
-
-        _renderCompletePage(
-            {
-                title: "Create Roles",
-                subtitle: "Roles are used to provide and determine access levels on the Premium App."
-            },
-            null, hb["wizard-page"]
-        )
-
-        // Render left guide bar
-        // TODO: Change to Roles in template
-        .then(() => _renderModule(hb['wizard-left'], {"highlight1": true}, 'wizard-left'))
-
-        //Render contents of staging area
-        .then(() => _renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content'))
-
-        //Render controls
-        .then(() => _renderModule(hb['wizard-role-control'], {}, 'wizard-control'))
-
-        // Event Handlers
-        .then($.proxy(assignEventHandler, this));
+        return integrationsApi.deleteIntegration(instanceId)
     }
 
     /**
-     * Page where user can choose which additional roles to assign to himself/herself
-     * @param {*} event 
+     * Stage a role
+     * @param {String} name 
+     * @param {String} description 
+     * @param {StringArray} permissions 
+     * @param {Boolean} assignToSelf 
      */
-    loadRolesAssignment(event){
-        _renderCompletePage(
-            {
-                title: "Assign Roles",
-                subtitle: "Assign roles to your current user."
-            },
-            null, hb["wizard-page"]
-        )
-        // Render left guide bar
-        // TODO: Change to Roles in template
-        .then(() => _renderModule(hb['wizard-left'], {"highlight1": true}, 'wizard-left'))
+    stageRole(name, description, permissions, assignToSelf){
+        if((name === '') || (typeof name !== "string")) throw "Invalid role name.";
 
-        //Render contents of staging area
-        .then(() => _renderModule(hb['wizard-role-assign-content'], this.stagingArea, 'wizard-content'))
+        let role = {
+            "name": name,
+            "description": description,
+            "permissions": permissions,
+            "assignToSelf": assignToSelf
+        };
 
-        //Render controls
-        .then(() => _renderModule(hb['wizard-role-assign-control'], {}, 'wizard-control'))
-
-        // Event Handlers
-        .then(() => {
-            // Take note of which roles to add to user after creation
-            setButtonClick(this, '#btn-next', () => {
-                for(let i = 0; i < this.stagingArea.roles.length; i++){
-                    if($('#check-' + i.toString()).prop("checked") == true){
-                        this.stagingArea.roles[i].assignToSelf = true;
-                    } else {
-                        this.stagingArea.roles[i].assignToSelf = false;
-                    }
-                }
-
-                // Next button to Groups Creation
-                $.proxy(this.loadGroupsCreation, this)();
-            });
-
-            // Back to Roles Creation
-            setButtonClick(this, '#btn-prev', this.loadRolesCreation);
-        });
-    }
-
-    /** 
-     * Stage the groups to be created.
-     * Thi is the First step of the installation wizard.
-     * @param {object} event 
-     */
-    loadGroupsCreation(event){
-        let assignEventHandler = function(){
-            // If add Group Button pressed then stage the group name 
-            // from the form input
-            setButtonClick(this, '#btn-add-group', () => {
-                if ($('#txt-group-name').hasClass('is-danger')){
-                    alert('Check your inputs.');
-                    return;
-                }
-
-                let tempGroup = {
-                    "name": $('#txt-group-name').val().trim(), 
-                    "description": $('#txt-group-description').val().trim(),
-                    "assignToSelf": true
-                }
-
-                this.stagingArea.groups.push(tempGroup);
-
-                $('#txt-group-name').val('');
-                $('#txt-group-description').val('');
-
-                _renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
-                .then($.proxy(assignEventHandler, this));
-            })    
-
-            // Next button to Apps Creation
-            setButtonClick(this, '#btn-next', this.loadAppsCreation);
-
-            // Back to check Installation
-            setButtonClick(this, '#btn-prev', this.loadRolesAssignment);
-
-            // Input validation for txt role name
-            $('#txt-group-name').addClass('is-danger')
-            setValidateInput('#txt-group-name');
-
-            // Assign deletion for each role entry
-            for(let i = 0; i < this.stagingArea.groups.length; i++){
-                let btnId = '#btn-delete-' + (i).toString();
-                setButtonClick(this, btnId, () => {
-                    this.stagingArea.groups.splice(i, 1);
-                    _renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
-                    .then($.proxy(assignEventHandler, this));
-                });
-            }
-        }
-
-        _renderCompletePage(
-            {
-                title: "Create groups",
-                subtitle: "Groups are required to filter which members will have access to specific instances of the App."
-            },
-            null, hb["wizard-page"]
-        )
-
-        // Render left guide bar
-        .then(() => _renderModule(hb['wizard-left'], {"highlight2": true}, 'wizard-left'))
-        
-        //Render contents of staging area
-        .then(() => _renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content'))
-        
-        //Render controls
-        .then(() => _renderModule(hb['wizard-group-control'], {}, 'wizard-control'))
-
-        // TODO: Input Validation and Error Handling
-        .then($.proxy(assignEventHandler, this));
+        this.stagingArea.roles.push(role);
     }
 
     /**
-     * Creatino of App instances
-     * @param {event} event 
+     * Assign or unassign a staged role to the user after installation
+     * @param {integer} roleIndex 
+     * @param {boolean} toAssign 
      */
-    loadAppsCreation(event){
-        // Clear all form inputs
-        function clearAll(){
-            $('#txt-instance-name').val("");
-            $('#txt-instance-uri').val("");
-            $('#list-instance-groups').val("");
-            $('#txt-instance-name').addClass('is-danger');
-            $('#txt-instance-uri').addClass('is-danger');
-        }
+    setStagedRoleAssignment(roleIndex, toAssign){
+        this.stagingArea.roles[roleIndex].assignToSelf = toAssign;
+    }
 
-        // Integrations that have groups which are unstaged would have 
-        // those groups automatically removed from their configuration
+    /**
+     * Unstages a role
+     * @param {integer} roleIndex Index in stagingArea.roles array
+     */
+    unstageRole(roleIndex){
+        this.stagingArea.roles.splice(roleIndex, 1);
+    }
+
+    /**
+     * Stage group
+     * @param {String} name 
+     * @param {String} description 
+     * @param {Boolean} asignToSelf 
+     */
+    stageGroup(name, description, asignToSelf){
+        let tempGroup = {
+            "name": name, 
+            "description": description,
+            "assignToSelf": asignToSelf
+        }
+        this.stagingArea.groups.push(tempGroup);
+    }
+
+    /**
+     * Unstage a group
+     * @param {Integer} groupIndex 
+     */
+    unstageGroup(groupIndex){
+        this.stagingArea.groups.splice(groupIndex, 1);
+    }
+
+    /**
+     * Stage App instance
+     * @param {String} name 
+     * @param {String} url 
+     * @param {String} type  Either standalone or widget
+     * @param {StringArray} groups
+     */
+    stageInstance(name, url, type, groups){
+        let instanceBody = {
+            "name": name,
+            "url": url,
+            "type": type,
+            "groups": groups
+        }
+        this.stagingArea.appInstances.push(instanceBody);
+    }
+
+    /**
+     * Unstage App Instance
+     * @param {Integer} instanceIndex 
+     */
+    unstageInstance(instanceIndex){
+        this.stagingArea.appInstances.splice(instanceIndex, 1);
+    }
+
+    /**
+     * Fix Staged instances that have groups which are unstaged after app is already configured. 
+     * Have those groups automatically removed from the instance configuration.
+     * Called when loading the App Instance page
+     */
+    reevaluateStagedInstances(){
         this.stagingArea.appInstances.forEach((instance) =>
-            instance.groups = instance.groups.filter((group) => 
-                this.stagingArea.groups.map(g => g.name).includes(group))
+        instance.groups = instance.groups.filter((group) => 
+            this.stagingArea.groups.map(g => g.name).includes(group))
         );
-
-        // Assign Event Handlers
-        let assignEventHandler = function(){
-            clearAll();
-
-            // Add Instance
-            setButtonClick(this, '#add-instance', () => {
-                if ($('#txt-instance-name').hasClass('is-danger') ||
-                    $('#txt-instance-uri').hasClass('is-danger')){
-                    alert('Check your inputs.');
-                    return;
-                }
-
-                let instanceName = $('#txt-instance-name').val();
-                let instanceType = $('input[name=instance-type]:checked', '#rad-instance-type').val();
-                let instanceUri = $('#txt-instance-uri').val();
-                let instanceGroups = $('#list-instance-groups').val();
-
-                let instanceBody = {
-                    "name": instanceName,
-                    "url": instanceUri,
-                    "type": instanceType,
-                    "groups": instanceGroups
-                }
-                this.stagingArea.appInstances.push(instanceBody);
-
-                clearAll();
-
-                _renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content')
-                .then($.proxy(assignEventHandler, this));
-            });
-            
-            setValidateInput('#txt-instance-name');
-            setValidateURL('#txt-instance-uri');
-            
-
-            // Clear form content      
-            setButtonClick(this, '#clear-details', clearAll);     
-
-            // Next button to Final Page
-            setButtonClick(this, '#btn-next', this.loadFinalizeInstallation);
-
-            // Back to groups Installation
-            setButtonClick(this, '#btn-prev', this.loadGroupsCreation);
-
-            // Assign deletion for each instance entry
-            for(let i = 0; i < this.stagingArea.appInstances.length; i++){
-                let btnId = '#btn-delete-' + (i).toString();
-                setButtonClick(this, btnId, () => {
-                    this.stagingArea.appInstances.splice(i, 1);
-                    _renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content')
-                    .then($.proxy(assignEventHandler, this));
-                });
-            }
-        }
-
-        _renderCompletePage(
-            {
-                title: "Create App Instances",
-                subtitle: "These is where you add instances of you app." +
-                          "You could specify the landing page of each instance " +
-                          "and the groups (must be created from the wizard) who " + 
-                          "will have access to them."
-            },
-            null, hb["wizard-page"]
-        )
-
-        // Render left guide bar
-        .then(() => _renderModule(hb['wizard-left'], {"highlight3": true}, 'wizard-left'))
-        
-        //Render contents of staging area
-        .then(() => _renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content'))
-        
-        //Render controls 
-        .then(() => _renderModule(hb['wizard-instance-control'], this.stagingArea, 'wizard-control'))
-
-        // Assign Event Handlers
-        .then($.proxy(assignEventHandler, this));
     }
 
     /**
-     * Installation page
-     * @param {event} event
-     * @todo Move actual PureCloud configuration and installation to separate method 
+     * Final Step of the installation wizard. Actually install every staged object.
      */
-    loadFinalizeInstallation(event){
-        _renderCompletePage(
-            {
-                title: "Finalize",
-                subtitle: "Please review the items below and press Install to " + 
-                          "install the apps and configuration."
-            },
-            null, hb["wizard-page"]
-        )
-         // Render left guide bar
-         .then(() => _renderModule(hb['wizard-left'], {"highlight4": true}, 'wizard-left'))
-
-         //Render contents of staging area
-        .then(() => _renderModule(hb['wizard-final-content'], this.stagingArea, 'wizard-content'))
-        
-        //Render controls 
-        .then(() => _renderModule(hb['wizard-final-control'], this.stagingArea, 'wizard-control'))  
-        
-        // Assign Event Handlers
-        .then(() => {
-            // Back to groups Installation
-            setButtonClick(this, '#btn-prev', this.loadAppsCreation);
-
-            // Start installing yeah!!!
-             // TODO: handle the possibility of rate limit being reached on the API calls
-            setButtonClick(this, '#btn-install', this.installAppConfigurations);
-        });
-    }
-
-
-    /**
-     * Configure PureCloud and install everything as defined from the 
-     * stagingArea member. This should be the last step of the installation wizard.
-     * @param {*} event 
-     */
-    installAppConfigurations(event){
-        let logInfo = (info) => {
-            console.log(info);
-            $("#install-log")
-            .append("<p class='has-text-grey is-marginless'><em>" +
-                        info + "</em></p>");
-        }
-
-
-        // Remove controls
-        _renderModule(hb['wizard-installing'], this.stagingArea, 'wizard-content')
-        _renderModule(hb['blank'], this.stagingArea, 'wizard-control');
-
+    installConfigurations(){
         // Api instances
         let groupsApi = new this.platformClient.GroupsApi();
         let authApi = new this.platformClient.AuthorizationApi();
@@ -693,7 +354,7 @@ class WizardApp {
 
         // Create the roles
         this.stagingArea.roles.forEach((role) => {
-            logInfo("Creating role: " + role.name);
+            this.pageManager.logInfo("Creating role: " + role.name);
 
             // Add the premium app permission if not included in staging area
             if(!role.permissions.includes(appConfig.premiumAppPermission))
@@ -708,7 +369,7 @@ class WizardApp {
             authPromises.push(
                 authApi.postAuthorizationRoles(roleBody)
                 .then((data) => {
-                    logInfo("Created role: " + role.name);
+                    this.pageManager.logInfo("Created role: " + role.name);
 
                     if(role.assignToSelf){
                         return authApi.putAuthorizationRoleUsersAdd(data.id, [this.userId]);
@@ -717,7 +378,7 @@ class WizardApp {
                     }
                 })
                 .then((data) => {
-                    logInfo("Assigned " + role.name + " to user");
+                    this.pageManager.logInfo("Assigned " + role.name + " to user");
                 })
                 .catch((err) => console.log(err))
             );
@@ -727,7 +388,7 @@ class WizardApp {
         Promise.all(authPromises)
         .then(() => {
             this.stagingArea.groups.forEach((group) => {
-                logInfo("Creating group: " + group.name);
+                this.pageManager.logInfo("Creating group: " + group.name);
 
                 let groupBody = {
                     "name": this.prefix + group.name,
@@ -735,12 +396,12 @@ class WizardApp {
                     "type": "official",
                     "rulesVisible": true,
                     "visibility": "members"
-                 }
-    
+                    }
+
                 groupPromises.push(
                     groupsApi.postGroups(groupBody)
                     .then((data) => {
-                        logInfo("Created group: " + group.name);
+                        this.pageManager.logInfo("Created group: " + group.name);
                         groupData[group.name] = data.id;
                     })
                     .catch((err) => console.log(err))
@@ -754,7 +415,7 @@ class WizardApp {
             Promise.all(groupPromises)
             .then(() => {
                 this.stagingArea.appInstances.forEach((instance) => {
-                    logInfo("Creating instance: " + instance.name);
+                    this.pageManager.logInfo("Creating instance: " + instance.name);
 
                     let integrationBody = {
                         "body": {
@@ -767,7 +428,7 @@ class WizardApp {
                     integrationPromises.push(
                         integrationsApi.postIntegrations(integrationBody)
                         .then((data) => {
-                            logInfo("Configuring instance: " + instance.name);
+                            this.pageManager.logInfo("Configuring instance: " + instance.name);
                             let integrationConfig = {
                                 "body": {
                                     "name": this.prefix + instance.name,
@@ -787,23 +448,22 @@ class WizardApp {
 
                             return integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig)
                         })
-                        .then((data) => logInfo("Configured instance: " + data.name))
+                        .then((data) => this.pageManager.logInfo("Configured instance: " + data.name))
                         .catch((err) => console.log(err))
                     );
                 });
                 return Promise.all(integrationPromises);
             })
-            .then(() => logInfo("<strong>Installation Complete!</strong>"));
+            .then(() => this.pageManager.logInfo("<strong>Installation Complete!</strong>"));
         });
     }
-
 
     /**
      * @description First thing that must be called to set-up the App
      */
     start(){
         this._setupClientApp();
-        this.loadLandingPage();
+        this.pageManager.setPage("landingPage");
     }
 }
 
