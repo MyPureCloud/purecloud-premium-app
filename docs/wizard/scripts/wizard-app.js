@@ -352,109 +352,114 @@ class WizardApp {
         let groupData = {};
 
 
-        // Create the roles
-        this.stagingArea.roles.forEach((role) => {
-            this.pageManager.logInfo("Creating role: " + role.name);
+        return new Promise((resolve,reject) => { 
+            // Create the roles
+            this.stagingArea.roles.forEach((role) => {
+                this.pageManager.logInfo("Creating role: " + role.name);
 
-            // Add the premium app permission if not included in staging area
-            if(!role.permissions.includes(appConfig.premiumAppPermission))
-                role.permissions.push(appConfig.premiumAppPermission);
+                // Add the premium app permission if not included in staging area
+                if(!role.permissions.includes(appConfig.premiumAppPermission))
+                    role.permissions.push(appConfig.premiumAppPermission);
 
-            let roleBody = {
-                    "name": this.prefix + role.name,
-                    "description": "",
-                    "permissions": role.permissions
-            };
+                let roleBody = {
+                        "name": this.prefix + role.name,
+                        "description": "",
+                        "permissions": role.permissions
+                };
 
-            authPromises.push(
-                authApi.postAuthorizationRoles(roleBody)
-                .then((data) => {
-                    this.pageManager.logInfo("Created role: " + role.name);
-
-                    if(role.assignToSelf){
-                        return authApi.putAuthorizationRoleUsersAdd(data.id, [this.userId]);
-                    }else{
-                        resolve();
-                    }
-                })
-                .then((data) => {
-                    this.pageManager.logInfo("Assigned " + role.name + " to user");
-                })
-                .catch((err) => console.log(err))
-            );
-        });
-
-        // Create the groups
-        Promise.all(authPromises)
-        .then(() => {
-            this.stagingArea.groups.forEach((group) => {
-                this.pageManager.logInfo("Creating group: " + group.name);
-
-                let groupBody = {
-                    "name": this.prefix + group.name,
-                    "description": group.description,
-                    "type": "official",
-                    "rulesVisible": true,
-                    "visibility": "members"
-                    }
-
-                groupPromises.push(
-                    groupsApi.postGroups(groupBody)
+                authPromises.push(
+                    authApi.postAuthorizationRoles(roleBody)
                     .then((data) => {
-                        this.pageManager.logInfo("Created group: " + group.name);
-                        groupData[group.name] = data.id;
+                        this.pageManager.logInfo("Created role: " + role.name);
+
+                        if(role.assignToSelf){
+                            return authApi.putAuthorizationRoleUsersAdd(data.id, [this.userId]);
+                        }else{
+                            resolve();
+                        }
+                    })
+                    .then((data) => {
+                        this.pageManager.logInfo("Assigned " + role.name + " to user");
                     })
                     .catch((err) => console.log(err))
                 );
             });
 
-            // After groups are created, create instances
-            // There are two steps for creating the app instances
-            // 1. Create instance of a custom-client-app
-            // 2. Configure the app
-            Promise.all(groupPromises)
+            // Create the groups
+            Promise.all(authPromises)
             .then(() => {
-                this.stagingArea.appInstances.forEach((instance) => {
-                    this.pageManager.logInfo("Creating instance: " + instance.name);
+                this.stagingArea.groups.forEach((group) => {
+                    this.pageManager.logInfo("Creating group: " + group.name);
 
-                    let integrationBody = {
-                        "body": {
-                            "integrationType": {
-                                "id": "embedded-client-app"
-                            }
+                    let groupBody = {
+                        "name": this.prefix + group.name,
+                        "description": group.description,
+                        "type": "official",
+                        "rulesVisible": true,
+                        "visibility": "members"
                         }
-                    }
 
-                    integrationPromises.push(
-                        integrationsApi.postIntegrations(integrationBody)
+                    groupPromises.push(
+                        groupsApi.postGroups(groupBody)
                         .then((data) => {
-                            this.pageManager.logInfo("Configuring instance: " + instance.name);
-                            let integrationConfig = {
-                                "body": {
-                                    "name": this.prefix + instance.name,
-                                    "version": 1, 
-                                    "properties": {
-                                        "url" : instance.url,
-                                        "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
-                                        "displayType": instance.type,
-                                        "featureCategory": "", 
-                                        "groups": instance.groups.map((groupName) => groupData[groupName])
-                                    },
-                                    "advanced": {},
-                                    "notes": "",
-                                    "credentials": {}
-                                }
-                            }
-
-                            return integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig)
+                            this.pageManager.logInfo("Created group: " + group.name);
+                            groupData[group.name] = data.id;
                         })
-                        .then((data) => this.pageManager.logInfo("Configured instance: " + data.name))
                         .catch((err) => console.log(err))
                     );
                 });
-                return Promise.all(integrationPromises);
-            })
-            .then(() => this.pageManager.logInfo("<strong>Installation Complete!</strong>"));
+
+                // After groups are created, create instances
+                // There are two steps for creating the app instances
+                // 1. Create instance of a custom-client-app
+                // 2. Configure the app
+                Promise.all(groupPromises)
+                .then(() => {
+                    this.stagingArea.appInstances.forEach((instance) => {
+                        this.pageManager.logInfo("Creating instance: " + instance.name);
+
+                        let integrationBody = {
+                            "body": {
+                                "integrationType": {
+                                    "id": "embedded-client-app"
+                                }
+                            }
+                        }
+
+                        integrationPromises.push(
+                            integrationsApi.postIntegrations(integrationBody)
+                            .then((data) => {
+                                this.pageManager.logInfo("Configuring instance: " + instance.name);
+                                let integrationConfig = {
+                                    "body": {
+                                        "name": this.prefix + instance.name,
+                                        "version": 1, 
+                                        "properties": {
+                                            "url" : instance.url,
+                                            "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
+                                            "displayType": instance.type,
+                                            "featureCategory": "", 
+                                            "groups": instance.groups.map((groupName) => groupData[groupName])
+                                        },
+                                        "advanced": {},
+                                        "notes": "",
+                                        "credentials": {}
+                                    }
+                                }
+
+                                return integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig)
+                            })
+                            .then((data) => this.pageManager.logInfo("Configured instance: " + data.name))
+                            .catch((err) => console.log(err))
+                        );
+                    });
+                    return Promise.all(integrationPromises);
+                })
+                .then(() => {
+                    this.pageManager.logInfo("<strong>Installation Complete!</strong>");
+                    resolve();
+                });
+            });
         });
     }
 

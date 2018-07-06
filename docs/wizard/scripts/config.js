@@ -6,8 +6,8 @@ export default {
         'mypurecloud.com.au': 'c8a4d721-3fbb-4f50-b3e0-aa49bf86ac87',
         'mypurecloud.jp': '28dbeebd-8128-4fe0-8f42-f2eebb767a71'
     },
-    "redirectUri": "https://princemerluza.github.io/purecloud-premium-app/wizard/index.html",
-    //"redirectUri": "https://localhost/wizard/index.html",
+    //"redirectUri": "https://princemerluza.github.io/purecloud-premium-app/wizard/index.html",
+    "redirectUri": "https://localhost/wizard/index.html",
 
     //Permissions required for running the Wizard App
     "setupPermissionsRequired": ['admin'],
