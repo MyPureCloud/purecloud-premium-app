@@ -21,7 +21,6 @@ if((typeof $ === 'undefined') || (typeof jQuery === 'undefined') || (typeof Hand
  * @todo keep track of current status with local storage to enable resuming
  * @todo Separate functions for assigning event handlers
  * @todo Determine app instance id of current app.
- * @todo Input Validation
  */
 class WizardApp {
     constructor(){
@@ -135,6 +134,23 @@ class WizardApp {
                 resolve();
             }); 
         });
+    }
+
+    stageRole(name, description, permissions, assignToSelf){
+        if((name === '') || (typeof name !== "string")) throw "Invalid role name.";
+
+        let role = {
+            "name": name,
+            "description": description,
+            "permissions": permissions,
+            "assignToSelf": assignToSelf
+        };
+
+        this.stagingArea.roles.push(role);
+    }
+
+    unstageRole(roleIndex){
+        this.stagingArea.roles.splice(roleIndex, 1);
     }
 
 
