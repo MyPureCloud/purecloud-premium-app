@@ -12,7 +12,7 @@ export function setButtonClick(that, buttonId, callbackFunction){
 }
 
 /**
- * Checks if input is valid: alphanumeric 
+ * Adds a listener to the input element that will validate if value is 'acceptable' string.
  * @param {string} id   Id of element that contains input 
  */
 export function setValidateInput(id){
@@ -28,7 +28,7 @@ export function setValidateInput(id){
 }
 
 /**
- * Checks if input is valid URL.
+ * Adds a listener to the input element that will validate if value is a URL
  * @param {string} id Id of element that should contain URL
  */
 export function setValidateURL(id){
