@@ -10,3 +10,35 @@ export function setButtonClick(that, buttonId, callbackFunction){
     .off('click')
     .click($.proxy(callbackFunction, that));
 }
+
+/**
+ * Checks if input is valid: alphanumeric 
+ * @param {string} id   Id of element that contains input 
+ */
+export function setValidateInput(id){
+    $(id).off('input').on('input', function(){
+        if(/^[a-zA-Z0-9_.!, ]+$/.test(this.value)){
+            console.log('YES');
+            $(this).removeClass('is-danger');
+        }else{
+            console.log('NO');
+            $(this).addClass('is-danger');
+        }
+    });
+}
+
+/**
+ * Checks if input is valid URL.
+ * @param {string} id Id of element that should contain URL
+ */
+export function setValidateURL(id){
+    $(id).off('input').on('input', function(){
+        if(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/.test(this.value)){
+            console.log('YES');
+            $(this).removeClass('is-danger');
+        }else{
+            console.log('NO');
+            $(this).addClass('is-danger');
+        }
+    });
+}

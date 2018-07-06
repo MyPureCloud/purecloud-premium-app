@@ -4,7 +4,7 @@
 import appConfig from './config.js'
 import hb from './template-references.js'
 import { _renderModule, _renderCompletePage } from './handlebars-helper.js'
-import { setButtonClick } from './util.js'
+import { setButtonClick, setValidateInput, setValidateURL } from './util.js'
 
 // Requires jQuery and Handlebars from parent context
 const $ = window.$;
@@ -18,12 +18,8 @@ if((typeof $ === 'undefined') || (typeof jQuery === 'undefined') || (typeof Hand
 
 /**
  * WizardApp class that handles everything in the App.
- * @todo codebase is too verbose now, might look into implementing proper MVC and different templating engine
- * @todo Change all members to static if more appropriate
- * @todo keep track of current main module(page) to check with inner modules before they're rendered
  * @todo keep track of current status with local storage to enable resuming
  * @todo Separate functions for assigning event handlers
- * @todo For load page methods, check the event to make sure that it was invoked legally.
  * @todo Determine app instance id of current app.
  * @todo Input Validation
  */
@@ -330,8 +326,13 @@ class WizardApp {
             // If add Role Button pressed then stage the role name 
             // from the form input
             setButtonClick(this, '#btn-add-role', () => {
-                let roleName = $('#txt-role-name').val();
-                let roleDescription = $('#txt-role-description').val();
+                if ($('#txt-role-name').hasClass('is-danger')){
+                    alert('Check your inputs.');
+                    return;
+                }
+
+                let roleName = $('#txt-role-name').val().trim();
+                let roleDescription = $('#txt-role-description').val().trim();
                 let tempRole = {
                     "name": roleName,
                     "description": roleDescription,
@@ -340,10 +341,17 @@ class WizardApp {
                 };
                 this.stagingArea.roles.push(tempRole);
 
+                // Clear fields
+                $('#txt-role-name').val('');
+                $('#txt-role-description').val('');
+
                 _renderModule(hb['wizard-role-content'], this.stagingArea, 'wizard-content')
                 .then($.proxy(assignEventHandler, this));
             });
-    
+
+            // Input validation for txt role name
+            $('#txt-role-name').addClass('is-danger')
+            setValidateInput('#txt-role-name');
 
             // Next button to Apps Creation
             setButtonClick(this, '#btn-next', this.loadRolesAssignment);
@@ -437,13 +445,21 @@ class WizardApp {
             // If add Group Button pressed then stage the group name 
             // from the form input
             setButtonClick(this, '#btn-add-group', () => {
+                if ($('#txt-group-name').hasClass('is-danger')){
+                    alert('Check your inputs.');
+                    return;
+                }
+
                 let tempGroup = {
-                    "name": $('#txt-group-name').val(), 
-                    "description": $('#txt-group-description').val(),
+                    "name": $('#txt-group-name').val().trim(), 
+                    "description": $('#txt-group-description').val().trim(),
                     "assignToSelf": true
                 }
 
                 this.stagingArea.groups.push(tempGroup);
+
+                $('#txt-group-name').val('');
+                $('#txt-group-description').val('');
 
                 _renderModule(hb['wizard-group-content'], this.stagingArea, 'wizard-content')
                 .then($.proxy(assignEventHandler, this));
@@ -454,6 +470,10 @@ class WizardApp {
 
             // Back to check Installation
             setButtonClick(this, '#btn-prev', this.loadRolesAssignment);
+
+            // Input validation for txt role name
+            $('#txt-group-name').addClass('is-danger')
+            setValidateInput('#txt-group-name');
 
             // Assign deletion for each role entry
             for(let i = 0; i < this.stagingArea.groups.length; i++){
@@ -493,7 +513,19 @@ class WizardApp {
      */
     loadAppsCreation(event){
         let assignEventHandler = function(){
+            function clearAll(){
+                $('#txt-instance-name').val("");
+                $('#txt-instance-uri').val("");
+                $('#list-instance-groups').val("");
+            }
+
             setButtonClick(this, '#add-instance', () => {
+                if ($('#txt-instance-name').hasClass('is-danger') ||
+                    $('#txt-instance-uri').hasClass('is-danger')){
+                    alert('Check your inputs.');
+                    return;
+                }
+
                 let instanceName = $('#txt-instance-name').val();
                 let instanceType = $('input[name=instance-type]:checked', '#rad-instance-type').val();
                 let instanceUri = $('#txt-instance-uri').val();
@@ -507,17 +539,19 @@ class WizardApp {
                 }
                 this.stagingArea.appInstances.push(instanceBody);
 
+                clearAll();
+
                 _renderModule(hb['wizard-instance-content'], this.stagingArea, 'wizard-content')
                 .then($.proxy(assignEventHandler, this));
             });
- 
             
+            setValidateURL('#txt-instance-name');
+            setValidateInput('#txt-instance-uri');
+            $('#txt-group-name').addClass('is-danger')
+            $('#txt-group-name').addClass('is-danger')
+
             // Clear form content      
-            setButtonClick(this, '#clear-details', () => {
-                $('#txt-instance-name').val("");
-                $('#txt-instance-uri').val("");
-                $('#list-instance-groups').val("");
-            })       
+            setButtonClick(this, '#clear-details', clearAll);     
 
             // Next button to Final Page
             setButtonClick(this, '#btn-next', this.loadFinalizeInstallation);
