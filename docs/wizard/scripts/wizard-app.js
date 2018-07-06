@@ -511,13 +511,27 @@ class WizardApp {
      * @param {event} event 
      */
     loadAppsCreation(event){
-        let assignEventHandler = function(){
-            function clearAll(){
-                $('#txt-instance-name').val("");
-                $('#txt-instance-uri').val("");
-                $('#list-instance-groups').val("");
-            }
+        // Clear all form inputs
+        function clearAll(){
+            $('#txt-instance-name').val("");
+            $('#txt-instance-uri').val("");
+            $('#list-instance-groups').val("");
+            $('#txt-instance-name').addClass('is-danger');
+            $('#txt-instance-uri').addClass('is-danger');
+        }
 
+        // Integrations that have groups which are unstaged would have 
+        // those groups automatically removed from their configuration
+        this.stagingArea.appInstances.forEach((instance) =>
+            instance.groups = instance.groups.filter((group) => 
+                this.stagingArea.groups.map(g => g.name).includes(group))
+        );
+
+        // Assign Event Handlers
+        let assignEventHandler = function(){
+            clearAll();
+
+            // Add Instance
             setButtonClick(this, '#add-instance', () => {
                 if ($('#txt-instance-name').hasClass('is-danger') ||
                     $('#txt-instance-uri').hasClass('is-danger')){
@@ -544,10 +558,9 @@ class WizardApp {
                 .then($.proxy(assignEventHandler, this));
             });
             
-            setValidateURL('#txt-instance-name');
-            setValidateInput('#txt-instance-uri');
-            $('#txt-group-name').addClass('is-danger')
-            $('#txt-group-name').addClass('is-danger')
+            setValidateInput('#txt-instance-name');
+            setValidateURL('#txt-instance-uri');
+            
 
             // Clear form content      
             setButtonClick(this, '#clear-details', clearAll);     
