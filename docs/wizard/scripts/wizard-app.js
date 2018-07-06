@@ -144,7 +144,6 @@ class WizardApp {
     loadLandingPage(event){
         this._pureCloudAuthenticate()
         .then(() => {
-            this._test();
             let organizationApi = new this.platformClient.OrganizationApi();
 
             // Get organization information
@@ -776,14 +775,6 @@ class WizardApp {
     start(){
         this._setupClientApp();
         this.loadLandingPage();
-    }
-
-
-    // This is called immediately after PureCloud and App SDK authentication
-    // For very quick and ugly tests
-    // TODO: Delete someday
-    _test(){
-
     }
 }
 
