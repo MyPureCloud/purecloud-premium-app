@@ -1,12 +1,12 @@
 {{#if fileName}}
     <article style="margin-top: 20px;" class="message is-primary">
         <div class="message-header">
-            <p>Default Installation Order Found</p>
+            <p>{{static.orderFound}}</p>
         </div>
         <div class="message-body">
-            You're seeing this message because we have detected a default installation order from 
+            {{static.p1}}
             <strong>{{fileName}}</strong>.
-            We have prepopulated the page with the details but feel free to modify as you wish.
+            {{static.p2}}
         </div>
     </article>
 {{/if}}
@@ -25,7 +25,7 @@
             </div>
         </nav>
         <div>
-            <em>Description: </em> {{description}}
+            <em>{{static.description}}</em> {{description}}
         </div> 
     </div>
     {{/each}}

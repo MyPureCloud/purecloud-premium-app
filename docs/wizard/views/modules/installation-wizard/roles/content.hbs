@@ -1,16 +1,15 @@
 {{#if fileName}}
     <article style="margin-top: 20px;" class="message is-primary">
         <div class="message-header">
-            <p>Installation Order Found</p>
+            <p>{{static.orderFound}}</p>
         </div>
         <div class="message-body">
             <p>
-                You're seeing this message because we have detected an installation order from 
-                <strong>{{fileName}}</strong> and have prepopulated this page with the requested roles.
+                {{static.p1}} 
+                <strong>{{fileName}}</strong> {{static.p2}}
             </p>
             <p>
-                This usually means there is no further need to modify anything on this page. If you wish
-                to add additional roles, they would only contain the basic permission to access the App.
+                {{static.p3}}
             </p>
         </div>
     </article>
@@ -30,10 +29,10 @@
             </div>
         </nav>
         <div>
-            <em>Permissions: </em> {{#each permissions}} "{{this}}". {{/each}}
+            <em>{{static.permissions}}</em> {{#each permissions}} "{{this}}". {{/each}}
         </div> 
         <div>
-            <em>Description: </em> {{description}}
+            <em>{{static.description}} </em> {{description}}
         </div> 
     </div>
     {{/each}}

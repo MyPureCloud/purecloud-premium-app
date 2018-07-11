@@ -1,20 +1,20 @@
 <div style="margin-top: 20px" class="columns">
     <div class="column is-two-thirds">
         <div class="field">
-          <label class="label">Name</label>
+          <label class="label">{{static.c_name}}</label>
             <div class="control">
-                <input id="txt-role-name" type="text" class="input" placeholder="Role Name">
+                <input id="txt-role-name" type="text" class="input" placeholder="{{static.c_roleName}}">
             </div>
         </div>
         <div class="field">
-          <label class="label">Description</label>
+          <label class="label">{{static.c_description}}</label>
             <div class="control">
-                <input id="txt-role-description" type="text" class="input" placeholder="Role Description">
+                <input id="txt-role-description" type="text" class="input" placeholder="{{static.c_roleDescription}}">
             </div>
         </div>
         <div class="field">
             <div class="control">
-                <button id="btn-add-role" class="button is-primary"> Add Role</button>
+                <button id="btn-add-role" class="button is-primary">{{static.c_addRole}}</button>
             </div>
         </div>
     </div>
@@ -27,7 +27,7 @@
   <div class="level-left">
     <p class="level-item">
       <button id="btn-prev" class="button is-warning has-text-centered is-size-4">
-        Back
+        {{static.c_back}}
       </button>
     </p>
   </div>
@@ -35,7 +35,7 @@
   <div class="level-right">
     <p class="level-item">
       <button id="btn-next" class="button is-info has-text-centered is-size-4">
-        Next
+        {{static.c_next}}
       </button>
     </p>
   </div>

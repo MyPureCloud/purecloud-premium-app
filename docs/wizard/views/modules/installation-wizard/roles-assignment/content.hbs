@@ -1,6 +1,6 @@
 <div id="purecloud-roles">
     <div style="margin-top: 20px; margin-bottom: 10px;" class="is-size-5">
-        Check the roles you wish to assign to yourself.
+        {{static.p1}}
     </div>
     {{#each roles}}
     <div class="box is-radiusless is-marginless">
@@ -16,10 +16,10 @@
                         <strong>{{name}}</strong>
                     </div>
                     <div>
-                        <em>Permissions: </em> {{#each permissions}} "{{this}}". {{/each}}
+                        <em>{{static.c_permissions}}</em> {{#each permissions}} "{{this}}". {{/each}}
                     </div>
                     <div>
-                        <em>Description: </em> {{description}}
+                        <em>{{static.c_description}}</em> {{description}}
                     </div>  
                 </div>
             </div>

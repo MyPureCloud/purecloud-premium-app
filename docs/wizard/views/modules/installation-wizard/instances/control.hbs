@@ -1,12 +1,12 @@
 <div style="margin-top: 20px;">
     <div class="content">
-      <h3>Add New Instance</h3>
+      <h3>{{static.c_addInstance}}</h3>
     </div>
 
     <div class="field">
-      <label class="label">Instance Name</label>
+      <label class="label">{{static.c_instanceName}}</label>
       <div class="control">
-        <input id="txt-instance-name" class="input" type="text" placeholder="Instance Name">
+        <input id="txt-instance-name" class="input" type="text" placeholder="{{static.c_instanceName}}">
       </div>
     </div>
 
@@ -14,24 +14,24 @@
       <div id="rad-instance-type" class="control">
         <label class="radio">
           <input checked type="radio" value="standalone" name="instance-type">
-          Stand Alone
+          {{static.c_standAlone}}
         </label>
         <label class="radio">
           <input type="radio" value="widget" name="instance-type">
-          Widget
+          {{static.c_widget}}
         </label>
       </div>
     </div>
 
     <div class="field">
-      <label class="label">URL</label>
+      <label class="label">{{c_URL}}</label>
       <div class="control">
         <input id="txt-instance-uri" class="input" type="text" placeholder="https://yourdomain.com/endpoint">
       </div>
     </div>
 
     <div class="field">
-      <label class="label">Groups</label>
+      <label class="label">{{static.c_groups}}</label>
       <div class="control">
         <div class="select is-multiple">
           <select id="list-instance-groups" multiple size="4">
@@ -47,10 +47,10 @@
 
     <div class="field is-grouped">
       <div class="control">
-        <button id="add-instance" class="button is-primary">Add Instance</button>
+        <button id="add-instance" class="button is-primary">{{static.c_btn_addInstance}}</button>
       </div>
       <div class="control">
-        <button id="clear-details" class="button is-text">Clear</button>
+        <button id="clear-details" class="button is-text">{{static.c_btn_clear}}</button>
       </div>
     </div>
 </div>
@@ -61,7 +61,7 @@
   <div class="level-left">
     <p class="level-item">
       <button id="btn-prev" class="button is-warning has-text-centered is-size-4">
-        Back
+        {{static.c_back}}
       </button>
     </p>
   </div>
@@ -69,7 +69,7 @@
   <div class="level-right">
     <p class="level-item">
       <button id="btn-next" class="button is-info has-text-centered is-size-4">
-        Next
+        {{static.c_next}}
       </button>
     </p>
   </div>

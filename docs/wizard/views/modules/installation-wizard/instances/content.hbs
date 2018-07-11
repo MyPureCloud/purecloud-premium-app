@@ -1,12 +1,12 @@
 {{#if fileName}}
     <article style="margin-top: 20px;" class="message is-primary">
         <div class="message-header">
-            <p>Default Installation Order Found</p>
+            <p>{{static.orderFound}}</p>
         </div>
         <div class="message-body">
-            You're seeing this message because we have detected a default installation order from 
+            {{static.p1}}
             <strong>{{fileName}}</strong>.
-            We have prepopulated the page with the details but feel free to modify as you wish.
+            {{static.p2}}
         </div>
     </article>
 {{/if}}
@@ -14,11 +14,10 @@
 <div class="box">
   <div class="content is-small">
     <p>
-        While modifying URL you can set macros that will automatically be 
-        filled by PureCloud. \{{pcLangTag}} and \{{pcEnvironment}}
+        {{static.p3}}
     </p>
     <p>
-        Please consult this page: https://developer.mypurecloud.com/api/client-apps/
+        {{static.p4}}
     </p>
   </div>
 </div>
@@ -38,13 +37,13 @@
         </nav>
         <div class="media-content">
             <p>  
-                <em>Type: </em> {{type}}
+                <em>{{static.type}}</em> {{type}}
             </p>
             <p>  
-                <em>URL: </em> {{url}}
+                <em>{{static.url}}</em> {{url}}
             </p>
             <p>  
-                <em>Groups: </em>
+                <em>{{static.groups}}</em>
                 {{#each groups}}
                     {{this}}
                 {{/each}}
