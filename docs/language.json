@@ -12,7 +12,8 @@
             "State": "Zustand",
             "WaitTime": "Wartezeit",
             "Duration": "Dauer",
-            "IncomingCall": "Eingehender Anruf"
+            "IncomingCall": "Eingehender Anruf",
+            "From": "Von"
         },
 
     "en-us":
@@ -28,7 +29,8 @@
             "State": "State",
             "WaitTime": "Wait Time",
             "Duration": "Duration",
-            "IncomingCall": "Incoming Call"
+            "IncomingCall": "Incoming Call",
+            "From": "From"
         },
 
     "es":
@@ -44,7 +46,8 @@
             "State": "Estado",
             "WaitTime": "Tiempo De Espera",
             "Duration": "Duración",
-            "IncomingCall": "Llamada Entrante"
+            "IncomingCall": "Llamada Entrante",
+            "From": "De"
         },
 
     "fr":
@@ -60,7 +63,8 @@
             "State": "Etat",
             "WaitTime": "Temps d'attente",
             "Duration": "Durée",
-            "IncomingCall": "Appel entrant"
+            "IncomingCall": "Appel entrant",
+            "From": "De"
         },
 
     "it":
@@ -76,7 +80,8 @@
             "State": "Stato",
             "WaitTime": "Tempo Di Attesa",
             "Duration": "Durata",
-            "IncomingCall": "Chiamata in Arrivo"
+            "IncomingCall": "Chiamata in Arrivo",
+            "From": "Da"
         },
 
     "ja":
@@ -92,7 +97,8 @@
             "State": "状態",
             "WaitTime": "待ち時間",
             "Duration": "期間",
-            "IncomingCall": "電話の着信"
+            "IncomingCall": "電話の着信",
+            "From": "から"
         },
 
     "ko":
@@ -108,7 +114,8 @@
             "State": "상태",
             "WaitTime": "기다리는 시간",
             "Duration": "지속",
-            "IncomingCall": "수신 전화"
+            "IncomingCall": "수신 전화",
+            "From": "에서"
         },
 
     "nl":
@@ -124,7 +131,8 @@
             "State": "Staat",
             "WaitTime": "Wacht Tijd",
             "Duration": "Looptijd",
-            "IncomingCall": "Binnenkomend Telefoongesprek"
+            "IncomingCall": "Binnenkomend Telefoongesprek",
+            "From": "Van"
         },
 
     "no":
@@ -140,7 +148,8 @@
             "State": "Stat",
             "WaitTime": "Ventetid",
             "Duration": "Varighet",
-            "IncomingCall": "Innkommende Anrop"
+            "IncomingCall": "Innkommende Anrop",
+            "From": "Fra"
         },
 
     "pl":
@@ -156,7 +165,8 @@
             "State": "Stan",
             "WaitTime": "Czas Ooczekiwania",
             "Duration": "Trwanie",
-            "IncomingCall": "Połączenie Przychodzące"
+            "IncomingCall": "Połączenie Przychodzące",
+            "From": "Od"
         },
 
     "pt-br":
@@ -172,7 +182,8 @@
             "State": "Estado",
             "WaitTime": "Tempo de Espera",
             "Duration": "Duração",
-            "IncomingCall": "Chamada Recebida"
+            "IncomingCall": "Chamada Recebida",
+            "From": "De"
         },
 
     "sv":
@@ -188,7 +199,8 @@
             "State": "Stat",
             "WaitTime": "Väntetid",
             "Duration": "Varaktighet",
-            "IncomingCall": "Inkommande Samtal"
+            "IncomingCall": "Inkommande Samtal",
+            "From": "Från"
         },
 
     "th":
@@ -204,7 +216,8 @@
             "State": "สถานะ",
             "WaitTime": "รอเวลา",
             "Duration": "ระยะเวลา",
-            "IncomingCall": "สายเรียกเข้า"
+            "IncomingCall": "สายเรียกเข้า",
+            "From": "จาก"
         },
 
     "tr":
@@ -220,7 +233,8 @@
             "State": "Devlet",
             "WaitTime": "Bekleme Zamanı",
             "Duration": "Süre",
-            "IncomingCall": "Gelen çağrı"
+            "IncomingCall": "Gelen çağrı",
+            "From": "Itibaren"
         },
 
     "zh-cn":
@@ -236,6 +250,7 @@
             "State": "州",
             "WaitTime": "等待时间",
             "Duration": "持续时间",
-            "IncomingCall": "来电"
+            "IncomingCall": "来电",
+            "From": "从"
         }
 }

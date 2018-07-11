@@ -16,8 +16,9 @@ const usersApi = new platformClient.UsersApi();
 const notificationsApi = new platformClient.NotificationsApi();
 
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
-clientApp.setup = function(pcEnv){
+clientApp.setup = function(pcEnv, langTag){
     let clientId = clientIDs[pcEnv] || clientIDs['mypurecloud.com'];
+    clientApp.langTag = langTag;
 
     // Authenticate via PureCloud
     client.setPersistSettings(true);
@@ -96,7 +97,16 @@ clientApp.onSocketMessage = function(event){
 
 clientApp.toastIncomingCall = function(callerLocation){
     if(clientApp.hasOwnProperty('purecloudClientApi')){
-        clientApp.purecloudClientApi.alerting.showToastPopup("Incoming Call", "From: " + callerLocation);
+        // clientApp.purecloudClientApi.alerting.showToastPopup("Incoming Call", "From: " + callerLocation);
+
+        if(clientApp.langTag !== null) {
+            $.getJSON('./language.json', function(data) {
+                clientApp.purecloudClientApi.alerting.showToastPopup(data[clientApp.langTag].IncomingCall, data[clientApp.langTag].From + ": " + callerLocation);
+            });
+        } else {
+            clientApp.purecloudClientApi.alerting.showToastPopup(data["en-us"].IncomingCall, data["en-us"].From + ": " + callerLocation);
+        }
+        
     }
 }
 
