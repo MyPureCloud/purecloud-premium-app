@@ -9,7 +9,9 @@ import PageManager from './page-manager.js'
 const $ = window.$;
 const jQuery = window.jQuery;
 const Handlebars = window.Handlebars;
-if((typeof $ === 'undefined') || (typeof jQuery === 'undefined') || (typeof Handlebars === 'undefined')){
+const i18n = window.i18n;
+if((typeof $ === 'undefined') || (typeof jQuery === 'undefined') || 
+   (typeof Handlebars === 'undefined') || (typeof i18n === 'undefined')){
     console.error("===== PREMIUM APP ERROR ====== \n" +
                   "A required library is missing. \n" +
                   "==============================");   
@@ -45,7 +47,8 @@ class WizardApp {
         // as a result of this installation wizard
         this.prefix = appConfig.prefix;
 
-
+        // Language defaul is english
+        this.language = 'en-us';
 
         // JS object that will stage information about the installation.
         this.stagingArea = {
@@ -68,16 +71,31 @@ class WizardApp {
      * First thing that needs to be called to setup up the PureCloud Client App
      */
     _setupClientApp(){    
-        // Backwards compatibility snippet from: https://github.com/MyPureCloud/client-app-sdk
-        let envQueryParamName = 'pcEnvironment';
-    
-        if (window && window.location && typeof window.location.search === 'string' &&
-            window.location.search.indexOf('pcEnvironment') >= 0) {
-                this.pcApp = new window.purecloud.apps.ClientApp({pcEnvironmentQueryParam: envQueryParamName});
-        } else {
+        // Snippet from URLInterpolation example: 
+        // https://github.com/MyPureCloud/client-app-sdk
+        const queryString = window.location.search.substring(1);
+        const pairs = queryString.split('&');
+        let pcEnv = null;   
+        for (var i = 0; i < pairs.length; i++)
+        {
+            var currParam = pairs[i].split('=');
+
+            if(currParam[0] === 'langTag') {
+                this.language = getParamValue(currParam);
+            } else if(currParam[0] === 'pcEnvironment') {
+                pcEnv = getParamValue(currParam);
+            } else if(currParam[0] === 'environment' && pcEnv === null) {
+                pcEnv = getParamValue(currParam);
+            }
+        }
+
+        if(pcEnv){
+            this.pcApp = new window.purecloud.apps.ClientApp({pcEnvironmentQueryParam: pcEnv});
+        }else{
             // Use default PureCloud region
             this.pcApp = new window.purecloud.apps.ClientApp();
         }
+        
         console.log(this.pcApp.pcEnvironment);
     }
 
