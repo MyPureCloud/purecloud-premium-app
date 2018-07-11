@@ -14,48 +14,22 @@
     <script src="https://sdk-cdn.mypurecloud.com/javascript/28.0.0/purecloud-platform-client-v2.min.js"></script>
 </head>
 <body>
-    <h1>Queues:</h1>
+    <h1 id="txtQueue"></h1>
     <div>        
         <div style="margin-bottom: 20px">
-            <div class="floating field-title" style="display: inline-block;">Subscribe: </div>
+            <div id="txtSubscribe" class="floating field-title" style="display: inline-block;"></div>
             <select id="ddlQueues" name="queues" onChange="subscribeToQueue()" style="display: inline-block;" dir="ltr"></select>
         </div>
-        <!-- <div id="callerDetails">
-            <div>
-                <div class="floating field-title">Name: </div>
-                <div id="supName" class="floating field-value"></div>  
-            </div>
-            <div>
-                <div class="floating field-title">ANI: </div>
-                <div id="supANI" class="floating field-value"></div>  
-            </div>
-            <div>
-                <div class="floating field-title">DNIS: </div>
-                <div id="supDNIS" class="floating field-value"></div>  
-            </div>
-            <div>
-                <div class="floating field-title">State: </div>
-                <div id="supState" class="floating field-value"></div>  
-            </div>
-            <div>
-                <div class="floating field-title">Wait Time: </div>
-                <div id="supWaitTime" class="floating field-value"></div>  
-            </div>
-            <div>
-                <div class="floating field-title">Duration: </div>
-                <div id="supDuration" class="floating field-value"></div>  
-            </div>
-        </div> -->
         <table id="tblCallerDetails">
             <thead>
                 <tr>
-                    <th style="display: none">Conversation ID</th>
-                    <th>Name</th>
-                    <th>ANI</th>
-                    <th>DNIS</th>
-                    <th>State</th>
-                    <th>Wait Time</th>
-                    <th>Duration</th>
+                    <th id="txtConvId" style="display: none"></th>
+                    <th id="txtName"></th>
+                    <th id="txtANI"></th>
+                    <th id="txtDNIS"></th>
+                    <th id="txtState"></th>
+                    <th id="txtWait"></th>
+                    <th id="txtDuration"></th>
                 </tr>
             </thead>
             <tbody>
@@ -68,17 +42,49 @@
         import clientApp from './client_app.js';
 
         var queryString = window.location.search.substring(1);
-        var currParam = queryString.split('=');
+        var pairs = queryString.split('&');
+        var langTag = null;
         var pcEnv = null;
-        if(currParam[0] === 'pcEnvironment') {
-            pcEnv = currParam[1];
-        } else if(currParam[0] === 'environment' && pcEnv === null) {
-            pcEnv = currParam[1];
+        for (var i = 0; i < pairs.length; i++)
+        {
+            var currParam = pairs[i].split('=');
+            if(currParam[0] === 'langTag') {
+                langTag = currParam[1];
+            } else if(currParam[0] === 'pcEnvironment') {
+                pcEnv = currParam[1];
+            } else if(currParam[0] === 'environment' && pcEnv === null) {
+                pcEnv = currParam[1];
+            }
+            
+            if (langTag !== null) {
+                $.getJSON('./language.json', function(data) {
+                    $("#txtQueue").text(data[langTag].Queues);
+                    $("#txtSubscribe").text(data[langTag].Subscribe + ": ");
+                    $("#txtConvId").text(data[langTag].ConversationID);
+                    $("#txtName").text(data[langTag].Name);
+                    $("#txtANI").text(data[langTag].ANI);
+                    $("#txtDNIS").text(data[langTag].DNIS);
+                    $("#txtState").text(data[langTag].State);
+                    $("#txtWait").text(data[langTag].WaitTime);
+                    $("#txtDuration").text(data[langTag].Duration);
+                });
+            } else {
+                $.getJSON('./language.json', function(data) {
+                    $("#txtQueue").text(data[en-us].Queues);
+                    $("#txtSubscribe").text(data[en-us].Subscribe + ": ");
+                    $("#txtConvId").text(data[en-us].ConversationID);
+                    $("#txtName").text(data[en-us].Name);
+                    $("#txtANI").text(data[en-us].ANI);
+                    $("#txtDNIS").text(data[en-us].DNIS);
+                    $("#txtState").text(data[en-us].State);
+                    $("#txtWait").text(data[en-us].WaitTime);
+                    $("#txtDuration").text(data[en-us].Duration);
+                });
+            }
         }
         
         clientApp.setup(pcEnv);
         clientApp.loadSupervisorView();
-        // clientApp.onPagLoad();
         clientApp.purecloudClientApi = new window.purecloud.apps.ClientApp();
 
         window.clientApp = clientApp;
