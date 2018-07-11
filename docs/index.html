@@ -54,16 +54,16 @@
                     $("#txtNumber").text(data[langTag].Number + ": ");
                     $("#txtStateInfo").text(data[langTag].StateInfo + ": ");
                 });
-            } else {
-                if (langTag !== null) {
-                $.getJSON('./language.json', function(data) {
-                    $("#txtIncomingCall").text("\u260E " + data[en-us].IncomingCall);
-                    $("#txtName").text(data[en-us].Name + ": ");
-                    $("#txtNumber").text(data[en-us].Number + ": ");
-                    $("#txtStateInfo").text(data[en-us].StateInfo + ": ");
-                });
             }
-            }
+        }
+
+        if(langTag === null){
+            $.getJSON('./language.json', function(data) {
+                $("#txtIncomingCall").text("\u260E " + data["en-us"].IncomingCall);
+                $("#txtName").text(data["en-us"].Name + ": ");
+                $("#txtNumber").text(data["en-us"].Number + ": ");
+                $("#txtStateInfo").text(data["en-us"].StateInfo + ": ");
+            });
         }
         
         clientApp.setup(pcEnv);

@@ -68,19 +68,21 @@
                     $("#txtWait").text(data[langTag].WaitTime);
                     $("#txtDuration").text(data[langTag].Duration);
                 });
-            } else {
-                $.getJSON('./language.json', function(data) {
-                    $("#txtQueue").text(data[en-us].Queues);
-                    $("#txtSubscribe").text(data[en-us].Subscribe + ": ");
-                    $("#txtConvId").text(data[en-us].ConversationID);
-                    $("#txtName").text(data[en-us].Name);
-                    $("#txtANI").text(data[en-us].ANI);
-                    $("#txtDNIS").text(data[en-us].DNIS);
-                    $("#txtState").text(data[en-us].State);
-                    $("#txtWait").text(data[en-us].WaitTime);
-                    $("#txtDuration").text(data[en-us].Duration);
-                });
             }
+        }
+
+        if(langTag === null){
+            $.getJSON('./language.json', function(data) {
+                $("#txtQueue").text(data["en-us"].Queues);
+                $("#txtSubscribe").text(data["en-us"].Subscribe + ": ");
+                $("#txtConvId").text(data["en-us"].ConversationID);
+                $("#txtName").text(data["en-us"].Name);
+                $("#txtANI").text(data["en-us"].ANI);
+                $("#txtDNIS").text(data["en-us"].DNIS);
+                $("#txtState").text(data["en-us"].State);
+                $("#txtWait").text(data["en-us"].WaitTime);
+                $("#txtDuration").text(data["en-us"].Duration);
+            });
         }
         
         clientApp.setup(pcEnv);
