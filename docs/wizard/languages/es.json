@@ -1,0 +1,47 @@
+{
+    "pages": {
+        "landingPage": {
+            "title": "App Asistente de Configuración",
+            "subtitle": "¡Bienvenido! Este asistente lo asistirá en la instalación, modificación o eliminación de la aplicación Premium."         
+        },
+        "installStatusPage": {
+            "title": "Comprobando la instalación",
+            "subtitle": "Verifique todos los objetos de PureCloud existentes configurados por la aplicación",
+            "p1": "Antes de comenzar, analicemos su organización de PureCloud para configuraciones de aplicaciones existentes.",
+            "p2": "Los objetos de PureCloud que utiliza la aplicación tienen el prefijo",
+            "p3": "Esto se puede cambiar en la clase WizardApp.",
+            "p4": "Para una instalación limpia, se recomienda eliminar los Objetos existentes que se enumeran a continuación para evitar la duplicación. <strong> No </ strong> elimine la función de mantenimiento que se le asignó hasta que el asistente haya finalizado.",
+            "loadingGroups": "Cargando datos de grupos ...",
+            "loadingRoles": "Carga de datos de roles ...",
+            "loadingIntegrations": "Cargando datos de integraciones ...",
+            "none": "Ninguna",
+            "deleting": "Eliminando ...",
+            "existingGroups": "Grupos existentes",
+            "existingRoles": "Roles existentes",
+            "existingIntegrations": "Integraciones existentes",
+            "proceed": "Proceda con la instalación"
+        },
+        "rolesCreation": {
+            "title": "Crear Roles",            
+            "subtitle": "Los roles se utilizan para proporcionar y determinar niveles de acceso en la Aplicación Premium."                  
+        },
+        "rolesAssignment": {
+            "title": "Asignar roles",
+            "subtitle":  "Asigna roles a tu usuario actual."        
+        },
+        "groupsCreation": {
+            "title": "Crear grupos",
+            "subtitle": "Los grupos deben filtrar qué miembros tendrán acceso a instancias específicas de la aplicación."       
+        },
+        "appsCreation": {
+            "title": "Crear instancias de aplicaciones",
+            "subtitle": "Aquí es donde agrega instancias de su aplicación. Puede especificar la página de destino de cada instancia y los grupos (se deben crear desde el asistente) que tendrán acceso a ellos."        
+        },
+        "finalizeInstallation": {
+            "title": "Finalizar",
+            "subtitle": "Revise los elementos a continuación y presione Instalar para instalar las aplicaciones y la configuración."       
+        },
+        "installingPage": {        
+        }
+    }
+}
