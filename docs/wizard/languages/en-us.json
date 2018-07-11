@@ -1,0 +1,47 @@
+{
+    "pages": {
+        "landingPage": {
+            "title": "App Setup Wizard",
+            "subtitle": "Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App."         
+        },
+        "installStatusPage": {
+            "title": "Checking Installation",
+            "subtitle": "Check any existing PureCloud Objects that is set up by the App",
+            "p1": "Before starting, let's analyze your PureCloud org for existing App configurations.",
+            "p2": "PureCloud objects that the App uses are prefixed with",
+            "p3": "This can be changed in the WizardApp class.",
+            "p4": "For a clean installation, it is recommended to delete the existing Objects listed below to avoid duplication. <strong>Do not</strong> delete the curent role assigned to you though until the wizard has finished.",
+            "loadingGroups": "Loading Groups data...",
+            "loadingRoles": "Loading Roles data...",
+            "loadingIntegrations": "Loading Integrations data...",
+            "none": "None",
+            "deleting": "Deleting...",
+            "existingGroups": "Existing Groups",
+            "existingRoles": "Existing Roles",
+            "existingIntegrations": "Existing Integrations",
+            "proceed": "Proceed with Installation"
+        },
+        "rolesCreation": {
+            "title": "Create Roles",            
+            "subtitle": "Roles are used to provide and determine access levels on the Premium App."                  
+        },
+        "rolesAssignment": {
+            "title": "Assign Roles",
+            "subtitle":  "Assign roles to your current user."        
+        },
+        "groupsCreation": {
+            "title": "Create groups",
+            "subtitle": "Groups are required to filter which members will have access to specific instances of the App."       
+        },
+        "appsCreation": {
+            "title": "Create App Instances",
+            "subtitle": "These is where you add instances of you app. You could specify the landing page of each instance and the groups (must be created from the wizard) who will have access to them."        
+        },
+        "finalizeInstallation": {
+            "title": "Finalize",
+            "subtitle": "Please review the items below and press Install to install the apps and configuration."       
+        },
+        "installingPage": {        
+        }
+    }
+}

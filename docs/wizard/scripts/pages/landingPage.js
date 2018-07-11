@@ -10,8 +10,8 @@ export default function loadLandingPage(event){
             let orgFeature = orgData.features;
 
             this._renderCompletePage({
-                    "title": "App Setup Wizard",
-                    "subtitle": "Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App."
+                    "title": this.app.languageContext.pages.landingPage.title,
+                    "subtitle": this.app.languageContext.pages.landingPage.subtitle
                 }, 
                 {
                     features: orgFeature,

@@ -48,7 +48,7 @@ export default function loadAppsCreation(event){
         this._setButtonClick(this, '#clear-details', clearAll);     
 
         // Next button to Final Page
-        this._setButtonClick(this, '#btn-next', this._getPageSetter("installationSummary"));
+        this._setButtonClick(this, '#btn-next', this._getPageSetter("finalizeInstallation"));
 
         // Back to groups Installation
         this._setButtonClick(this, '#btn-prev', this._getPageSetter("groupsCreation"));
@@ -66,11 +66,8 @@ export default function loadAppsCreation(event){
 
     this._renderCompletePage(
         {
-            title: "Create App Instances",
-            subtitle: "These is where you add instances of you app." +
-                        "You could specify the landing page of each instance " +
-                        "and the groups (must be created from the wizard) who " + 
-                        "will have access to them."
+            title: this.app.languageContext.pages.appsCreation.title,
+            subtitle: this.app.languageContext.pages.appsCreation.subtitle
         },
         null, this._getTemplate("wizard-page")
     )

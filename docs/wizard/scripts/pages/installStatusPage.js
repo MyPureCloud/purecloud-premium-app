@@ -6,12 +6,14 @@
  *          Get integration has max 100 before manual filter.
  */
 export default function loadCheckInstallationStatus(event){
+    const staticText = this.app.languageContext.pages.installStatusPage;
+
     this.app._loadDefaultOrder(this.app.defaultOrderFileName)
     .then(() => 
     this._renderCompletePage(
         {
-            "title": "Checking Installation",
-            "subtitle": "Check any existing PureCloud Objects that is set up by the App"
+            "title": staticText.title,
+            "subtitle": staticText.subtitle
         }, 
         {
             objectPrefix: this.app.prefix
@@ -27,7 +29,7 @@ export default function loadCheckInstallationStatus(event){
     .then(data => {
         let group = (typeof data.results !== 'undefined') ? data.results : [];
         let context = {
-            panelHeading: 'Existing Groups (' + group.length + ')',
+            panelHeading: staticText.existingGroups + ' (' + group.length + ')',
             objType: 'groups',
             pureCloudObjArr: group,
             icon: 'fa-users'
@@ -60,7 +62,7 @@ export default function loadCheckInstallationStatus(event){
     .then(data => {
         let roles = data.entities;
         let context = {
-            panelHeading: 'Existing Roles (' + roles.length + ')',
+            panelHeading: staticText.existingRoles + ' (' + roles.length + ')',
             objType: 'roles',
             pureCloudObjArr: roles,
             icon: 'fa-briefcase'
@@ -89,7 +91,7 @@ export default function loadCheckInstallationStatus(event){
     .then(data => {
         let integrations = data.entities.filter(entity => entity.name.startsWith(this.app.prefix));
         let context = {
-            panelHeading: 'Existing Integrations (' + integrations.length + ')',
+            panelHeading: staticText.existingIntegrations + ' (' + integrations.length + ')',
             objType: 'integrations',
             pureCloudObjArr: integrations,
             icon: 'fa-cogs'

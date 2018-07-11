@@ -8,9 +8,8 @@
 export default function loadFinalizeInstallation(event){
     this._renderCompletePage(
         {
-            title: "Finalize",
-            subtitle: "Please review the items below and press Install to " + 
-                        "install the apps and configuration."
+            title: this.app.languageContext.pages.finalizeInstallation.title,
+            subtitle: this.app.languageContext.pages.finalizeInstallation.subtitle
         },
         null, this._getTemplate("wizard-page")
     )

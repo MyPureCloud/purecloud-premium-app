@@ -14,7 +14,7 @@ import rolesCreation from './pages/rolesCreation.js'
 import rolesAssignment from './pages/rolesAssignment.js'
 import groupsCreation from './pages/groupsCreation.js'
 import appsCreation from './pages/appsCreation.js'
-import installationSummary from './pages/finalizeInstallation.js'
+import finalizeInstallation from './pages/finalizeInstallation.js'
 import installingPage from './pages/installingPage.js'
 
 let templatesPath = './views/';
@@ -26,7 +26,7 @@ let pageMapping = {
     "rolesAssignment": rolesAssignment,
     "groupsCreation": groupsCreation,
     "appsCreation": appsCreation,
-    "installationSummary": installationSummary,
+    "finalizeInstallation": finalizeInstallation,
     "installingPage": installingPage
 }
 
@@ -45,8 +45,12 @@ export default class PageManager {
      * @returns Promise
      */
     _renderModule(page, context, target, resolveData) {
-        context = (typeof context !== 'undefined') ? context : {}; 
-        target = (typeof target !== 'undefined') ? target : 'default-module'; 
+        context = (context) ? context : {}; 
+        target = (target) ? target : 'default-module'; 
+
+        // Add static text context
+        context.static = this.app.languageContext.pages[this.currentPage];
+        console.log(context);
 
         let templateUri = templatesPath + page + '.hbs';
         let templateSource;

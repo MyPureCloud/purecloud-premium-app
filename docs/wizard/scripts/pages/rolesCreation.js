@@ -48,8 +48,8 @@ export default function loadRolesCreation(event){
 
     this._renderCompletePage(
         {
-            title: "Create Roles",
-            subtitle: "Roles are used to provide and determine access levels on the Premium App."
+            title: this.app.languageContext.pages.rolesCreation.title,
+            subtitle: this.app.languageContext.pages.rolesCreation.subtitle
         },
         null, this._getTemplate("wizard-page")
     )

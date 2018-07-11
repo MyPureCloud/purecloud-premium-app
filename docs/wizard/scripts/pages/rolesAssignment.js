@@ -6,8 +6,8 @@
 export default function loadRolesAssignment(event){
     this._renderCompletePage(
         {
-            title: "Assign Roles",
-            subtitle: "Assign roles to your current user."
+            title: this.app.languageContext.pages.rolesAssignment.title,
+            subtitle: this.app.languageContext.pages.rolesAssignment.subtitle
         },
         null, this._getTemplate("wizard-page")
     )

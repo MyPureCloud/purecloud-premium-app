@@ -46,8 +46,10 @@ class WizardApp {
         // as a result of this installation wizard
         this.prefix = appConfig.prefix;
 
-        // Language defaul is english
+        // Language default is english
+        // Language context is object containing the translations
         this.language = 'en-us';
+        this.languageContext = null
 
         // JS object that will stage information about the installation.
         this.stagingArea = {
@@ -68,8 +70,12 @@ class WizardApp {
 
     /**
      * First thing that needs to be called to setup up the PureCloud Client App
+     * @param {String} forceLang fallback language if translation file does not exist 
+     * @returns {Promise} Due to AJAX call of language file
      */
-    _setupClientApp(){    
+    _setupClientApp(forceLang){    
+        this.language = forceLang;
+
         // Snippet from URLInterpolation example: 
         // https://github.com/MyPureCloud/client-app-sdk
         const queryString = window.location.search.substring(1);
@@ -80,11 +86,11 @@ class WizardApp {
             var currParam = pairs[i].split('=');
 
             if(currParam[0] === 'langTag') {
-                this.language = getParamValue(currParam);
+                if(!forceLang) this.language = currParam[1];
             } else if(currParam[0] === 'pcEnvironment') {
-                pcEnv = getParamValue(currParam);
+                pcEnv = currParam[1];
             } else if(currParam[0] === 'environment' && pcEnv === null) {
-                pcEnv = getParamValue(currParam);
+                pcEnv = currParam[1];
             }
         }
 
@@ -96,6 +102,21 @@ class WizardApp {
         }
         
         console.log(this.pcApp.pcEnvironment);
+
+        // Get the language context file and assign it to the app
+        return new Promise((resolve, reject) => {
+            let fileUri = './languages/' + this.language + '.json';
+            $.getJSON(fileUri)
+            .done(data => {
+                console.log("aaaaaa");
+                this.languageContext = data;
+                resolve()
+            })
+            .fail(xhr => {
+                console.log('Language file not found. Defaulting to en-us');
+                this._setupClientApp('en-us');
+            }); 
+        });
     }
 
     /**
@@ -484,8 +505,8 @@ class WizardApp {
      * @description First thing that must be called to set-up the App
      */
     start(){
-        this._setupClientApp();
-        this.pageManager.setPage("landingPage");
+        this._setupClientApp()
+        .then(this.pageManager.setPage("landingPage"));
     }
 }
 

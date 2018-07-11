@@ -49,8 +49,8 @@ export default function loadGroupsCreation(event){
 
     this._renderCompletePage(
         {
-            title: "Create groups",
-            subtitle: "Groups are required to filter which members will have access to specific instances of the App."
+            title: this.app.languageContext.pages.groupsCreation.title,
+            subtitle: this.app.languageContext.pages.groupsCreation.subtitle
         },
         null, this._getTemplate("wizard-page")
     )
