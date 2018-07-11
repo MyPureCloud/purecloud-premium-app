@@ -108,7 +108,6 @@ class WizardApp {
             let fileUri = './languages/' + this.language + '.json';
             $.getJSON(fileUri)
             .done(data => {
-                console.log("aaaaaa");
                 this.languageContext = data;
                 resolve()
             })
