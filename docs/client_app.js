@@ -97,16 +97,15 @@ clientApp.onSocketMessage = function(event){
 
 clientApp.toastIncomingCall = function(callerLocation){
     if(clientApp.hasOwnProperty('purecloudClientApi')){
-        // clientApp.purecloudClientApi.alerting.showToastPopup("Incoming Call", "From: " + callerLocation);
-
         if(clientApp.langTag !== null) {
             $.getJSON('./language.json', function(data) {
                 clientApp.purecloudClientApi.alerting.showToastPopup(data[clientApp.langTag].IncomingCall, data[clientApp.langTag].From + ": " + callerLocation);
             });
         } else {
-            clientApp.purecloudClientApi.alerting.showToastPopup(data["en-us"].IncomingCall, data["en-us"].From + ": " + callerLocation);
-        }
-        
+            $.getJSON('./language.json', function(data) {
+                clientApp.purecloudClientApi.alerting.showToastPopup(data["en-us"].IncomingCall, data["en-us"].From + ": " + callerLocation);
+            });
+        }        
     }
 }
 
