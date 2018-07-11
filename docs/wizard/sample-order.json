@@ -34,14 +34,14 @@
     "appInstances": [
         {
             "name": "Agent Widget",
-            "url": "https://localhost/index.html",
-            "type": "standalone",
-            "groups": ["Agents"]
+            "url": "https://mypurecloud.github.io/purecloud-premium-app/index.html",
+            "type": "widget",
+            "groups": ["Agents", "Supervisors"]
         },
         {
             "name": "Supervisor Widget",
-            "url": "https://localhost/supervisor.html",
-            "type": "widget",
+            "url": "https://mypurecloud.github.io/purecloud-premium-app/supervisor.html",
+            "type": "standalone",
             "groups": ["Supervisors"]
         }
     ]
