@@ -2,7 +2,8 @@
     "pages": {
         "landingPage": {
             "title": "App Setup Wizard",
-            "subtitle": "Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App."         
+            "subtitle": "Welcome! This Wizard will assist you in the installation, modification, or removal of the Premium App.",
+            "startWizard": "Start Wizard"     
         },
         "installStatusPage": {
             "title": "Checking Installation",

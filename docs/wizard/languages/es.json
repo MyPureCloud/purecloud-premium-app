@@ -2,7 +2,8 @@
     "pages": {
         "landingPage": {
             "title": "App Asistente de Configuración",
-            "subtitle": "¡Bienvenido! Este asistente lo asistirá en la instalación, modificación o eliminación de la aplicación Premium."         
+            "subtitle": "¡Bienvenido! Este asistente lo asistirá en la instalación, modificación o eliminación de la aplicación Premium.",
+            "startWizard": "Mago Principiante"          
         },
         "installStatusPage": {
             "title": "Comprobando la instalación",
@@ -10,7 +11,7 @@
             "p1": "Antes de comenzar, analicemos su organización de PureCloud para configuraciones de aplicaciones existentes.",
             "p2": "Los objetos de PureCloud que utiliza la aplicación tienen el prefijo",
             "p3": "Esto se puede cambiar en la clase WizardApp.",
-            "p4": "Para una instalación limpia, se recomienda eliminar los Objetos existentes que se enumeran a continuación para evitar la duplicación. <strong> No </ strong> elimine la función de mantenimiento que se le asignó hasta que el asistente haya finalizado.",
+            "p4": "Para una instalación limpia, se recomienda eliminar los Objetos existentes que se enumeran a continuación para evitar la duplicación. <strong> No </strong> elimine la función de mantenimiento que se le asignó hasta que el asistente haya finalizado.",
             "loadingGroups": "Cargando datos de grupos ...",
             "loadingRoles": "Carga de datos de roles ...",
             "loadingIntegrations": "Cargando datos de integraciones ...",
