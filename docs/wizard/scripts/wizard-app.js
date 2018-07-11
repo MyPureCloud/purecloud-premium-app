@@ -298,11 +298,11 @@ class WizardApp {
     /**
      * Stage App instance
      * @param {String} name 
-     * @param {String} url 
-     * @param {String} type  Either standalone or widget
+     * @param {String} type Either standalone or widget
+     * @param {String} url  
      * @param {StringArray} groups
      */
-    stageInstance(name, url, type, groups){
+    stageInstance(name, type, url, groups){
         let instanceBody = {
             "name": name,
             "url": url,
