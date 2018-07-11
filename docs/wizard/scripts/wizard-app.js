@@ -9,9 +9,8 @@ import PageManager from './page-manager.js'
 const $ = window.$;
 const jQuery = window.jQuery;
 const Handlebars = window.Handlebars;
-const i18n = window.i18n;
 if((typeof $ === 'undefined') || (typeof jQuery === 'undefined') || 
-   (typeof Handlebars === 'undefined') || (typeof i18n === 'undefined')){
+   (typeof Handlebars === 'undefined')){
     console.error("===== PREMIUM APP ERROR ====== \n" +
                   "A required library is missing. \n" +
                   "==============================");   
