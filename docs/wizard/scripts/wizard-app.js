@@ -388,6 +388,8 @@ class WizardApp {
         // object of (groupName: groupId) pairs
         let groupData = {};
 
+        // Get info from created integrations
+        let integrationsData = [];
 
         return new Promise((resolve,reject) => { 
             // Create the roles
@@ -450,6 +452,7 @@ class WizardApp {
                 // There are two steps for creating the app instances
                 // 1. Create instance of a custom-client-app
                 // 2. Configure the app
+                // 3. Activate the instances
                 Promise.all(groupPromises)
                 .then(() => {
                     this.stagingArea.appInstances.forEach((instance) => {
@@ -484,18 +487,39 @@ class WizardApp {
                                     }
                                 }
 
+                                integrationsData.push(data);
                                 return integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig)
                             })
-                            .then((data) => this.pageManager.logInfo("Configured instance: " + data.name))
+                            .then((data) => {
+                                this.pageManager.logInfo("Configured instance: " + data.name);                           
+                            })
                             .catch((err) => console.log(err))
                         );
                     });
                     return Promise.all(integrationPromises);
                 })
                 .then(() => {
+                    let enablePromises = [];
+                    integrationsData.forEach((instance) => {
+                        let opts = {
+                            "body": {
+                                "intendedState": "ENABLED"
+                            }
+                         }
+
+                        enablePromises.push(
+                            integrationsApi.patchIntegration(instance.id, opts)
+                            .then((data) => this.pageManager.logInfo("Enabled instance: " + data.name))
+                            .catch((err) => console.log(err))
+                        );
+                    });
+                    
+                    return Promise.all(enablePromises);
+                })
+                .then(() => {
                     this.pageManager.logInfo("<strong>Installation Complete!</strong>");
                     resolve();
-                });
+                })
             });
         });
     }
