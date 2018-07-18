@@ -2,27 +2,13 @@
 *   NOTE: This sample uses ES6 features
 */
 import appConfig from './config.js'
-import hb from './template-references.js'
-import PageManager from './page-manager.js'
 
-// Requires jQuery and Handlebars from parent context
 const $ = window.$;
 const jQuery = window.jQuery;
-const Handlebars = window.Handlebars;
-if((typeof $ === 'undefined') || (typeof jQuery === 'undefined') || 
-   (typeof Handlebars === 'undefined')){
-    console.error("===== PREMIUM APP ERROR ====== \n" +
-                  "A required library is missing. \n" +
-                  "==============================");   
-}
 
 /**
  * WizardApp class that handles everything in the App.
- * @todo keep track of current status with local storage to enable resuming
- * @todo Separate functions for assigning event handlers
- * @todo Determine app instance id of current app.
- * @todo Maybe implement middleware between pages and App. RN Pages are directly invoking methods
- *       and accessing stagearea property.
+ * @todo Make app persistent by using localStorage
  */
 class WizardApp {
     constructor(){
@@ -41,31 +27,49 @@ class WizardApp {
         // Default permission to add to new roles
         this.premiumAppPermission = appConfig.premiumAppPermission;
 
-        // Prefix to add to all objects that will be added
-        // (roles, groups, integrations, etc..)
-        // as a result of this installation wizard
-        this.prefix = appConfig.prefix;
-
         // Language default is english
         // Language context is object containing the translations
         this.language = 'en-us';
         this.languageContext = null
 
-        // JS object that will stage information about the installation.
-        this.stagingArea = {
-            groups: [],
-            roles: [],
-            appInstances: []
-        };
+        this.prefix = "PREMIUM_SAMPLE_";
+        this.installationData = {
+            "roles": [
+                {
+                    "name": "Role",
+                    "description": "Generated role for access to the app.",
+                    "permissions": ["admin", "premium_app_permission"]
+                }
+            ],
+            "groups": [
+                {
+                    "name": "Agents",
+                    "description": "Agents have access to a widget that gives US state information based on caller's number.",
+                },
+                {
+                    "name": "Supervisors",
+                    "description": "Supervisors have the ability to watch a queue for ACD conversations.",
+                }
+            ],
+            "appInstances": [
+                {
+                    "name": "Agent Widget",
+                    "url": "https://mypurecloud.github.io/purecloud-premium-app/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}",
+                    "type": "widget",
+                    "groups": ["Agents", "Supervisors"]
+                },
+                {
+                    "name": "Supervisor Widget",
+                    "url": "https://mypurecloud.github.io/purecloud-premium-app/supervisor.html?lang={{pcLangTag}}&environment={{pcEnvironment}}",
+                    "type": "standalone",
+                    "groups": ["Supervisors"]
+                }
+            ]
+        }
 
-        // Default order to prefill staging area
-        this.defaultOrderFileName = appConfig.defaultOrderFileName;
-
-        // User ID 
-        this.userId = null;
-
-        // Asign to class so pages could call it
-        this.pageManager = new PageManager(this);
+        // Used to determine progress
+        //this.totalSteps = 11;
+        this.currentStep = 0;
     }
 
     /**
@@ -105,16 +109,17 @@ class WizardApp {
 
         // Get the language context file and assign it to the app
         return new Promise((resolve, reject) => {
-            let fileUri = './languages/' + this.language + '.json';
-            $.getJSON(fileUri)
-            .done(data => {
-                this.languageContext = data;
-                resolve()
-            })
-            .fail(xhr => {
-                console.log('Language file not found. Defaulting to en-us');
-                this._setupClientApp('en-us');
-            }); 
+            resolve();
+            // let fileUri = './languages/' + this.language + '.json';
+            // $.getJSON(fileUri)
+            // .done(data => {
+            //     this.languageContext = data;
+            //     resolve()
+            // })
+            // .fail(xhr => {
+            //     console.log('Language file not found. Defaulting to en-us');
+            //     this._setupClientApp('en-us');
+            // }); 
         });
     }
 
@@ -132,53 +137,32 @@ class WizardApp {
             // Check user permissions
             .then(data => {
                 console.log(data);
-
-                let usersApi = new this.platformClient.UsersApi();
-
-                let opts = {'expand': ['authorization']};
-
-                return usersApi.getUsersMe(opts); 
-            }).then(userMe => {
-                console.log(userMe);
-                this.userId = userMe.id;
-
-                // Show appropriate elements based on qualification of user permissions.
-                if(!this.setupPermissionsRequired.every(perm => userMe.authorization.permissions.indexOf(perm) > -1)){
-                    _renderModule('not-authorized');
-                }else{
-                    resolve();
-                }
-                
+                resolve();
             // Error handler catch all
             }).catch(err => console.log(err));
         });
     }
 
-    /**
-     * Load the default installation order for the wizard
-     * @param {string} fileName extensionless json filename  
-     */
-    _loadDefaultOrder(fileName){
-        let fileUri = fileName + ".json";
+    getUserDetails(){
+        let usersApi = new this.platformClient.UsersApi();
+        let opts = {'expand': ['authorization']};
+    
+        return usersApi.getUsersMe(opts)
+    }
 
+    validateProductAvailability(){
+        // premium-app-example
         return new Promise((resolve, reject) => {
-            $.getJSON(fileUri)
-            .done(data => {
-                this.stagingArea = data;
-                this.stagingArea.fileName = fileUri;
-
-                resolve()
-            })
-            .fail(xhr => {
-                console.log('error', xhr)
-                this.stagingArea = {
-                    groups: [],
-                    roles: [],
-                    appInstances: []
+            let integrationsApi = new this.platformClient.IntegrationsApi();
+            
+            integrationsApi.getIntegrationsTypes({})
+            .then((data) => {
+                if (data.entities.filter((integType) => integType.id === "premium-app-example")[0]){
+                    resolve(true);
+                } else {
+                    resolve(false);
                 }
-
-                resolve();
-            }); 
+            })
         });
     }
 
@@ -190,6 +174,26 @@ class WizardApp {
 
         // Get organization information
         return organizationApi.getOrganizationsMe()
+    }
+
+
+    isExisting(){
+        return new Promise((resolve, reject) => {
+            this.getExistingGroups()
+            .then((data) => {
+                if(data.total > 0) resolve();
+                else 
+                return this.getExistingRoles()
+            })
+            .then((data) => {
+                if(data.total > 0) resolve();
+                else 
+                return this.getExistingApps()
+            })
+            .then((data) => {
+                
+            })
+        })
     }
 
     /**
@@ -272,102 +276,6 @@ class WizardApp {
         return integrationsApi.deleteIntegration(instanceId)
     }
 
-    /**
-     * Stage a role
-     * @param {String} name 
-     * @param {String} description 
-     * @param {StringArray} permissions 
-     * @param {Boolean} assignToSelf 
-     */
-    stageRole(name, description, permissions, assignToSelf){
-        if((name === '') || (typeof name !== "string")) throw "Invalid role name.";
-
-        let role = {
-            "name": name,
-            "description": description,
-            "permissions": permissions,
-            "assignToSelf": assignToSelf
-        };
-
-        this.stagingArea.roles.push(role);
-    }
-
-    /**
-     * Assign or unassign a staged role to the user after installation
-     * @param {integer} roleIndex 
-     * @param {boolean} toAssign 
-     */
-    setStagedRoleAssignment(roleIndex, toAssign){
-        this.stagingArea.roles[roleIndex].assignToSelf = toAssign;
-    }
-
-    /**
-     * Unstages a role
-     * @param {integer} roleIndex Index in stagingArea.roles array
-     */
-    unstageRole(roleIndex){
-        this.stagingArea.roles.splice(roleIndex, 1);
-    }
-
-    /**
-     * Stage group
-     * @param {String} name 
-     * @param {String} description 
-     * @param {Boolean} asignToSelf 
-     */
-    stageGroup(name, description, asignToSelf){
-        let tempGroup = {
-            "name": name, 
-            "description": description,
-            "assignToSelf": asignToSelf
-        }
-        this.stagingArea.groups.push(tempGroup);
-    }
-
-    /**
-     * Unstage a group
-     * @param {Integer} groupIndex 
-     */
-    unstageGroup(groupIndex){
-        this.stagingArea.groups.splice(groupIndex, 1);
-    }
-
-    /**
-     * Stage App instance
-     * @param {String} name 
-     * @param {String} type Either standalone or widget
-     * @param {String} url  
-     * @param {StringArray} groups
-     */
-    stageInstance(name, type, url, groups){
-        let instanceBody = {
-            "name": name,
-            "url": url,
-            "type": type,
-            "groups": groups
-        }
-        this.stagingArea.appInstances.push(instanceBody);
-    }
-
-    /**
-     * Unstage App Instance
-     * @param {Integer} instanceIndex 
-     */
-    unstageInstance(instanceIndex){
-        this.stagingArea.appInstances.splice(instanceIndex, 1);
-    }
-
-    /**
-     * Fix Staged instances that have groups which are unstaged after app is already configured. 
-     * Have those groups automatically removed from the instance configuration.
-     * Called when loading the App Instance page
-     */
-    reevaluateStagedInstances(){
-        this.stagingArea.appInstances.forEach((instance) =>
-        instance.groups = instance.groups.filter((group) => 
-            this.stagingArea.groups.map(g => g.name).includes(group))
-        );
-    }
 
     /**
      * Final Step of the installation wizard. Actually install every staged object.
@@ -393,9 +301,7 @@ class WizardApp {
 
         return new Promise((resolve,reject) => { 
             // Create the roles
-            this.stagingArea.roles.forEach((role) => {
-                this.pageManager.logInfo("Creating role: " + role.name);
-
+            this.installationData.roles.forEach((role) => {
                 // Add the premium app permission if not included in staging area
                 if(!role.permissions.includes(appConfig.premiumAppPermission))
                     role.permissions.push(appConfig.premiumAppPermission);
@@ -406,19 +312,21 @@ class WizardApp {
                         "permissions": role.permissions
                 };
 
+                // TODO: Fix roles assingment not working
+                let roleId = null;
                 authPromises.push(
                     authApi.postAuthorizationRoles(roleBody)
                     .then((data) => {
-                        this.pageManager.logInfo("Created role: " + role.name);
+                        this.logInfo("Created role: " + role.name, this.currentStep++);
+                        roleId = data.id;
 
-                        if(role.assignToSelf){
-                            return authApi.putAuthorizationRoleUsersAdd(data.id, [this.userId]);
-                        }else{
-                            resolve();
-                        }
+                        return self.getUserDetails();
                     })
                     .then((data) => {
-                        this.pageManager.logInfo("Assigned " + role.name + " to user");
+                        return authApi.putAuthorizationRoleUsersAdd(roleId, [data.userId]);
+                    })
+                    .then((data) => {
+                        this.logInfo("Assigned " + role.name + " to user", this.currentStep++);
                     })
                     .catch((err) => console.log(err))
                 );
@@ -427,9 +335,7 @@ class WizardApp {
             // Create the groups
             Promise.all(authPromises)
             .then(() => {
-                this.stagingArea.groups.forEach((group) => {
-                    this.pageManager.logInfo("Creating group: " + group.name);
-
+                this.installationData.groups.forEach((group) => {
                     let groupBody = {
                         "name": this.prefix + group.name,
                         "description": group.description,
@@ -441,7 +347,7 @@ class WizardApp {
                     groupPromises.push(
                         groupsApi.postGroups(groupBody)
                         .then((data) => {
-                            this.pageManager.logInfo("Created group: " + group.name);
+                            this.logInfo("Created group: " + group.name, this.currentStep++);
                             groupData[group.name] = data.id;
                         })
                         .catch((err) => console.log(err))
@@ -455,9 +361,7 @@ class WizardApp {
                 // 3. Activate the instances
                 Promise.all(groupPromises)
                 .then(() => {
-                    this.stagingArea.appInstances.forEach((instance) => {
-                        this.pageManager.logInfo("Creating instance: " + instance.name);
-
+                    this.installationData.appInstances.forEach((instance) => {
                         let integrationBody = {
                             "body": {
                                 "integrationType": {
@@ -469,7 +373,7 @@ class WizardApp {
                         integrationPromises.push(
                             integrationsApi.postIntegrations(integrationBody)
                             .then((data) => {
-                                this.pageManager.logInfo("Configuring instance: " + instance.name);
+                                this.logInfo("Created instance: " + instance.name, this.currentStep++);
                                 let integrationConfig = {
                                     "body": {
                                         "name": this.prefix + instance.name,
@@ -491,7 +395,7 @@ class WizardApp {
                                 return integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig)
                             })
                             .then((data) => {
-                                this.pageManager.logInfo("Configured instance: " + data.name);                           
+                                this.logInfo("Configured instance: " + data.name, this.currentStep++);                           
                             })
                             .catch((err) => console.log(err))
                         );
@@ -509,7 +413,7 @@ class WizardApp {
 
                         enablePromises.push(
                             integrationsApi.patchIntegration(instance.id, opts)
-                            .then((data) => this.pageManager.logInfo("Enabled instance: " + data.name))
+                            .then((data) => this.logInfo("Enabled instance: " + data.name, this.currentStep++))
                             .catch((err) => console.log(err))
                         );
                     });
@@ -517,19 +421,31 @@ class WizardApp {
                     return Promise.all(enablePromises);
                 })
                 .then(() => {
-                    this.pageManager.logInfo("<strong>Installation Complete!</strong>");
+                    this.logInfo("Installation Complete!", this.currentStep++);
                     resolve();
                 })
             });
         });
     }
 
+    logInfo(data, progress){
+        if (!data || (typeof(data) !== 'string')) data = "";
+        if (!progress) progress = 0;
+
+        $.LoadingOverlay("text", data);
+        $.LoadingOverlay("progress", progress * 11)
+    }
+
     /**
      * @description First thing that must be called to set-up the App
      */
     start(){
-        this._setupClientApp()
-        .then(this.pageManager.setPage("landingPage"));
+        return new Promise((resolve, reject) => {
+            this._setupClientApp()
+            .then(() => this._pureCloudAuthenticate())
+            .then(() => resolve())
+            .catch(() => reject())
+        });
     }
 }
 

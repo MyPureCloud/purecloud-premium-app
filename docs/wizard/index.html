@@ -6,33 +6,95 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Premium App Wizard</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
-    <link rel="stylesheet" href="../style.css">
+    <link href='//fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' async type='text/css'>
+    <link rel="stylesheet" href="./style.css">
 
     <script src="https://sdk-cdn.mypurecloud.com/javascript/29.1.0/purecloud-platform-client-v2.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/1.0.0/purecloud-client-app-sdk-ed1f20f5244ee2bb9cc242f669369639.min.js"></script>
     
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
 </head>
 <body>
-    <!-- TODO: Check if browser supports ES6 and notify user. -->
     <noscript>
         For full functionality of this site it is necessary to enable JavaScript. Here are the <a href="http://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web browser</a>.
     </noscript>
-    <div id="default-module">
-        <h1 class="is-size-2 has-text-centered has-text-grey-light">
-            <i class="fa fa-spinner fa-spin" style="font-size:24px"></i> Loading...
-        </h1>
+
+    <header>
+        <img src="logo.png" alt="Logo">
+    </header>
+
+    <div id="loading" style="margin-top: 30px; text-align: center;">
+        <i class="fa fa-spinner fa-spin" style="font-size:70px"></i>
     </div>
+    <div class="title">
+        <span id="welcome"></span>
+    </div>
+
+    <ul class="hidden progress-bar">
+        <li class="active current">Start</li>
+        <li class="">Install</li>
+        <li class="">Summary</li>
+    </ul>
+
+    <main class="hidden">
+        <div id="available" class="hidden">
+            <p class="success">
+                Product avaiable. <i class="fas fa-check-circle enlarge"></i>
+            </p>
+            <p>
+                We're ready to set you up. Please click the Start button.
+            </p>
+            <button id="next" onclick="window.location='./install.html'" class="btn-info right">Start <i class="button-icon fas fa-chevron-right"></i></button>
+        </div>
+
+        <div id="unavailable" class="hidden">
+            <p class="fail">
+                Product not avaiable. <i class="fas fa-times-circle enlarge"></i>
+            </p>
+            <p>
+                We're sorry but your PureCloud org does not have the Premium App Sample Product enabled.
+                Please contact the authorities.
+            </p>
+        </div>
+    </main>
 
     <!-- Client Instances and PureCloud API will be encapsulated in the wizardApp module -->
     <script type="module">
         import WizardApp from './scripts/wizard-app.js'
 
+        // Initiate the App
         let myApp = new WizardApp();
-        myApp.start();
+        myApp.start()
+
+
+        // Check Product Availability and display appropriate message
+        .then(() => {
+            return myApp.validateProductAvailability();
+        })
+        .then((isAvailable) => {
+            if (isAvailable){
+                $("#available").removeClass("hidden");
+            }else{
+                $("#unavailable").removeClass("hidden");
+            }
+
+
+        // Check if there is an existing installation 
+        
+
+
+        // Get the user information to display on the screen
+            return myApp.getUserDetails();
+        })
+
+        // Display welcome message after everythin has been loaded
+        .then((user) => {
+            $("main").removeClass("hidden");
+            $(".progress-bar").removeClass("hidden");
+            $("#loading").addClass("hidden");
+            $("#welcome").text("Hi " + user.name + ". welcome to the Premium App Example")
+        });
     </script>
 </body>
 </html>
