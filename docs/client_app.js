@@ -16,13 +16,13 @@ const usersApi = new platformClient.UsersApi();
 const notificationsApi = new platformClient.NotificationsApi();
 
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
-clientApp.setup = function(pcEnv, langTag){
+clientApp.setup = function(pcEnv, langTag, html){
     let clientId = clientIDs[pcEnv] || clientIDs['mypurecloud.com'];
     clientApp.langTag = langTag;
 
     // Authenticate via PureCloud
     client.setPersistSettings(true);
-    client.loginImplicitGrant(clientId, redirectUri, { state: "state" })
+    client.loginImplicitGrant(clientId, redirectUri + html, { state: "state" })
     .then(data => {
         console.log(data);
         // Set access Token
