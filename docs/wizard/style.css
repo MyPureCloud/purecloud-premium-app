@@ -5,7 +5,7 @@
 }
 
 body {
-    color: #4c4c4c;
+    color: #7c7c7c;
     font-family: "Lato", "HelveticaNeue", "Helvetica", "Arial", sans-serif;
     font-size: 1em;
     background-color: #F8F8F8;
@@ -26,7 +26,7 @@ header img {
 main {
     margin: auto;
     margin-top: 20px;
-    width: 900px;
+    width: 800px;
     text-align: center;
 }
 
@@ -35,7 +35,7 @@ p {
 }
 
 .success {
-    color: #0BC353;
+    color: #0baf4a;
 }
 
 .fail {
@@ -43,9 +43,17 @@ p {
 }
 
 /* Font awesmoe modifiers */
-.fas.enlarge {
+.enlarge {
     font-size: 2em;
     vertical-align: middle;
+}
+
+.hidden {
+    display: none;
+}
+
+.sink-more {
+    margin-top:40px;
 }
 
 /* Buttons */
@@ -79,7 +87,7 @@ button {
 
 /* Modal */
 .adjust-text {
-    margin-top: -350px;
+   /* margin-top: -100px; */
     color: #4498B4;
     font-size-adjust: unset;
 }
@@ -169,7 +177,7 @@ button {
 }
 
 .message-title{
-    padding: 12px;
+    padding: 16px;
     color: white;
     font-size: 1em;
     font-weight: bold;
@@ -179,6 +187,7 @@ button {
 
 .message-content {
     background-color: #fff;
-    padding: 12px;
+    padding: 16px;
+    padding-left: 32px;
     text-align: left;
 }
