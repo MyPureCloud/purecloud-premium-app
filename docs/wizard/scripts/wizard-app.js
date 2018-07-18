@@ -95,7 +95,7 @@ class WizardApp {
         }
 
         if(pcEnv){
-            this.pcApp = new window.purecloud.apps.ClientApp({pcEnvironmentQueryParam: pcEnv});
+            this.pcApp = new window.purecloud.apps.ClientApp({pcEnvironment: pcEnv});
         }else{
             // Use default PureCloud region
             this.pcApp = new window.purecloud.apps.ClientApp();
