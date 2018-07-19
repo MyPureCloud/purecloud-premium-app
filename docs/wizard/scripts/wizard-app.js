@@ -35,13 +35,20 @@ class WizardApp {
         // PureCloud app name
         this.appName = "premium-app-example"
 
-        this.prefix = "PREMIUM_SAMPLE_";
+        this.prefix = appConfig.prefix;
         this.installationData = {
             "roles": [
                 {
                     "name": "Role",
                     "description": "Generated role for access to the app.",
-                    "permissions": ["admin", "premium_app_permission"]
+                    "permissionPolicies": [
+                        {
+                            "domain": "integration",
+                            "entityName": "examplePremiumApp",
+                            "actionSet": ["*"],
+                            "allowConditions": false
+                        }
+                    ]
                 }
             ],
             "groups": [
@@ -372,14 +379,10 @@ class WizardApp {
         return new Promise((resolve,reject) => { 
             // Create the roles
             this.installationData.roles.forEach((role) => {
-                // Add the premium app permission if not included in staging area
-                if(!role.permissions.includes(appConfig.premiumAppPermission))
-                    role.permissions.push(appConfig.premiumAppPermission);
-
                 let roleBody = {
                         "name": this.prefix + role.name,
                         "description": "",
-                        "permissions": role.permissions
+                        "permissionPolicies": role.permissionPolicies
                 };
 
                 // TODO: Fix roles assingment not working
@@ -390,10 +393,10 @@ class WizardApp {
                         this.logInfo("Created role: " + role.name, this.currentStep++);
                         roleId = data.id;
 
-                        return self.getUserDetails();
+                        return this.getUserDetails();
                     })
                     .then((data) => {
-                        return authApi.putAuthorizationRoleUsersAdd(roleId, [data.userId]);
+                        return authApi.putAuthorizationRoleUsersAdd(roleId, [data.id]);
                     })
                     .then((data) => {
                         this.logInfo("Assigned " + role.name + " to user", this.currentStep++);
