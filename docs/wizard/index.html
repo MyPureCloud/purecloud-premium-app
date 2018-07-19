@@ -79,21 +79,26 @@
                 $("#unavailable").removeClass("hidden");
             }
 
-
-        // Check if there is an existing installation 
-        
-
+        // Check if there is an existing installation and redirect to manage.html if so
+        return myApp.isExisting(); 
+        }).then(() => {
 
         // Get the user information to display on the screen
-            return myApp.getUserDetails();
-        })
-
+        return myApp.getUserDetails(); 
+        }).then((user) => {
+        
         // Display welcome message after everythin has been loaded
-        .then((user) => {
             $("main").removeClass("hidden");
             $(".progress-bar").removeClass("hidden");
             $("#loading").addClass("hidden");
             $("#welcome").text("Hi " + user.name + ". welcome to the Premium App Example")
+        })
+
+        .catch((e) => {
+            // If existing directly go to the manage page
+            if(e.isExisting){
+                window.location='./manage.html';
+            }
         });
     </script>
 </body>
