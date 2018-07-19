@@ -30,7 +30,6 @@ class WizardApp {
         // Language default is english
         // Language context is object containing the translations
         this.language = 'en-us';
-        this.languageContext = null
 
         // PureCloud app name
         this.appName = "premium-app-example"
@@ -84,12 +83,8 @@ class WizardApp {
 
     /**
      * First thing that needs to be called to setup up the PureCloud Client App
-     * @param {String} forceLang fallback language if translation file does not exist 
-     * @returns {Promise} Due to AJAX call of language file
      */
-    _setupClientApp(forceLang){    
-        this.language = forceLang;
-
+    _setupClientApp(){    
         // Snippet from URLInterpolation example: 
         // https://github.com/MyPureCloud/client-app-sdk
         const queryString = window.location.search.substring(1);
@@ -100,7 +95,7 @@ class WizardApp {
             var currParam = pairs[i].split('=');
 
             if(currParam[0] === 'langTag') {
-                if(!forceLang) this.language = currParam[1];
+                this.language = currParam[1];
             } else if(currParam[0] === 'pcEnvironment') {
                 pcEnv = currParam[1];
             } else if(currParam[0] === 'environment' && pcEnv === null) {
@@ -119,17 +114,15 @@ class WizardApp {
 
         // Get the language context file and assign it to the app
         return new Promise((resolve, reject) => {
-            resolve();
-            // let fileUri = './languages/' + this.language + '.json';
-            // $.getJSON(fileUri)
-            // .done(data => {
-            //     this.languageContext = data;
-            //     resolve()
-            // })
-            // .fail(xhr => {
-            //     console.log('Language file not found. Defaulting to en-us');
-            //     this._setupClientApp('en-us');
-            // }); 
+            let fileUri = './languages/' + this.language + '.json';
+            $.getJSON(fileUri)
+            .done(data => {
+                this.displayPageText(data);
+                resolve();
+            })
+            .fail(xhr => {
+                console.log('Language file not found.');
+            }); 
         });
     }
 
@@ -150,6 +143,15 @@ class WizardApp {
                 resolve();
             // Error handler catch all
             }).catch(err => console.log(err));
+        });
+    }
+
+    displayPageText(text){
+        $(document).ready(() => {
+            for (let key in text){
+                if(!text.hasOwnProperty(key)) continue;
+                $("." + key).text(text[key]);
+            }
         });
     }
 

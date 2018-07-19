@@ -14,6 +14,8 @@
     
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+    <script src="./scripts/util.js"></script>
+
 </head>
 <body>
     <noscript>
@@ -29,16 +31,32 @@
     </div>
 
     <ul class="progress-bar">
-        <li class="active">Start</li>
-        <li class="active">Install</li>
-        <li class="active current">Summary</li>
+        <li class="active">
+            <span class="txt-start">Start</span>
+        </li>
+        <li class="active">
+            <span class="txt-install">Install</span>
+        </li>
+        <li class="active current">
+            <span class="txt-summary">Summary</span>
+        </li>
     </ul>
     <main>
         <p class="success">
-            We've finished installing the Roles, Groups, and App Instances in your org. <i class="fas fa-check-circle enlarge"></i>
+            <span class="txt-finish-install">
+                We've finished installing the Roles, Groups, and App Instances in your org. <i class="fas fa-check-circle enlarge"></i>
+            </span>
         </p>
-        <button class="btn-info" onclick="window.location='./index.html'">Back</button>
+        <button class="btn-info" onclick="goToPage('index')">
+            <span class="txt-back">Back</span>
+        </button>
     </main>
-    
+    <script type="module">
+        import WizardApp from './scripts/wizard-app.js'
+
+        // Initiate the App
+        let myApp = new WizardApp();
+        myApp.start()
+    </script>
 </body>
 </html>

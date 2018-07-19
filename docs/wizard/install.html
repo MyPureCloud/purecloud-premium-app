@@ -15,6 +15,8 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.4/dist/loadingoverlay.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+
+    <script src="./scripts/util.js"></script>
 </head>
 <body>
     <noscript>
@@ -34,44 +36,72 @@
     </div>
 
     <ul class="progress-bar">
-        <li class="active">Start</li>
-        <li class="active current">Install</li>
-        <li class="">Summary</li>
+        <li class="active">
+            <span class="txt-start">Start</span>
+        </li>
+        <li class="active current">
+            <span class="txt-install">Install</span>
+        </li>
+        <li class="">
+            <span class="txt-summary">Summary</span>
+        </li>
     </ul>
 
     <main>
-        <p>These are the steps that will be automatically performed for you!</p>
+        <p>
+            <span class="txt-install-summary">These are the steps that will be automatically performed for you!</span> 
+        </p>
 
         <div class="message">
-            <div class="message-title">1. Create Role</div>
+            <div class="message-title">
+                <span class="txt-create-role">1. Create Role</span>
+            </div>
             <div class="message-content">
                 <div>
-                    Create a role specifically to provide access to the app.
+                    <span class="txt-create-role-msg">
+                        Create a role specifically to provide access to the app.
+                    </span>
                 </div> 
             </div>
         </div>
 
         <div class="message">
-            <div class="message-title">2. Create Groups</div>
+            <div class="message-title">
+                    <span class="txt-create-group">2. Create Groups</span>
+            </div>
             <div class="message-content">
                 <div>
-                    Groups will provide filtering to users' access to the app instances.
+                    <span class="txt-create-role-msg">
+                        Groups will provide filtering to users' access to the app instances.
+                    </span> 
                 </div> 
             </div>
         </div>
 
         <div class="message">
-            <div class="message-title">3. Create instances</div>
+            <div class="message-title">
+                <span class="txt-create-instance">
+                3. Create instances
+                </span>
+            </div>
             <div class="message-content">
                 <div>
-                    More instances of the app will be created with different URI endpoints to provide different features of the app.
+                    <span class="txt-create-instance-msg">
+                        More instances of the app will be created with different URI endpoints to provide different features of the app.
+                    </span>
                 </div> 
             </div>
         </div>
 
-        <p class="sink-more">Please click <strong>Start</strong> to start the installation.</p>
+        <p class="sink-more">
+            <span class="txt-please-click">
+                Please click the button to start the installation.
+            </span>
+        </p>
 
-        <button id="start" class="btn-info right" style="margin-top: 40px; margin-bottom: 40px;">Start <i class="button-icon fas fa-chevron-right"></i></button>
+        <button id="start" class="btn-info right" style="margin-top: 40px; margin-bottom: 40px;">
+            <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i>
+        </button>
     </main>
 
     <script type="module">
@@ -104,7 +134,7 @@
                 .then(() => {
                     setTimeout(() => {
                         $.LoadingOverlay("hide");
-                        window.location='./finish.html'
+                        goToPage('finish');
                     }, 1800);
                 })
             });

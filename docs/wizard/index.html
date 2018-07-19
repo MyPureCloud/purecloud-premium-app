@@ -14,6 +14,7 @@
     
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+    <script src="./scripts/util.js"></script>
 </head>
 <body>
     <noscript>
@@ -27,34 +28,50 @@
     <div id="loading" style="margin-top: 30px; text-align: center;">
         <i class="fa fa-spinner fa-spin" style="font-size:70px"></i>
     </div>
-    <div class="title">
-        <span id="welcome"></span>
+
+    <div id="title" class="hidden title">
+        <span class="txt-greeting">
+        Hi 
+        </span>
+        <span id="username"></span>
+        <span class="txt-greeting-2">
+            welcome to the Premium App Example
+        </span>
     </div>
 
     <ul class="hidden progress-bar">
-        <li class="active current">Start</li>
-        <li class="">Install</li>
-        <li class="">Summary</li>
+        <li class="active current">
+            <span class="txt-start">Start</span>
+        </li>
+        <li class="">
+            <span class="txt-install">Install</span>
+        </li>
+        <li class="">
+            <span class="txt-summary">Summary</span>
+        </li>
     </ul>
 
     <main class="hidden">
         <div id="available" class="hidden">
             <p class="success">
-                Product avaiable. <i class="fas fa-check-circle enlarge"></i>
+                <span class="txt-product-available">Product Available </span> <i class="fas fa-check-circle enlarge"></i>
             </p>
             <p>
-                We're ready to set you up. Please click the Start button.
+                <span class="txt-available-message">We're ready to set you up. Please click the Start button.</span>
             </p>
-            <button id="next" onclick="window.location='./install.html'" class="btn-info right">Start <i class="button-icon fas fa-chevron-right"></i></button>
+            <button id="next" onclick="goToPage('install')" class="btn-info right">
+                <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i></button>
         </div>
 
         <div id="unavailable" class="hidden">
             <p class="fail">
-                Product not avaiable. <i class="fas fa-times-circle enlarge"></i>
+                <span class="txt-product-not-available">Product not avaiable.</span>  <i class="fas fa-times-circle enlarge"></i>
             </p>
             <p>
+                <span class="txt-not-available-message">
                 We're sorry but your PureCloud org does not have the Premium App Sample Product enabled.
                 Please contact the authorities.
+                </span>
             </p>
         </div>
     </main>
@@ -91,13 +108,14 @@
             $("main").removeClass("hidden");
             $(".progress-bar").removeClass("hidden");
             $("#loading").addClass("hidden");
-            $("#welcome").text("Hi " + user.name + ". welcome to the Premium App Example")
+            $(".title").removeClass("hidden");
+            $("#username").text(user.name);
         })
 
         .catch((e) => {
             // If existing directly go to the manage page
             if(e.isExisting){
-                window.location='./manage.html';
+                goToPage('manage');
             }
         });
     </script>
