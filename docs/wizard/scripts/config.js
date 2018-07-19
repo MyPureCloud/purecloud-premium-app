@@ -12,13 +12,6 @@ export default {
     //Permissions required for running the Wizard App
     "setupPermissionsRequired": ['admin'],
 
-    // Premium app permission
-    "premiumAppPermission": "premium_app_permission",
-
     // To be added to names of PureCloud objects created by the wizard
-    "prefix": "PREMIUM_SAMPLE_ ",
-
-    // Default configurations of the wizard. Should be on the same path
-    // as the index page.
-    "defaultOrderFileName": "sample-order"
+    "prefix": "PREMIUM_EXAMPLE_",
 }
