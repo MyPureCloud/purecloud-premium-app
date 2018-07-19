@@ -179,21 +179,88 @@ class WizardApp {
 
     isExisting(){
         return new Promise((resolve, reject) => {
-            this.getExistingGroups()
-            .then((data) => {
-                if(data.total > 0) resolve();
-                else 
-                return this.getExistingRoles()
-            })
-            .then((data) => {
-                if(data.total > 0) resolve();
-                else 
-                return this.getExistingApps()
-            })
-            .then((data) => {
-                
-            })
+            let promiseArr = []; 
+            
+            promiseArr.push(
+                this.getExistingGroups()
+                .then((data) => {
+                    if(data.total > 0) reject({"isExisting": true});
+            }));
+            
+            promiseArr.push(
+                this.getExistingRoles()
+                .then((data) => {
+                    if(data.total > 0) reject({"isExisting": true});
+            }));
+
+            promiseArr.push(
+                this.getExistingApps()
+                .then((data) => {
+                    let integrations = data.entities.filter(entity => entity.name.startsWith(this.prefix));
+                    if (integrations.length > 0) reject({"isExisting": true});
+            }));
+
+            Promise.all(promiseArr)
+            .then(() => resolve())
         })
+    }
+
+    clearConfigurations(){
+        let configArr = [];
+
+        // Delete groups
+        configArr.push(
+            this.getExistingGroups()
+            .then(groups => {
+                let del_group = [];
+
+                if(groups.total > 0){
+                    groups.results.map(grp => grp.id).forEach(x => {
+                        del_group.push(this.deletePureCloudGroup(x));
+                    });
+                }
+
+                return Promise.all(del_group);
+            })
+        )
+
+        // Delete Roles
+        configArr.push(
+            this.getExistingRoles()
+            .then(roles => {
+                let del_role = [];
+
+                if(roles.total > 0){
+                    roles.entities.map(r => r.id).forEach(x => {
+                        del_role.push(this.deletePureCloudRole(x));
+                    });
+                }
+                
+                return Promise.all(del_role);
+            })
+        )
+
+        // Delete instances
+        configArr.push(
+            this.getExistingApps()
+            .then(apps => {
+                let del_app = [];
+
+                if (apps.total > 0){
+                    // Filter results before deleting
+                    apps.entities
+                        .filter(entity => entity.name.startsWith(this.prefix))
+                        .map(entity => entity.id)
+                        .forEach(x => {
+                            del_app.push(this.deletePureCloudApp(x));
+                    });
+                }
+
+                return Promise.all(del_app);
+            })
+        )
+
+        return Promise.all(configArr);
     }
 
     /**
