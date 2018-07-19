@@ -32,6 +32,9 @@ class WizardApp {
         this.language = 'en-us';
         this.languageContext = null
 
+        // PureCloud app name
+        this.appName = "premium-app-example"
+
         this.prefix = "PREMIUM_SAMPLE_";
         this.installationData = {
             "roles": [
@@ -157,7 +160,7 @@ class WizardApp {
             
             integrationsApi.getIntegrationsTypes({})
             .then((data) => {
-                if (data.entities.filter((integType) => integType.id === "premium-app-example")[0]){
+                if (data.entities.filter((integType) => integType.id === this.appName)[0]){
                     resolve(true);
                 } else {
                     resolve(false);
@@ -200,7 +203,7 @@ class WizardApp {
                     if (integrations.length > 0) reject({"isExisting": true});
             }));
 
-            Promise.all(promiseArr)
+            return Promise.all(promiseArr)
             .then(() => resolve())
         })
     }
@@ -432,7 +435,7 @@ class WizardApp {
                         let integrationBody = {
                             "body": {
                                 "integrationType": {
-                                    "id": "embedded-client-app"
+                                    "id": this.appName
                                 }
                             }
                         }
@@ -450,7 +453,7 @@ class WizardApp {
                                             "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
                                             "displayType": instance.type,
                                             "featureCategory": "", 
-                                            "groups": instance.groups.map((groupName) => groupData[groupName])
+                                            "groupFilter": instance.groups.map((groupName) => groupData[groupName])
                                         },
                                         "advanced": {},
                                         "notes": "",
