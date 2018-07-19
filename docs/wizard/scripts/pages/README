@@ -1,3 +1,0 @@
-These folder contains the script files for each page.
-The filenames should exactly match the string mappings in page-manager.js
-since those are also used in the language json files.
