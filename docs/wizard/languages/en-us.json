@@ -14,7 +14,7 @@
     "txt-create-role": "1. Create Role",
     "txt-create-role-msg": "Create a role specifically to provide access to the app.",
     "txt-create-group": "2. Create Group",
-    "txt-create-group-msg": "Create groups to filter the app access.",
+    "txt-create-group-msg": "Groups will provide filtering to users' access to the app instances.",
     "txt-create-instance": "3. Create Instance",
     "txt-create-instance-msg": " More instances of the app will be created with different URI endpoints to provide different features of the app.",
     "txt-please-click": "Please click the button to start the installation.",
