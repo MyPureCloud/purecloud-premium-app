@@ -13,8 +13,8 @@ var getUrlParameter = function getUrlParameter(sParam) {
     }
 };
 
-var goToPage = function goToPag(page){
+var goToPage = function goToPage(page){
     window.location = getUrlParameter('langTag') ? 
-        './' + page + '.html?langTag=' + getUrlParameter('langTag') : 
-        './' + page + '.html?langTag='
+        page + '.html?langTag=' + getUrlParameter('langTag') : 
+        page + '.html?langTag=en-us'
 }
