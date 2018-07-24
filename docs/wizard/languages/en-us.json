@@ -20,6 +20,5 @@
     "txt-please-click": "Please click the button to start the installation.",
     "txt-finish-install": "Please wait while we take you to the application.",
     "txt-installed": "Installed",
-    "txt-still-installed-1": "The app is still fully/partially configured in your org.",
-    "txt-still-installed-2": "Press the Reset button to delete all existing configuration and restart the configuration process."
+    "txt-still-installed-1": "Please wait while we're uninstalling."
 }

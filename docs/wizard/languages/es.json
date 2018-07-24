@@ -20,6 +20,5 @@
     "txt-please-click": "Haga clic en el botón para comenzar la instalación",
     "txt-finish-install": "Espere mientras lo llevamos a la aplicación.",
     "txt-installed": "Instalado",
-    "txt-still-installed-1": "La aplicación todavía está configurada total / parcialmente en su organización",
-    "txt-still-installed-2": "Presione el botón Restablecer para eliminar toda la configuración existente y reiniciar el proceso de configuración"
+    "txt-still-installed-1": "Por favor espere mientras estamos desinstalando"
 }
