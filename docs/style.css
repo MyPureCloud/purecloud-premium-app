@@ -62,3 +62,31 @@ table {
     padding: 5px;
     text-align: center;
   }
+
+  button {
+    border-radius: 5px 5px;
+    padding: 15px 32px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.btn-info {
+    background-color: #34b3dd;
+    color: white;
+    border: 1px solid #34b3dd;
+    border-bottom: 3px solid #24a3cd;
+}
+
+.btn-info:hover {
+    background-color: #25c0df;
+}
+
+.right {
+    float: right;
+}
+
+.left {
+    float: left;
+}

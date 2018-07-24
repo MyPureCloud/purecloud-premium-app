@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link href='//fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' async type='text/css'>
+    <link rel="stylesheet" href="./style.css">
+
+    <script src="https://sdk-cdn.mypurecloud.com/javascript/29.1.0/purecloud-platform-client-v2.min.js"></script>
+    <script src="https://sdk-cdn.mypurecloud.com/client-apps/1.0.0/purecloud-client-app-sdk-ed1f20f5244ee2bb9cc242f669369639.min.js"></script>
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.4/dist/loadingoverlay.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+    <script src="./scripts/util.js"></script>
+
+</head>
+<body>
+    <div style="position: fixed; top:0; left:0; z-index: -10; background: #F4571E; width: 100%; height: 100%;"></div>
+    <canvas id="bubbly-layer" style="position: fixed; top:0; left:0; z-index: -5; "></canvas>
+
+    <noscript>
+        For full functionality of this site it is necessary to enable JavaScript. Here are the <a href="http://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web browser</a>.
+    </noscript>
+
+    <header>
+        <img src="logo.png" alt="Logo">
+    </header>
+
+    <div class="title">
+        <span class="txt-installed">Installed</span>
+    </div>
+
+    <main>
+        <p class="txt-still-installed-1">
+            Please wait while we're uninstalling.
+        </p>
+    </main>
+
+    <script type="module">
+        import WizardApp from './scripts/wizard-app.js'
+
+        // Initiate the App
+        let myApp = new WizardApp();
+        myApp.start()
+        .then(() => {
+            $.LoadingOverlay("show", {
+                image: '<svg width="350px" height="350px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="lds-cube" style="background: none;"><g transform="translate(80,10)"><circle cx="0" cy="0" r="4" stroke="#ff3e04" stroke-width="3.5" fill="#fff"><animate attributeType="XML" attributeName="stroke" calcmode="linear" values="#ff3e04;#ffae64;#ff2e04" dur="1.3s" repeatCount="indefinite" begin="-0.5s"></animate><animate attributeType="XML" attributeName="r" calcmode="linear" values="5;6;4" dur="1.2s" repeatCount="indefinite" begin="-0.5s"></animate></circle></g><g transform="translate(54,23)"><rect x="-18" y="-5" rx="6" ry="6" width="36" height="10" stroke-width="3.5" stroke="#ff3e04" fill="#fff"><animate attributeType="XML" attributeName="stroke" calcmode="linear" values="#ff3e04;#ff7e64;#ff2e04" dur="1.3s" repeatCount="indefinite" begin="-0.3s"></animate></rect></g><g transform="translate(34,40)"><rect x="-22" y="-5" rx="6" ry="6" width="44" height="10" stroke-width="3.5" stroke="#ff3e04" fill="#fff"><animate attributeType="XML" attributeName="stroke" calcmode="linear" values="#ff3e04;#ff7e64;#ff2e04" dur="1.3s" repeatCount="indefinite" begin="-0.1s"></animate></rect></g><g transform="translate(57,57)"><rect x="-25" y="-5" rx="6" ry="6" width="50" height="10" stroke-width="3.5" stroke="#ff3e04" fill="#fff"><animate attributeType="XML" attributeName="stroke" calcmode="linear" values="#ff3e04;#ff7e64;#ff2e04" dur="1.3s" repeatCount="indefinite" begin="0.1s"></animate></rect></g><g transform="translate(75,74)"><rect x="-22" y="-5" rx="6" ry="6" width="44" height="10" stroke-width="3.5" stroke="#ff3e04" fill="#fff"><animate attributeType="XML" attributeName="stroke" calcmode="linear" values="#ff3e04;#ff7e64;#ff2e04" dur="1.3s" repeatCount="indefinite" begin="0.3s"></animate></rect></g><g transform="translate(54,91)"><rect x="-22" y="-5" rx="6" ry="6" width="44" height="10" stroke-width="3.5" stroke="#ff3e04" fill="#fff"><animate attributeType="XML" attributeName="stroke" calcmode="linear" values="#ff3e04;#ff7e64;#ff2e04" dur="1.3s" repeatCount="indefinite" begin="0.5s"></animate></rect></g></svg>',                    
+                imageResizeFactor: 2.5,
+                text: "Clearing Configurations",
+                textResizeFactor: .3,
+                textOrder: 2,
+                textClass: "adjust-text",
+                background: "rgba(60, 80, 100, 0.2)",
+                imageAnimation: "",
+                imageColor: "",
+                progress: true,
+                progressOrder: 3,
+                progressColor: "#4EB3D3",
+                progressSpeed: 200,
+                progressResizeFactor: 0.05
+            });
+
+            myApp.clearConfigurations()
+            .then(() => {
+                setTimeout(() => {
+                    $.LoadingOverlay("hide");
+                    goToPage('index');
+                }, 1800);
+            });
+        })
+
+    </script>
+
+<script src="./scripts/bubbles.js"></script>
+</body>
+</html>
