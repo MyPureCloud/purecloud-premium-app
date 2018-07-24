@@ -1,6 +1,6 @@
 {
     "txt-greeting": "Hola",
-    "txt-greeting-2": "Bienvenido al ejemplo de la aplicación Premium",
+    "txt-greeting-2": "Bienvenido a la Aplicación de Ejemplo de Aplicación Premium",
     "txt-start": "Inicio",
     "txt-install": "Instalar",
     "txt-summary": "Resumen",
@@ -18,7 +18,7 @@
     "txt-create-instance": "3. Crear instancia",
     "txt-create-instance-msg": "Se crearán más instancias de la aplicación con diferentes puntos finales URI para proporcionar diferentes funciones de la aplicación",
     "txt-please-click": "Haga clic en el botón para comenzar la instalación",
-    "txt-finish-install": "Hemos terminado de instalar Roles, Grupos e Instancias de aplicaciones en su organización",
+    "txt-finish-install": "Espere mientras lo llevamos a la aplicación.",
     "txt-installed": "Instalado",
     "txt-still-installed-1": "La aplicación todavía está configurada total / parcialmente en su organización",
     "txt-still-installed-2": "Presione el botón Restablecer para eliminar toda la configuración existente y reiniciar el proceso de configuración"

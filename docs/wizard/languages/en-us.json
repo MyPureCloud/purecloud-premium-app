@@ -1,6 +1,6 @@
 {
     "txt-greeting": "Hi",
-    "txt-greeting-2": "welcome to the Premium App Example",
+    "txt-greeting-2": "Welcome to the Premium App Example Application",
     "txt-start": "Start",
     "txt-install": "Install",
     "txt-summary": "Summary",
@@ -18,7 +18,7 @@
     "txt-create-instance": "3. Create Instance",
     "txt-create-instance-msg": " More instances of the app will be created with different URI endpoints to provide different features of the app.",
     "txt-please-click": "Please click the button to start the installation.",
-    "txt-finish-install": "We've finished installing the Roles, Groups, and App Instances in your org.",
+    "txt-finish-install": "Please wait while we take you to the application.",
     "txt-installed": "Installed",
     "txt-still-installed-1": "The app is still fully/partially configured in your org.",
     "txt-still-installed-2": "Press the Reset button to delete all existing configuration and restart the configuration process."
