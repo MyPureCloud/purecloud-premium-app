@@ -22,6 +22,8 @@
     <noscript>
         For full functionality of this site it is necessary to enable JavaScript. Here are the <a href="http://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web browser</a>.
     </noscript>
+    <div style="position: fixed; top:0; left:0; z-index: -10; background: #F4571E; width: 100%; height: 100%;"></div>
+    <canvas id="bubbly-layer" style="position: fixed; top:0; left:0; z-index: -5; "></canvas>
 
     <header>
         <img src="logo.png" alt="Logo">
@@ -99,7 +101,7 @@
             </span>
         </p>
 
-        <button id="start" class="btn-info right" style="margin-top: 40px; margin-bottom: 40px;">
+        <button id="start" class="btn-info right">
             <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i>
         </button>
     </main>
@@ -134,11 +136,13 @@
                 .then(() => {
                     setTimeout(() => {
                         $.LoadingOverlay("hide");
-                        goToPage('finish');
+                        goToPage('./finish');
                     }, 1800);
                 })
             });
         });
     </script>
+
+<script src="./scripts/bubbles.js"></script>
 </body>
 </html>
