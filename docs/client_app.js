@@ -226,18 +226,19 @@ clientApp.subscribeToQueue = function(queue){
                 // Create text nodes
                 var idText = document.createTextNode(conversation.conversationId);
                 var nameText = document.createTextNode(caller.participantName);
-                var aniText = document.createTextNode(caller.sessions[0].ani);
-                var dnisText = document.createTextNode(caller.sessions[0].dnis);
-
-                if(agent.sessions[0].mediaType === "voice") {
-                    console.log("CALL || " + agent.sessions[0].mediaType);
+                
+                if(caller.sessions[0].mediaType === "voice") {
                     var typeText = "Call";
-                } else if(agent.sessions[0].mediaType === "chat") {
-                    console.log("CHAT || " + agent.sessions[0].mediaType);
+                    var aniText = document.createTextNode(caller.sessions[0].ani);
+                    var dnisText = document.createTextNode(caller.sessions[0].dnis);
+                } else if(caller.sessions[0].mediaType === "chat") {
                     var typeText = "Chat";
-                } else if(agent.sessions[0].mediaType === "callback") {
-                    console.log("CALLBACK || " + agent.sessions[0].mediaType);
+                    var aniText = document.createTextNode(caller.sessions[0].roomId);
+                    var dnisText = document.createTextNode(caller.sessions[0].roomId);
+                } else if(caller.sessions[1].mediaType === "callback") {
                     var typeText = "Callback";
+                    var aniText = document.createTextNode(caller.sessions[0].ani);
+                    var dnisText = document.createTextNode(caller.sessions[0].dnis);
                 }
 
                 if(agent !== undefined) {
@@ -251,6 +252,15 @@ clientApp.subscribeToQueue = function(queue){
                     var waitText = document.createTextNode("--");
                     var durationText = document.createTextNode("--");
                 }
+
+                console.log("idText || " + idText);
+                console.log("typeText || " + typeText);
+                console.log("nameText || " + nameText);
+                console.log("aniText || " + aniText);
+                console.log("dnisText || " + dnisText);
+                console.log("stateText || " + stateText);
+                console.log("waitText || " + waitText);
+                console.log("durationText || " + durationText);
                 
                 // Append text nodes to cell columns
                 idCell.appendChild(idText);
@@ -261,6 +271,8 @@ clientApp.subscribeToQueue = function(queue){
                 stateCell.appendChild(stateText);
                 waitCell.appendChild(waitText);
                 durationCell.appendChild(durationText);
+
+                console.log("BEFORE ADDING CSS");
 
                 // Add CSS Style
                 idCell.className = "dt-cell value-cell";
