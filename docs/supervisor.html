@@ -265,7 +265,7 @@
             for (var i = 0; i < tr.length; i++) {
                 var td = tr[i].getElementsByTagName("td")[1];
                 if (td) {
-                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    if (td.innerHTML.toUpperCase().search(/\bCall\b/) > -1) {
                         tr[i].style.display = "";
                     } else {
                         tr[i].style.display = "none";
