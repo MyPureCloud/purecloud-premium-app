@@ -213,15 +213,17 @@ clientApp.subscribeToQueue = function(queue){
 
                 // Create cell columns
                 var idCell  = newRow.insertCell(0);
-                var nameCell  = newRow.insertCell(1);
-                var aniCell  = newRow.insertCell(2);
-                var dnisCell  = newRow.insertCell(3);
-                var stateCell  = newRow.insertCell(4);
-                var waitCell  = newRow.insertCell(5);
-                var durationCell  = newRow.insertCell(6);
+                var typeCell  = newRow.insertCell(1);
+                var nameCell  = newRow.insertCell(2);
+                var aniCell  = newRow.insertCell(3);
+                var dnisCell  = newRow.insertCell(4);
+                var stateCell  = newRow.insertCell(5);
+                var waitCell  = newRow.insertCell(6);
+                var durationCell  = newRow.insertCell(7);
 
                 // Create text nodes
                 var idText  = document.createTextNode(conversation.conversationId);
+                var typeText  = document.createTextNode("Call");
                 var nameText  = document.createTextNode(caller.participantName);
                 var aniText  = document.createTextNode(caller.sessions[0].ani);
                 var dnisText  = document.createTextNode(caller.sessions[0].dnis);
@@ -240,6 +242,7 @@ clientApp.subscribeToQueue = function(queue){
                 
                 // Append text nodes to cell columns
                 idCell.appendChild(idText);
+                typeCell.appendChild(typeText);
                 nameCell.appendChild(nameText);
                 aniCell.appendChild(aniText);
                 dnisCell.appendChild(dnisText);
@@ -249,6 +252,7 @@ clientApp.subscribeToQueue = function(queue){
 
                 // Add CSS Style
                 idCell.className = "dt-cell value-cell";
+                typeCell.className = "dt-cell value-cell";
                 nameCell.className = "dt-cell value-cell";
                 aniCell.className = "dt-cell value-cell";
                 dnisCell.className = "dt-cell value-cell";
