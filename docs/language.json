@@ -13,7 +13,8 @@
             "WaitTime": "Wartezeit",
             "Duration": "Dauer",
             "IncomingCall": "Eingehender Anruf",
-            "From": "Von"
+            "From": "Von",
+            "Type": "Art"
         },
 
     "en-us":
@@ -30,7 +31,8 @@
             "WaitTime": "Wait Time",
             "Duration": "Duration",
             "IncomingCall": "Incoming Call",
-            "From": "From"
+            "From": "From",
+            "Type": "Type"
         },
 
     "es":
@@ -47,7 +49,8 @@
             "WaitTime": "Tiempo De Espera",
             "Duration": "Duración",
             "IncomingCall": "Llamada Entrante",
-            "From": "De"
+            "From": "De",
+            "Type": "Tipo"
         },
 
     "fr":
@@ -64,7 +67,8 @@
             "WaitTime": "Temps d'attente",
             "Duration": "Durée",
             "IncomingCall": "Appel entrant",
-            "From": "De"
+            "From": "De",
+            "Type": "Type"
         },
 
     "it":
@@ -81,7 +85,8 @@
             "WaitTime": "Tempo Di Attesa",
             "Duration": "Durata",
             "IncomingCall": "Chiamata in Arrivo",
-            "From": "Da"
+            "From": "Da",
+            "Type": "Tipo"
         },
 
     "ja":
@@ -98,7 +103,8 @@
             "WaitTime": "待ち時間",
             "Duration": "期間",
             "IncomingCall": "電話の着信",
-            "From": "から"
+            "From": "から",
+            "Type": "タイプ"
         },
 
     "ko":
@@ -115,7 +121,8 @@
             "WaitTime": "기다리는 시간",
             "Duration": "지속",
             "IncomingCall": "수신 전화",
-            "From": "에서"
+            "From": "에서",
+            "Type": "유형"
         },
 
     "nl":
@@ -132,7 +139,8 @@
             "WaitTime": "Wacht Tijd",
             "Duration": "Looptijd",
             "IncomingCall": "Binnenkomend Telefoongesprek",
-            "From": "Van"
+            "From": "Van",
+            "Type": "Type"
         },
 
     "no":
@@ -149,7 +157,8 @@
             "WaitTime": "Ventetid",
             "Duration": "Varighet",
             "IncomingCall": "Innkommende Anrop",
-            "From": "Fra"
+            "From": "Fra",
+            "Type": "Type"
         },
 
     "pl":
@@ -166,7 +175,8 @@
             "WaitTime": "Czas Ooczekiwania",
             "Duration": "Trwanie",
             "IncomingCall": "Połączenie Przychodzące",
-            "From": "Od"
+            "From": "Od",
+            "Type": "Rodzaj"
         },
 
     "pt-br":
@@ -183,7 +193,8 @@
             "WaitTime": "Tempo de Espera",
             "Duration": "Duração",
             "IncomingCall": "Chamada Recebida",
-            "From": "De"
+            "From": "De",
+            "Type": "Tipo"
         },
 
     "sv":
@@ -200,7 +211,8 @@
             "WaitTime": "Väntetid",
             "Duration": "Varaktighet",
             "IncomingCall": "Inkommande Samtal",
-            "From": "Från"
+            "From": "Från",
+            "Type": "Typ"
         },
 
     "th":
@@ -217,7 +229,8 @@
             "WaitTime": "รอเวลา",
             "Duration": "ระยะเวลา",
             "IncomingCall": "สายเรียกเข้า",
-            "From": "จาก"
+            "From": "จาก",
+            "Type": "ชนิด"
         },
 
     "tr":
@@ -234,7 +247,8 @@
             "WaitTime": "Bekleme Zamanı",
             "Duration": "Süre",
             "IncomingCall": "Gelen çağrı",
-            "From": "Itibaren"
+            "From": "Itibaren",
+            "Type": "Tip"
         },
 
     "zh-cn":
@@ -251,6 +265,7 @@
             "WaitTime": "等待时间",
             "Duration": "持续时间",
             "IncomingCall": "来电",
-            "From": "从"
+            "From": "从",
+            "Type": "类型"
         }
 }

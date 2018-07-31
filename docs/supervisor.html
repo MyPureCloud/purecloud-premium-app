@@ -205,7 +205,7 @@
                     $("#txtConversations").text(data[langTag].Conversations);
                     $("#txtSubscribe").text(data[langTag].Subscribe + ": ");
                     $("#txtConvId").text(data[langTag].ConversationID);
-                    $("txtConvType").text("Type");
+                    $("txtConvType").text(data[langTag].Type);
                     $("#txtName").text(data[langTag].Name);
                     $("#txtANI").text(data[langTag].ANI);
                     $("#txtDNIS").text(data[langTag].DNIS);
@@ -221,7 +221,7 @@
                 $("#txtConversations").text(data["en-us"].Conversations);
                 $("#txtSubscribe").text(data["en-us"].Subscribe + ": ");
                 $("#txtConvId").text(data["en-us"].ConversationID);
-                $("txtConvType").text("Type");
+                $("txtConvType").text(data["en-us"].Type);
                 $("#txtName").text(data["en-us"].Name);
                 $("#txtANI").text(data["en-us"].ANI);
                 $("#txtDNIS").text(data["en-us"].DNIS);
@@ -251,7 +251,24 @@
         }
 
         function phoneConversations() {
-            alert("PHONE CONVERSATIONS");
+            // // Declare variables 
+            // var input, filter, table, tr, td, i;
+            // input = document.getElementById("myInput");
+            // filter = input.value.toUpperCase();
+            table = document.getElementById("tblCallerDetails");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf("Call") > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                } 
+            }
         }
 
         function callbackConversations() {
@@ -259,7 +276,24 @@
         }
 
         function chatConversations() {
-            alert("CHAT CONVERSATIONS");
+            // // Declare variables 
+            // var input, filter, table, tr, td, i;
+            // input = document.getElementById("myInput");
+            // filter = input.value.toUpperCase();
+            table = document.getElementById("tblCallerDetails");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    if (td.innerHTML.toUpperCase().indexOf("Chat") > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                } 
+            }
         }
 
         function emailConversations() {
