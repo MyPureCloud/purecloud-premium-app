@@ -232,11 +232,11 @@ clientApp.subscribeToQueue = function(queue){
                     var aniText = document.createTextNode(caller.sessions[0].ani);
                     var dnisText = document.createTextNode(caller.sessions[0].dnis);
                 } else if(caller.sessions[0].mediaType === "chat") {
-                    var typeText = document.createTextNode("Chat");;
+                    var typeText = document.createTextNode("Chat");
                     var aniText = document.createTextNode(caller.sessions[0].roomId);
                     var dnisText = document.createTextNode(caller.sessions[0].roomId);
                 } else if(caller.sessions[1].mediaType === "callback") {
-                    var typeText = document.createTextNode("Callback");;
+                    var typeText = document.createTextNode("Callback");
                     var aniText = document.createTextNode(caller.sessions[0].ani);
                     var dnisText = document.createTextNode(caller.sessions[0].dnis);
                 }
