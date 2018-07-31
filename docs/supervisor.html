@@ -175,6 +175,26 @@
                                 </tr>
                             </thead>
                             <tbody class="dt-section dt-section-body scrollable-section">
+                                <tr>
+                                    <td style="display: none">ID</td>
+                                    <td>Call</td>
+                                    <td>Name 1</td>
+                                    <td>ANI 1</td>
+                                    <td>DNIS 1</td>
+                                    <td>State 1</td>
+                                    <td>Wait 1</td>
+                                    <td>Duration 1</td>
+                                </tr>
+                                <tr>
+                                    <td style="display: none">ID</td>
+                                    <td>Chat</td>
+                                    <td>Name 2</td>
+                                    <td>ANI 2</td>
+                                    <td>DNIS 2</td>
+                                    <td>State 2</td>
+                                    <td>Wait 2</td>
+                                    <td>Duration 2</td>
+                                </tr>
                             </tbody>
                         </table> 
                     </div>            
@@ -247,22 +267,25 @@
         }
 
         function allConversations() {
-            alert("ALL CONVERSATIONS");
+            var table = document.getElementById("tblCallerDetails");
+            var tr = table.getElementsByTagName("tr");
+
+            for (var i = 0; i < tr.length; i++) {
+                tr[i].style.display = "";
+            }
         }
 
         function phoneConversations() {
-            // // Declare variables 
-            // var input, filter, table, tr, td, i;
-            // input = document.getElementById("myInput");
-            // filter = input.value.toUpperCase();
-            table = document.getElementById("tblCallerDetails");
-            tr = table.getElementsByTagName("tr");
+            var input = "Call";
+            var filter = input.toUpperCase();
+            var table = document.getElementById("tblCallerDetails");
+            var tr = table.getElementsByTagName("tr");
 
             // Loop through all table rows, and hide those who don't match the search query
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1];
+            for (var i = 0; i < tr.length; i++) {
+                var td = tr[i].getElementsByTagName("td")[1];
                 if (td) {
-                    if (td.innerHTML.toUpperCase().indexOf("Call") > -1) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
                         tr[i].style.display = "";
                     } else {
                         tr[i].style.display = "none";
@@ -276,18 +299,16 @@
         }
 
         function chatConversations() {
-            // // Declare variables 
-            // var input, filter, table, tr, td, i;
-            // input = document.getElementById("myInput");
-            // filter = input.value.toUpperCase();
-            table = document.getElementById("tblCallerDetails");
-            tr = table.getElementsByTagName("tr");
+            var input = "Chat";
+            var filter = input.toUpperCase();
+            var table = document.getElementById("tblCallerDetails");
+            var tr = table.getElementsByTagName("tr");
 
             // Loop through all table rows, and hide those who don't match the search query
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1];
+            for (var i = 0; i < tr.length; i++) {
+                var td = tr[i].getElementsByTagName("td")[1];
                 if (td) {
-                    if (td.innerHTML.toUpperCase().indexOf("Chat") > -1) {
+                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
                         tr[i].style.display = "";
                     } else {
                         tr[i].style.display = "none";
