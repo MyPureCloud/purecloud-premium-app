@@ -14,7 +14,7 @@ body {
 header {
     margin: 0;
     padding: 10px;
-    background-color: #fff;
+    background-color: #F6F6F6;
     border-bottom: 2px solid #DDDDDD
 }
 
@@ -24,23 +24,22 @@ header img {
 }
 
 #loading {
-    color: #fff;
+    color: #DDDDDD;
 }
 
 main {
     margin: auto;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding: 40px 10px 40px 10px;
     margin-top: 20px;
     width: 800px;
     text-align: center;
-    border: 2px solid #fff;
-    border-bottom: 5px solid #fff;
+    border: 1px solid #DDDDDD;
+    border-bottom: 5px solid #DDDDDD;
     border-radius: 1em 1em;
-    background: rgba(250, 250, 250, 0.85);
+    background: rgba(250, 250, 250, 0.9);
     overflow: hidden;
 
-    box-shadow: 10px 10px;
+    box-shadow: 7px 7px #DDDDDD;
 }
 
 p {
@@ -108,7 +107,7 @@ button {
 
 /* Progress */
 .progress-bar {
-    color: #fff;
+    color: #4C4C4C;
     counter-reset: step;
     width: 950px;
     height: 60px;
@@ -159,7 +158,7 @@ button {
 }
 
 .progress-bar li.active {
-    color: #fff;
+    color: #4C4C4C;
 }
 
 .progress-bar li.active::before {
@@ -172,7 +171,7 @@ button {
 }
 
 .progress-bar li.active + li:after {
-    background-color: #fff;
+    background-color: #DDDDDD;
 }
 
 .title {
@@ -180,7 +179,7 @@ button {
     font-size: 2em;
     font-weight: bold;
     text-align: center;
-    color: #fff;
+    color: #4C4C4C;
 }
 
 /* Message-box */
@@ -197,7 +196,7 @@ button {
     font-size: 1em;
     font-weight: bold;
     text-align: left;
-    background-color: #4EB3D3;
+    background-color: #4EB3D3; 
 }
 
 .message-content {
