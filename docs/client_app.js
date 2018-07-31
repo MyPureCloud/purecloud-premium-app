@@ -318,7 +318,7 @@ clientApp.addTableRow = function(data) {
     var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
     
     // Call Conversation Type
-    if(acd.calls !== undefined) {
+    if(caller.calls !== undefined) {
         if ((agent === undefined) && (acd.calls[0].state === "connected")) {
             // Caller on queue
             var newRow   = tableRef.insertRow(tableRef.rows.length);
@@ -401,7 +401,7 @@ clientApp.addTableRow = function(data) {
     }    
 
     // Chat Conversation Type
-    if(acd.chats !== undefined) {
+    if(caller.chats !== undefined) {
         if ((agent === undefined) && (acd.chats[0].state === "connected")) {
             // Caller on queue
             var newRow   = tableRef.insertRow(tableRef.rows.length);
@@ -504,50 +504,102 @@ clientApp.updateTableRow = function(data) {
     let acd = data.eventBody.participants
         .filter(participant => participant.purpose === "acd")[0];
 
-    if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
-        // If incoming call
-        // Update State column
-        $('#tblCallerDetails > tbody> tr').each(function() {
-            var firstTd = $(this).find('td:first');
-            if ($(firstTd).text() == data.eventBody.id) {
-                $(this).find('td:eq(4)').text(agent.calls[0].state);
-                $(this).find('td:eq(5)').text("--");
-                $(this).find('td:eq(6)').text("--");
-            }
-        })
-
-        // Makes sure that the field only changes the first time. 
-        clientApp.isCallActiveSup = false;
-    } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
-        // If active call
-        // Update State and Wait Time columns
-        $('#tblCallerDetails > tbody> tr').each(function() {
-            var firstTd = $(this).find('td:first');
-            if ($(firstTd).text() == data.eventBody.id) {
-                $(this).find('td:eq(4)').text(agent.calls[0].state);
-                $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                $(this).find('td:eq(6)').text("--");
-            }
-        })
-
-        // Makes sure that the field only changes the first time. 
-        clientApp.isCallActiveSup = true;
-    } else if(agent !== undefined) {
-        if (agent.calls[0].state === "disconnected") {
-            // If disconnected call
-            // Update State, Wait Time and Duration columns
+    // Call Conversation Type
+    if(caller.calls !== undefined) {
+        if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
+            // If incoming call
+            // Update State column
+            $('#tblCallerDetails > tbody> tr').each(function() {
+                var firstTd = $(this).find('td:first');
+                if ($(firstTd).text() == data.eventBody.id) {
+                    $(this).find('td:eq(4)').text(agent.calls[0].state);
+                    $(this).find('td:eq(5)').text("--");
+                    $(this).find('td:eq(6)').text("--");
+                }
+            })
+    
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActiveSup = false;
+        } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
+            // If active call
+            // Update State and Wait Time columns
             $('#tblCallerDetails > tbody> tr').each(function() {
                 var firstTd = $(this).find('td:first');
                 if ($(firstTd).text() == data.eventBody.id) {
                     $(this).find('td:eq(4)').text(agent.calls[0].state);
                     $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                    $(this).find('td:eq(6)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                    $(this).find('td:eq(6)').text("--");
                 }
             })
-
+    
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActiveSup = true;
+        } else if(agent !== undefined) {
+            if (agent.calls[0].state === "disconnected") {
+                // If disconnected call
+                // Update State, Wait Time and Duration columns
+                $('#tblCallerDetails > tbody> tr').each(function() {
+                    var firstTd = $(this).find('td:first');
+                    if ($(firstTd).text() == data.eventBody.id) {
+                        $(this).find('td:eq(4)').text(agent.calls[0].state);
+                        $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                        $(this).find('td:eq(6)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                    }
+                })
+    
+                // Makes sure that the field only changes the first time. 
+                clientApp.isCallActiveSup = false;
+            }        
+        }
+    }
+    
+    // Chat Conversation Type
+    if(caller.chats !== undefined) {
+        if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
+            // If incoming chat
+            // Update State column
+            $('#tblCallerDetails > tbody> tr').each(function() {
+                var firstTd = $(this).find('td:first');
+                if ($(firstTd).text() == data.eventBody.id) {
+                    $(this).find('td:eq(4)').text(agent.chats[0].state);
+                    $(this).find('td:eq(5)').text("--");
+                    $(this).find('td:eq(6)').text("--");
+                }
+            })
+    
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
-        }        
+        } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
+            // If active chat
+            // Update State and Wait Time columns
+            $('#tblCallerDetails > tbody> tr').each(function() {
+                var firstTd = $(this).find('td:first');
+                if ($(firstTd).text() == data.eventBody.id) {
+                    $(this).find('td:eq(4)').text(agent.chats[0].state);
+                    $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                    $(this).find('td:eq(6)').text("--");
+                }
+            })
+    
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActiveSup = true;
+        } else if(agent !== undefined) {
+            if (agent.chats[0].state === "disconnected") {
+                // If disconnected chat
+                // Update State, Wait Time and Duration columns
+                $('#tblCallerDetails > tbody> tr').each(function() {
+                    var firstTd = $(this).find('td:first');
+                    if ($(firstTd).text() == data.eventBody.id) {
+                        $(this).find('td:eq(4)').text(agent.chats[0].state);
+                        $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                        $(this).find('td:eq(6)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                    }
+                })
+    
+                // Makes sure that the field only changes the first time. 
+                clientApp.isCallActiveSup = false;
+            }        
+        }
     }
 }
 
