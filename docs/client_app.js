@@ -322,7 +322,7 @@ clientApp.addTableRow = function(data) {
     var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
     
     // Call Conversation Type
-    if(caller.calls !== undefined) {
+    if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks === undefined)) {
         if ((agent === undefined) && (acd.calls[0].state === "connected")) {
             // Caller on queue
             var newRow   = tableRef.insertRow(tableRef.rows.length);
@@ -405,7 +405,7 @@ clientApp.addTableRow = function(data) {
     }    
 
     // Chat Conversation Type
-    if(caller.chats !== undefined) {
+    if((caller.calls === undefined) && (caller.chats !== undefined) && (caller.callbacks === undefined)) {
         if ((agent === undefined) && (acd.chats[0].state === "connected")) {
             // Caller on queue
             var newRow   = tableRef.insertRow(tableRef.rows.length);
@@ -488,7 +488,7 @@ clientApp.addTableRow = function(data) {
     }
 
     // Callback Conversation Type
-    if(caller.callbacks !== undefined) {
+    if((caller.calls === undefined) && (caller.chats === undefined) && (caller.callbacks !== undefined)) {
         if ((agent === undefined) && (acd.callbacks[0].state === "connected")) {
             // Caller on queue
             var newRow   = tableRef.insertRow(tableRef.rows.length);
@@ -592,7 +592,7 @@ clientApp.updateTableRow = function(data) {
         .filter(participant => participant.purpose === "acd")[0];
 
     // Call Conversation Type
-    if(caller.calls !== undefined) {
+    if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks === undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming call
             // Update State column
@@ -641,7 +641,7 @@ clientApp.updateTableRow = function(data) {
     }
     
     // Chat Conversation Type
-    if(caller.chats !== undefined) {
+    if((caller.calls === undefined) && (caller.chats !== undefined) && (caller.callbacks === undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming chat
             // Update State column
@@ -690,7 +690,7 @@ clientApp.updateTableRow = function(data) {
     }
 
     // Callback Conversation Type
-    if(caller.callbacks !== undefined) {
+    if((caller.calls === undefined) && (caller.chats === undefined) && (caller.callbacks !== undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming callback
             // Update State column
