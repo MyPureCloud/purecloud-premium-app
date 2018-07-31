@@ -137,7 +137,7 @@ clientApp.loadSupervisorView = function(){
 }
 
 clientApp.subscribeToQueue = function(queue){
-    // Check if there is an active call
+    // Check if there is an active conversation
     var startDt = new Date();
     startDt.setHours(0,0,0,0);
     startDt.toUTCString();
@@ -195,6 +195,8 @@ clientApp.subscribeToQueue = function(queue){
         ['application/json']
     ).then(data => {
         if(Object.keys(data).length > 0) {
+            console.log(JSON.stringify(data));
+
             (data.conversations).forEach(function(conversation) {
                 let caller = conversation.participants
                     .filter(participant => participant.purpose === "external")[0];
@@ -569,16 +571,6 @@ clientApp.addTableRow = function(data) {
             clientApp.isCallActiveSup = true;
         }
     }
-
-    // Set timer for Caller Wait Time
-    //     var intervalId1 = setInterval(function() {
-    //         var currentDate = new Date();        
-    //         $("#supWaitTime").text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);
-    //     }, 1000);
-    //     $("#supWaitTime").attr("wait-timer-id",intervalId1);
-
-    // Stop timer for Caller Wait Time
-    //     window.clearInterval($("#supWaitTime").attr("wait-timer-id"));
 }
 
 clientApp.updateTableRow = function(data) {
