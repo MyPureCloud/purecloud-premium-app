@@ -8,40 +8,187 @@
 
     <link href='//fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' async type='text/css'>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://dhqbrvplips7x.cloudfront.net/directory/5000/assets/vendor-076c7aa353d2434073d9cda6452233b2.css">
+    <link rel="stylesheet" href="https://dhqbrvplips7x.cloudfront.net/directory/5000/assets/web-directory-cf58866683f864f6e81ea7b74c9eb2d9.css">
 
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/1.0.0/purecloud-client-app-sdk.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/javascript/28.0.0/purecloud-platform-client-v2.min.js"></script>
 </head>
 <body>
+    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <symbol viewBox="0 0 32 32" id="icon-phone">
+            <path d="M13,12.77,15.4,10.4a3.22,3.22,0,0,0,.06-3.53L13.75,3.5a2.15,2.15,0,0,0-3.37-.77A11.57,11.57,0,0,0,6.63,8.36a6,6,0,0,0,.44,4.47l2,4L11.76,22l2.1,4.08a6,6,0,0,0,3.26,3,11.51,11.51,0,0,0,7,.28,2.11,2.11,0,0,0,1.32-3c-.66-1.32-1.32-2.59-2-3.92a3,3,0,0,0-2.65-1.6l-3.64.06Z"/>
+        </symbol>
+        <symbol viewBox="0 0 32 32" id="icon-callback">
+            <path d="M29.65,24.91c-.55-1.1-1.16-2.21-1.71-3.37a2.5,2.5,0,0,0-2.26-1.38l-3.09.06-3.59-7,2-2a2.72,2.72,0,0,0,.06-3L19.66,5.27a1.83,1.83,0,0,0-2.87-.66,10,10,0,0,0-3.2,4.85A5.07,5.07,0,0,0,14,13.27l1.77,3.42L18,21.16l1.77,3.53a5.08,5.08,0,0,0,2.81,2.54,10,10,0,0,0,6,.28,1.89,1.89,0,0,0,1.1-2.59Z"/>
+            <path d="M12,17.63h0l-5.41-.06,1.66-1.65A1.29,1.29,0,0,0,6.47,14.1L2.61,17.9h0a.77.77,0,0,0-.17.22c0,.06-.06.06-.06.11s-.06.06-.06.11-.06.11-.06.17-.06.06-.06.11-.06.17-.06.28h0l.06.06a.21.21,0,0,0,.06.17c0,.06.06.06.06.11s0,.06.06.11a.19.19,0,0,0,.06.11c0,.06.06.06.06.11s.06.11.11.17a.05.05,0,0,0,.06.06h0l3.81,3.86a1.29,1.29,0,0,0,.94.39,1.1,1.1,0,0,0,.88-.39,1.3,1.3,0,0,0,0-1.82L6.64,20.11H12.1a1.25,1.25,0,0,0,1.27-1.27A1.29,1.29,0,0,0,12,17.63Z"/>
+        </symbol>
+        <symbol viewBox="0 0 32 32" id="icon-chat">
+            <path d="M16,3.13C8.41,3.13,2.23,8.26,2.23,14.66a10.21,10.21,0,0,0,2.48,6.57.68.68,0,0,1,.11.55l-2,6.29a.61.61,0,0,0,.88.72L9.9,25.2a.54.54,0,0,1,.5-.06,16.64,16.64,0,0,0,5.57,1c7.61,0,13.79-5.13,13.79-11.53S23.64,3.13,16,3.13Z"/>
+        </symbol>
+        <symbol viewBox="0 0 32 32" id="icon-envelope">
+            <path d="M25.22,5H6.62c-2.37,0-4.3.5-4.41,2.87a.72.72,0,0,0,.44.66l11.59,5.9a3.69,3.69,0,0,0,1.71.39,4,4,0,0,0,1.6-.39L29.24,8.8A1,1,0,0,0,29.79,8V7.75C29.79,5.32,27.64,5,25.22,5Z"/>
+            <path d="M3.26,12.44a.7.7,0,0,0-.66,0c-.44.22-.39.55-.39.88v10.1A3.58,3.58,0,0,0,5.79,27h20.8a3.2,3.2,0,0,0,3.2-3.2V13.1a.71.71,0,0,0-.5-.72,1.51,1.51,0,0,0-.88.11L17.44,18a3.39,3.39,0,0,1-3.09,0L3.26,12.44Z"/>
+        </symbol>
+        <symbol viewBox="0 0 32 32" id="icon-comment-ellipsis">
+            <path d="M2.2,9.5v8A5.93,5.93,0,0,0,8.11,23.4h7.47a.82.82,0,0,1,.62.28,56,56,0,0,0,4.71,4.52,1,1,0,0,0,1.59-.68c.12-1.41-.28-4,.89-4.09l.5,0A5.93,5.93,0,0,0,29.8,17.5v-8a5.93,5.93,0,0,0-5.9-5.92H8.11A5.93,5.93,0,0,0,2.2,9.5ZM20,13.5a1.74,1.74,0,1,1,1.74,1.74A1.74,1.74,0,0,1,20,13.5Zm-5.75,0A1.74,1.74,0,1,1,16,15.23,1.74,1.74,0,0,1,14.26,13.5Zm-5.75,0a1.74,1.74,0,1,1,1.74,1.74A1.74,1.74,0,0,1,8.52,13.5Z"/>
+        </symbol>
+        <symbol viewBox="0 0 32 32" id="icon-calendar-dots-day">
+            <path d="M18.5,16A2.5,2.5,0,1,1,16,13.5,2.5,2.5,0,0,1,18.5,16Z"/>
+        </symbol>
+        <symbol viewBox="0 0 32 32" id="icon-calendar-dots-week">
+            <path d="M24.5,16A2.5,2.5,0,1,1,22,13.5,2.5,2.5,0,0,1,24.5,16Z"/>
+            <path d="M30.4,16a2.5,2.5,0,1,1-2.5-2.5A2.5,2.5,0,0,1,30.4,16Z"/>
+            <path d="M18.5,16A2.5,2.5,0,1,1,16,13.5,2.5,2.5,0,0,1,18.5,16Z"/>
+            <path d="M12.5,16A2.5,2.5,0,1,1,10,13.5,2.5,2.5,0,0,1,12.5,16Z"/>
+            <path d="M6.6,16a2.5,2.5,0,1,1-2.5-2.5A2.5,2.5,0,0,1,6.6,16Z"/>
+        </symbol>
+        <symbol viewBox="0 0 32 32" id="icon-calendar-dots-month">
+            <path d="M24.5,16A2.5,2.5,0,1,1,22,13.5,2.5,2.5,0,0,1,24.5,16Z"/>
+            <path d="M30.4,16a2.5,2.5,0,1,1-2.5-2.5A2.5,2.5,0,0,1,30.4,16Z"/>
+            <path d="M18.5,16A2.5,2.5,0,1,1,16,13.5,2.5,2.5,0,0,1,18.5,16Z"/>
+            <path d="M12.5,16A2.5,2.5,0,1,1,10,13.5,2.5,2.5,0,0,1,12.5,16Z"/>
+            <path d="M6.6,16a2.5,2.5,0,1,1-2.5-2.5A2.5,2.5,0,0,1,6.6,16Z"/>
+            <path d="M24.5,22A2.5,2.5,0,1,1,22,19.5,2.5,2.5,0,0,1,24.5,22Z"/>
+            <path d="M18.5,22A2.5,2.5,0,1,1,16,19.5,2.5,2.5,0,0,1,18.5,22Z"/>
+            <path d="M12.5,22A2.5,2.5,0,1,1,10,19.5,2.5,2.5,0,0,1,12.5,22Z"/>
+            <path d="M6.6,22a2.5,2.5,0,1,1-2.5-2.5A2.5,2.5,0,0,1,6.6,22Z"/>
+            <path d="M24.5,10A2.5,2.5,0,1,1,22,7.5,2.5,2.5,0,0,1,24.5,10Z"/>
+            <path d="M30.4,10a2.5,2.5,0,1,1-2.5-2.5A2.5,2.5,0,0,1,30.4,10Z"/>
+            <path d="M18.5,10A2.5,2.5,0,1,1,16,7.5,2.5,2.5,0,0,1,18.5,10Z"/>
+            <path d="M12.5,10A2.5,2.5,0,1,1,10,7.5,2.5,2.5,0,0,1,12.5,10Z"/>
+        </symbol>
+        <symbol viewBox="0 0 32 32" id="icon-calendar-range">
+            <path d="M27.65,26.85a1.79,1.79,0,0,1-1.8,1.8H6.05a1.79,1.79,0,0,1-1.8-1.8v-18a1.79,1.79,0,0,1,1.8-1.8h1.8V5.65a2.33,2.33,0,0,1,2.3-2.3H11a2.33,2.33,0,0,1,2.3,2.3v1.4h5.4V5.65A2.33,2.33,0,0,1,21,3.35h.9a2.33,2.33,0,0,1,2.3,2.3v1.4h1.8a1.79,1.79,0,0,1,1.8,1.8v18Zm-1.8,0V12.45H6v14.4ZM11.45,5.65a.47.47,0,0,0-.5-.5H10a.47.47,0,0,0-.5.5v4.1a.47.47,0,0,0,.5.5h.9a.47.47,0,0,0,.5-.5Zm10.8,0a.47.47,0,0,0-.5-.5h-.8a.47.47,0,0,0-.5.5v4.1a.47.47,0,0,0,.5.5h.9a.47.47,0,0,0,.5-.5V5.65Z"/>
+            <path d="M22.95,18.85h0l-3-3a1,1,0,0,0-1.4,1.4l1.3,1.3h-7.7l1.3-1.3a1,1,0,0,0-1.4-1.4l-3,2.9-.1.1a1,1,0,0,0-.3.8,1.14,1.14,0,0,0,.3.8h0l2.9,3a1.06,1.06,0,0,0,1.2.2c.1-.1.2-.1.3-.2a1,1,0,0,0,0-1.4L12,20.65h7.8L18.55,22a1,1,0,0,0,0,1.4c.1.1.2.2.3.2a1.09,1.09,0,0,0,1.2-.2l2.9-3,.1-.1a1.14,1.14,0,0,0,.3-.8A.75.75,0,0,0,22.95,18.85Z"/>
+        </symbol>
+    </svg>
     <div>
         <button class="btn-info right" onclick="window.location='./wizard/uninstall.html'">Uninstall App</button>
     </div>
     <h1 id="txtQueue"></h1>
-    <div>        
-        <div style="margin-bottom: 20px">
-            <div id="txtSubscribe" class="floating field-title" style="display: inline-block;"></div>
-            <select id="ddlQueues" name="queues" onChange="subscribeToQueue()" style="display: inline-block;" dir="ltr"></select>
+    <div class="ember-engine-queues-main-content">
+        <div class="secondary-nav-bar">
+            <div class="engage-components-date-span-picker ember-view">
+                <span class="span-picker-section button-bar-section border-right section-day  active-span button-bar-active">
+                    <button title="Day" class="select-span">
+                        <svg class="svg-icon">
+                            <use xlink:href="#icon-calendar-dots-day"></use>
+                        </svg>
+                    </button>
+                </span>
+                <span class="span-picker-section button-bar-section border-right section-week">
+                    <button title="Week" class="select-span">
+                        <svg class="svg-icon">
+                            <use xlink:href="#icon-calendar-dots-week"></use>
+                        </svg>
+                    </button>
+                </span>
+                <span class="span-picker-section button-bar-section border-right section-month">
+                    <button title="Month" class="select-span">
+                        <svg class="svg-icon">
+                            <use xlink:href="#icon-calendar-dots-month"></use>
+                        </svg>
+                    </button>
+                </span>
+                <span class="span-picker-section button-bar-section border-right section-custom ">
+                    <button title="Custom" class="select-span">
+                        <svg class="svg-icon">
+                            <use xlink:href="#icon-calendar-range"></use>
+                        </svg>
+                    </button>
+                </span>
+            </div>
         </div>
-        <table id="tblCallerDetails">
-            <thead>
-                <tr>
-                    <th id="txtConvId" style="display: none"></th>
-                    <th id="txtName"></th>
-                    <th id="txtANI"></th>
-                    <th id="txtDNIS"></th>
-                    <th id="txtState"></th>
-                    <th id="txtWait"></th>
-                    <th id="txtDuration"></th>
-                </tr>
-            </thead>
-            <tbody>
-
-            </tbody>
-        </table>        
-    </div>
-
-    
+        <div class="interaction-search-content filter-view-content">
+            <div class="pager" style="margin-bottom: 20px">
+                    <div id="txtSubscribe" class="floating field-title" style="display: inline-block;"></div>
+                    <select id="ddlQueues" name="queues" onChange="subscribeToQueue()" style="display: inline-block;" dir="ltr"></select>
+                </div>
+                <div class="filter-bar">
+                    <div class="filter-sections">
+                        <div class="filter-section filter-left media-type-filter ember-view">
+                            <span class="all-media-types selected-media-type">ALL</span>
+                            <span class="media-type-filter-icon media-type-phone">
+                                <span class="media-icon ember-view">
+                                    <svg class="svg-icon icon-phone">
+                                        <use xlink:href="#icon-phone"></use>
+                                    </svg>
+                                </span>
+                                <span class="media-type-filter-name filter-name-phone">PHONE</span>
+                            </span>
+                            <span class="media-type-filter-icon media-type-callback"><span class="media-icon ember-view">
+                                    <svg class="svg-icon icon-callback">
+                                        <use xlink:href="#icon-callback"></use>
+                                    </svg>
+                                </span>
+                                <span class="media-type-filter-name filter-name-phone">CALLBACK</span>
+                            </span>
+                            <span class="media-type-filter-icon media-type-chat">
+                                <span class="media-icon ember-view">
+                                        <svg class="svg-icon icon-chat">
+                                            <use xlink:href="#icon-chat"></use>
+                                        </svg>
+                                    </span>
+                                    <span class="media-type-filter-name filter-name-phone">CHAT</span>
+                            </span>
+                            <span class="media-type-filter-icon media-type-email"><span class="media-icon ember-view">
+                                    <svg class="svg-icon icon-envelope">
+                                        <use xlink:href="#icon-envelope"></use>
+                                    </svg>
+                                </span>
+                                <span class="media-type-filter-name filter-name-phone">EMAIL</span>
+                            </span>
+                            <span class="media-type-filter-icon media-type-message"><span class="media-icon ember-view">
+                                    <svg class="svg-icon icon-comment-ellipsis">
+                                        <use xlink:href="#icon-comment-ellipsis"></use>
+                                    </svg>
+                                </span>
+                                <span class="media-type-filter-name filter-name-phone">MESSAGE</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="l-scroll-table-stretch data-table column-picker-toggle ember-view">
+                    <div class="dt-horiz-scrollable">
+                        <table id="tblCallerDetails">
+                            <thead class="dt-section dt-section-head">
+                                <tr class="dt-row header-row sortable-objects ember-view">
+                                    <th id="txtConvId" style="display: none"></th>
+                                    <th id="txtName"></th>
+                                    <th id="txtANI"></th>
+                                    <th id="txtDNIS"></th>
+                                    <th id="txtState"></th>
+                                    <th id="txtWait"></th>
+                                    <th id="txtDuration"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="dt-section dt-section-body scrollable-section">
+                                <!-- <tr>
+                                    <td class="dt-cell value-cell" style="display: none">ConversationID</td>
+                                    <td class="dt-cell value-cell">Name 1</td>
+                                    <td class="dt-cell value-cell">ANI 1</td>
+                                    <td class="dt-cell value-cell">DNIS 1</td>
+                                    <td class="dt-cell value-cell">State 1</td>
+                                    <td class="dt-cell value-cell">Wait 1</td>
+                                    <td class="dt-cell value-cell">Duration 1</td>
+                                </tr>
+                                <tr>
+                                    <td class="dt-cell value-cell" style="display: none">ConversationID</td>
+                                    <td class="dt-cell value-cell">Name 2</td>
+                                    <td class="dt-cell value-cell">ANI 2</td>
+                                    <td class="dt-cell value-cell">DNIS 2</td>
+                                    <td class="dt-cell value-cell">State 2</td>
+                                    <td class="dt-cell value-cell">Wait 2</td>
+                                    <td class="dt-cell value-cell">Duration 2</td>
+                                </tr> -->
+                            </tbody>
+                        </table> 
+                    </div>            
+                </div>               
+        </div>        
+    </div>    
 
     <script type="module">
         import clientApp from './client_app.js';

@@ -8,7 +8,7 @@ let clientApp = {};
 // PureCloud OAuth information
 const platformClient = require('platformClient');
 const client = platformClient.ApiClient.instance;
-// const redirectUri = "http://localhost:3000";
+// const redirectUri = "http://localhost:3000/";
 const redirectUri = "https://mypurecloud.github.io/purecloud-premium-app/";
 
 // API instances
@@ -246,6 +246,15 @@ clientApp.subscribeToQueue = function(queue){
                 stateCell.appendChild(stateText);
                 waitCell.appendChild(waitText);
                 durationCell.appendChild(durationText);
+
+                // Add CSS Style
+                idCell.className = "dt-cell value-cell";
+                nameCell.className = "dt-cell value-cell";
+                aniCell.className = "dt-cell value-cell";
+                dnisCell.className = "dt-cell value-cell";
+                stateCell.className = "dt-cell value-cell";
+                waitCell.className = "dt-cell value-cell";
+                durationCell.className = "dt-cell value-cell";
 
                 // Make sure Conversation ID column is always hidden
                 idCell.hidden = true;
