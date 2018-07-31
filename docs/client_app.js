@@ -292,6 +292,8 @@ clientApp.onSocketMessageQueue = function(event){
     let data = JSON.parse(event.data);
     let topic = data.topicName;
 
+    console.log(JSON.stringify(data));
+
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
         // Check to see if Conversation details is already displayed in the view

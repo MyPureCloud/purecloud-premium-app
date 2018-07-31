@@ -67,7 +67,13 @@
     <div>
         <button class="btn-info right" onclick="window.location='./wizard/uninstall.html'">Uninstall App</button>
     </div>
-    <h1 id="txtQueue"></h1>
+    <nav class="ember-engine-queues-navigation">
+        <div class="breadcrumb-bar ember-view">
+            <ol class="breadcrumbs">
+                <li id="txtConversations" class=" breadcrumb-interaction-search"></li>
+            </ol>
+        </div>
+    </nav>
     <div class="ember-engine-queues-main-content">
         <div class="secondary-nav-bar">
             <div class="engage-components-date-span-picker ember-view">
@@ -109,8 +115,8 @@
                 <div class="filter-bar">
                     <div class="filter-sections">
                         <div class="filter-section filter-left media-type-filter ember-view">
-                            <span class="all-media-types selected-media-type">ALL</span>
-                            <span class="media-type-filter-icon media-type-phone">
+                            <span class="all-media-types" onClick="allConversations()">ALL</span>
+                            <span class="media-type-filter-icon media-type-phone" onClick="phoneConversations()">
                                 <span class="media-icon ember-view">
                                     <svg class="svg-icon icon-phone">
                                         <use xlink:href="#icon-phone"></use>
@@ -118,14 +124,15 @@
                                 </span>
                                 <span class="media-type-filter-name filter-name-phone">PHONE</span>
                             </span>
-                            <span class="media-type-filter-icon media-type-callback"><span class="media-icon ember-view">
+                            <span class="media-type-filter-icon media-type-callback" onClick="callbackConversations()">
+                                <span class="media-icon ember-view">
                                     <svg class="svg-icon icon-callback">
                                         <use xlink:href="#icon-callback"></use>
                                     </svg>
                                 </span>
                                 <span class="media-type-filter-name filter-name-phone">CALLBACK</span>
                             </span>
-                            <span class="media-type-filter-icon media-type-chat">
+                            <span class="media-type-filter-icon media-type-chat" onClick="chatConversations()">
                                 <span class="media-icon ember-view">
                                         <svg class="svg-icon icon-chat">
                                             <use xlink:href="#icon-chat"></use>
@@ -133,14 +140,16 @@
                                     </span>
                                     <span class="media-type-filter-name filter-name-phone">CHAT</span>
                             </span>
-                            <span class="media-type-filter-icon media-type-email"><span class="media-icon ember-view">
+                            <span class="media-type-filter-icon media-type-email" onClick="emailConversations()">
+                                <span class="media-icon ember-view">
                                     <svg class="svg-icon icon-envelope">
                                         <use xlink:href="#icon-envelope"></use>
                                     </svg>
                                 </span>
                                 <span class="media-type-filter-name filter-name-phone">EMAIL</span>
                             </span>
-                            <span class="media-type-filter-icon media-type-message"><span class="media-icon ember-view">
+                            <span class="media-type-filter-icon media-type-message" onClick="messageConversations()">
+                                <span class="media-icon ember-view">
                                     <svg class="svg-icon icon-comment-ellipsis">
                                         <use xlink:href="#icon-comment-ellipsis"></use>
                                     </svg>
@@ -192,7 +201,7 @@
             
             if (langTag !== null) {
                 $.getJSON('./language.json', function(data) {
-                    $("#txtQueue").text(data[langTag].Queues);
+                    $("#txtConversations").text(data[langTag].Conversations);
                     $("#txtSubscribe").text(data[langTag].Subscribe + ": ");
                     $("#txtConvId").text(data[langTag].ConversationID);
                     $("#txtName").text(data[langTag].Name);
@@ -207,7 +216,7 @@
 
         if(langTag === null){
             $.getJSON('./language.json', function(data) {
-                $("#txtQueue").text(data["en-us"].Queues);
+                $("#txtConversations").text(data["en-us"].Conversations);
                 $("#txtSubscribe").text(data["en-us"].Subscribe + ": ");
                 $("#txtConvId").text(data["en-us"].ConversationID);
                 $("#txtName").text(data["en-us"].Name);
@@ -232,6 +241,30 @@
             var queueText = queue.options[queue.selectedIndex].text;
 
             clientApp.subscribeToQueue(queueValue);
+        }
+
+        function allConversations() {
+            alert("ALL CONVERSATIONS");
+        }
+
+        function phoneConversations() {
+            alert("PHONE CONVERSATIONS");
+        }
+
+        function callbackConversations() {
+            alert("CALLBACK CONVERSATIONS");
+        }
+
+        function chatConversations() {
+            alert("CHAT CONVERSATIONS");
+        }
+
+        function emailConversations() {
+            alert("EMAIL CONVERSATIONS");
+        }
+
+        function messageConversations() {
+            alert("MESSAGE CONVERSATIONS");
         }
     </script>
 </body>
