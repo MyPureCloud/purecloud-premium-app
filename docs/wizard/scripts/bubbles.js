@@ -81,7 +81,7 @@ class GenesysShape{
             });
         }
         //console.log(GenesysShape.shapes.length);
-        setTimeout(GenesysShape.addShapes, 1000, ctx);
+        setTimeout(GenesysShape.addShapes, 2000, ctx);
     }
     
     /**
@@ -118,6 +118,7 @@ class GenesysShape{
         shapes.forEach((shape) => {
             sizes.forEach((size) => {
                 blurLevels.forEach((blur) => {
+                    let opacity_multipier = 4;
                     let t_canv = document.createElement('canvas');
                     
                     let t_cnxt = t_canv.getContext('2d');
@@ -127,13 +128,13 @@ class GenesysShape{
                             t_canv.width = size;
                             t_canv.height = size;
                             GenesysShape.drawShape(t_cnxt, shape, size * 0.83, size * 0.5, size, 
-                                        1.0 / (blur + 1.7), blur);
+                                        1.0 / (blur + opacity_multipier), blur);
                             break;
                         case "oblong":
                             t_canv.width = size * 2;
                             t_canv.height = size * 0.8;
                             GenesysShape.drawShape(t_cnxt, shape, size * 0.4, size * 0.15, size, 
-                                        1.0 / (blur + 1.7), blur);
+                                        1.0 / (blur + opacity_multipier), blur);
                             break;
                     }
                     // t_cnxt.fillStyle = "rgba(0,0,0,0.1)";
@@ -162,7 +163,7 @@ class GenesysShape{
         ctx.filter = "blur(" + blur + "px)";
         //opacity = Math.floor(255 * opacity);
         //console.log(opacity);
-        ctx.strokeStyle = "rgba(255, 255, 255, " + opacity + " )";
+        ctx.strokeStyle = "rgba(244, 87, 30, " + opacity + " )";
         let radius = 0;
 
         switch(shape){
