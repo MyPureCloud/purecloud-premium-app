@@ -485,7 +485,90 @@ clientApp.addTableRow = function(data) {
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         }
-    }    
+    }
+
+    // Callback Conversation Type
+    if(caller.callbacks !== undefined) {
+        if ((agent === undefined) && (acd.callbacks[0].state === "connected")) {
+            // Caller on queue
+            var newRow   = tableRef.insertRow(tableRef.rows.length);
+    
+            // Create Cell columns
+            var idCell  = newRow.insertCell(0);
+            var typeCell  = newRow.insertCell(1);
+            var nameCell  = newRow.insertCell(2);
+            var aniCell  = newRow.insertCell(3);
+            var dnisCell  = newRow.insertCell(4);
+            var stateCell  = newRow.insertCell(5);
+            var waitCell  = newRow.insertCell(6);
+            var durationCell  = newRow.insertCell(7);
+    
+            // Create text nodes
+            var idText  = document.createTextNode(data.eventBody.id);
+            var typeText  = document.createTextNode("Callback");
+            var nameText  = document.createTextNode(caller.name);
+            var aniText  = document.createTextNode(caller.address);
+            var dnisText  = document.createTextNode(caller.calls[0].other.addressNormalized);
+            var stateText  = document.createTextNode("on queue");
+            var waitText  = document.createTextNode("--");
+            var durationText  = document.createTextNode("--");
+    
+            // Append text nodes to cell columns
+            idCell.appendChild(idText);
+            typeCell.appendChild(typeText);
+            nameCell.appendChild(nameText);
+            aniCell.appendChild(aniText);
+            dnisCell.appendChild(dnisText);
+            stateCell.appendChild(stateText);
+            waitCell.appendChild(waitText);
+            durationCell.appendChild(durationText);
+    
+            // Make sure Conversation ID column is always hidden
+            idCell.hidden = true;
+    
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActiveSup = false;
+        } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
+            // If incoming call
+            var newRow   = tableRef.insertRow(tableRef.rows.length);
+    
+            // Create Cell columns
+            var idCell  = newRow.insertCell(0);
+            var typeCell  = newRow.insertCell(1);
+            var nameCell  = newRow.insertCell(2);
+            var aniCell  = newRow.insertCell(3);
+            var dnisCell  = newRow.insertCell(4);
+            var stateCell  = newRow.insertCell(5);
+            var waitCell  = newRow.insertCell(6);
+            var durationCell  = newRow.insertCell(7);
+    
+            // Create text nodes
+            var idText  = document.createTextNode(data.eventBody.id);
+            var typeText  = document.createTextNode("Callback");
+            var nameText  = document.createTextNode(caller.name);
+            var aniText  = document.createTextNode(caller.address);
+            var dnisText  = document.createTextNode(caller.calls[0].other.addressNormalized);
+            var stateText  = document.createTextNode(agent.callbacks[0].state);
+            var waitText  = document.createTextNode("--");
+            var durationText  = document.createTextNode("--");
+    
+            // Append text nodes to cell columns
+            idCell.appendChild(idText);
+            typeCell.appendChild(typeText);
+            nameCell.appendChild(nameText);
+            aniCell.appendChild(aniText);
+            dnisCell.appendChild(dnisText);
+            stateCell.appendChild(stateText);
+            waitCell.appendChild(waitText);
+            durationCell.appendChild(durationText);
+    
+            // Make sure Conversation ID column is always hidden
+            idCell.hidden = true;
+    
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActiveSup = true;
+        }
+    }
 
     // Set timer for Caller Wait Time
     //     var intervalId1 = setInterval(function() {
@@ -595,6 +678,55 @@ clientApp.updateTableRow = function(data) {
                     var firstTd = $(this).find('td:first');
                     if ($(firstTd).text() == data.eventBody.id) {
                         $(this).find('td:eq(5)').text(agent.chats[0].state);
+                        $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                        $(this).find('td:eq(7)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                    }
+                })
+    
+                // Makes sure that the field only changes the first time. 
+                clientApp.isCallActiveSup = false;
+            }        
+        }
+    }
+
+    // Callback Conversation Type
+    if(caller.callbacks !== undefined) {
+        if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
+            // If incoming callback
+            // Update State column
+            $('#tblCallerDetails > tbody> tr').each(function() {
+                var firstTd = $(this).find('td:first');
+                if ($(firstTd).text() == data.eventBody.id) {
+                    $(this).find('td:eq(5)').text(agent.callbacks[0].state);
+                    $(this).find('td:eq(6)').text("--");
+                    $(this).find('td:eq(7)').text("--");
+                }
+            })
+    
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActiveSup = false;
+        } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
+            // If active callback
+            // Update State and Wait Time columns
+            $('#tblCallerDetails > tbody> tr').each(function() {
+                var firstTd = $(this).find('td:first');
+                if ($(firstTd).text() == data.eventBody.id) {
+                    $(this).find('td:eq(5)').text(agent.callbacks[0].state);
+                    $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                    $(this).find('td:eq(7)').text("--");
+                }
+            })
+    
+            // Makes sure that the field only changes the first time. 
+            clientApp.isCallActiveSup = true;
+        } else if(agent !== undefined) {
+            if (agent.chats[0].state === "disconnected") {
+                // If disconnected callback
+                // Update State, Wait Time and Duration columns
+                $('#tblCallerDetails > tbody> tr').each(function() {
+                    var firstTd = $(this).find('td:first');
+                    if ($(firstTd).text() == data.eventBody.id) {
+                        $(this).find('td:eq(5)').text(agent.callbacks[0].state);
                         $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
                         $(this).find('td:eq(7)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
                     }
