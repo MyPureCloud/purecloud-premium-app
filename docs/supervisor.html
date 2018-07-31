@@ -256,8 +256,6 @@
         }
 
         function phoneConversations() {
-            var input = "Call";
-            var filter = input.toUpperCase();
             var table = document.getElementById("tblCallerDetails");
             var tr = table.getElementsByTagName("tr");
 
@@ -265,7 +263,7 @@
             for (var i = 0; i < tr.length; i++) {
                 var td = tr[i].getElementsByTagName("td")[1];
                 if (td) {
-                    if (td.innerHTML.toUpperCase().search(/\bCall\b/) > -1) {
+                    if (td.innerHTML.search(/\bCall\b/) > -1) {
                         tr[i].style.display = "";
                     } else {
                         tr[i].style.display = "none";
@@ -275,8 +273,6 @@
         }
 
         function callbackConversations() {
-            var input = "Callback";
-            var filter = input.toUpperCase();
             var table = document.getElementById("tblCallerDetails");
             var tr = table.getElementsByTagName("tr");
 
@@ -284,7 +280,7 @@
             for (var i = 0; i < tr.length; i++) {
                 var td = tr[i].getElementsByTagName("td")[1];
                 if (td) {
-                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    if (td.innerHTML.search(/\bCallback\b/) > -1) {
                         tr[i].style.display = "";
                     } else {
                         tr[i].style.display = "none";
@@ -294,8 +290,6 @@
         }
 
         function chatConversations() {
-            var input = "Chat";
-            var filter = input.toUpperCase();
             var table = document.getElementById("tblCallerDetails");
             var tr = table.getElementsByTagName("tr");
 
@@ -303,7 +297,7 @@
             for (var i = 0; i < tr.length; i++) {
                 var td = tr[i].getElementsByTagName("td")[1];
                 if (td) {
-                    if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    if (td.innerHTML.search(/\bChat\b/) > -1) {
                         tr[i].style.display = "";
                     } else {
                         tr[i].style.display = "none";
