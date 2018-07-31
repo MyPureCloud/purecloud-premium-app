@@ -228,14 +228,16 @@ clientApp.subscribeToQueue = function(queue){
                 var nameText = document.createTextNode(caller.participantName);
                 var aniText = document.createTextNode(caller.sessions[0].ani);
                 var dnisText = document.createTextNode(caller.sessions[0].dnis);
-                var typeText = null;
 
                 if(agent.sessions[0].mediaType === "voice") {
-                    typeText = "Call";
+                    console.log("CALL || " + agent.sessions[0].mediaType);
+                    var typeText = "Call";
                 } else if(agent.sessions[0].mediaType === "chat") {
-                    typeText = "Chat";
+                    console.log("CHAT || " + agent.sessions[0].mediaType);
+                    var typeText = "Chat";
                 } else if(agent.sessions[0].mediaType === "callback") {
-                    typeText = "Callback";
+                    console.log("CALLBACK || " + agent.sessions[0].mediaType);
+                    var typeText = "Callback";
                 }
 
                 if(agent !== undefined) {
