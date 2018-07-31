@@ -516,9 +516,9 @@ clientApp.updateTableRow = function(data) {
             $('#tblCallerDetails > tbody> tr').each(function() {
                 var firstTd = $(this).find('td:first');
                 if ($(firstTd).text() == data.eventBody.id) {
-                    $(this).find('td:eq(4)').text(agent.calls[0].state);
-                    $(this).find('td:eq(5)').text("--");
+                    $(this).find('td:eq(5)').text(agent.calls[0].state);
                     $(this).find('td:eq(6)').text("--");
+                    $(this).find('td:eq(7)').text("--");
                 }
             })
     
@@ -530,9 +530,9 @@ clientApp.updateTableRow = function(data) {
             $('#tblCallerDetails > tbody> tr').each(function() {
                 var firstTd = $(this).find('td:first');
                 if ($(firstTd).text() == data.eventBody.id) {
-                    $(this).find('td:eq(4)').text(agent.calls[0].state);
-                    $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                    $(this).find('td:eq(6)').text("--");
+                    $(this).find('td:eq(5)').text(agent.calls[0].state);
+                    $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                    $(this).find('td:eq(7)').text("--");
                 }
             })
     
@@ -545,9 +545,9 @@ clientApp.updateTableRow = function(data) {
                 $('#tblCallerDetails > tbody> tr').each(function() {
                     var firstTd = $(this).find('td:first');
                     if ($(firstTd).text() == data.eventBody.id) {
-                        $(this).find('td:eq(4)').text(agent.calls[0].state);
-                        $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                        $(this).find('td:eq(6)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                        $(this).find('td:eq(5)').text(agent.calls[0].state);
+                        $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                        $(this).find('td:eq(7)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
                     }
                 })
     
@@ -565,9 +565,9 @@ clientApp.updateTableRow = function(data) {
             $('#tblCallerDetails > tbody> tr').each(function() {
                 var firstTd = $(this).find('td:first');
                 if ($(firstTd).text() == data.eventBody.id) {
-                    $(this).find('td:eq(4)').text(agent.chats[0].state);
-                    $(this).find('td:eq(5)').text("--");
+                    $(this).find('td:eq(5)').text(agent.chats[0].state);
                     $(this).find('td:eq(6)').text("--");
+                    $(this).find('td:eq(7)').text("--");
                 }
             })
     
@@ -579,9 +579,9 @@ clientApp.updateTableRow = function(data) {
             $('#tblCallerDetails > tbody> tr').each(function() {
                 var firstTd = $(this).find('td:first');
                 if ($(firstTd).text() == data.eventBody.id) {
-                    $(this).find('td:eq(4)').text(agent.chats[0].state);
-                    $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                    $(this).find('td:eq(6)').text("--");
+                    $(this).find('td:eq(5)').text(agent.chats[0].state);
+                    $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                    $(this).find('td:eq(7)').text("--");
                 }
             })
     
@@ -594,9 +594,9 @@ clientApp.updateTableRow = function(data) {
                 $('#tblCallerDetails > tbody> tr').each(function() {
                     var firstTd = $(this).find('td:first');
                     if ($(firstTd).text() == data.eventBody.id) {
-                        $(this).find('td:eq(4)').text(agent.chats[0].state);
-                        $(this).find('td:eq(5)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                        $(this).find('td:eq(6)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                        $(this).find('td:eq(5)').text(agent.chats[0].state);
+                        $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
+                        $(this).find('td:eq(7)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
                     }
                 })
     
