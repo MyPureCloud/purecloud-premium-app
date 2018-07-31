@@ -165,24 +165,6 @@
                                 </tr>
                             </thead>
                             <tbody class="dt-section dt-section-body scrollable-section">
-                                <!-- <tr>
-                                    <td class="dt-cell value-cell" style="display: none">ConversationID</td>
-                                    <td class="dt-cell value-cell">Name 1</td>
-                                    <td class="dt-cell value-cell">ANI 1</td>
-                                    <td class="dt-cell value-cell">DNIS 1</td>
-                                    <td class="dt-cell value-cell">State 1</td>
-                                    <td class="dt-cell value-cell">Wait 1</td>
-                                    <td class="dt-cell value-cell">Duration 1</td>
-                                </tr>
-                                <tr>
-                                    <td class="dt-cell value-cell" style="display: none">ConversationID</td>
-                                    <td class="dt-cell value-cell">Name 2</td>
-                                    <td class="dt-cell value-cell">ANI 2</td>
-                                    <td class="dt-cell value-cell">DNIS 2</td>
-                                    <td class="dt-cell value-cell">State 2</td>
-                                    <td class="dt-cell value-cell">Wait 2</td>
-                                    <td class="dt-cell value-cell">Duration 2</td>
-                                </tr> -->
                             </tbody>
                         </table> 
                     </div>            
@@ -245,12 +227,9 @@
     </script>
     <script>
         function subscribeToQueue() {
-            console.log("subscribeToQueue");
             var queue = document.getElementById("ddlQueues");
             var queueValue = document.getElementById("ddlQueues").value;
             var queueText = queue.options[queue.selectedIndex].text;
-
-            console.log("queueValue || " + queueValue);
 
             clientApp.subscribeToQueue(queueValue);
         }
