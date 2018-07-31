@@ -318,7 +318,7 @@ clientApp.addTableRow = function(data) {
     var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
     
     // Call Conversation Type
-    if(acd.calls[0] !== undefined) {
+    if(acd.calls !== undefined) {
         if ((agent === undefined) && (acd.calls[0].state === "connected")) {
             // Caller on queue
             var newRow   = tableRef.insertRow(tableRef.rows.length);
@@ -401,7 +401,7 @@ clientApp.addTableRow = function(data) {
     }    
 
     // Chat Conversation Type
-    if(acd.chats[0] !== undefined) {
+    if(acd.chats !== undefined) {
         if ((agent === undefined) && (acd.chats[0].state === "connected")) {
             // Caller on queue
             var newRow   = tableRef.insertRow(tableRef.rows.length);
