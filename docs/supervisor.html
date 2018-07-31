@@ -165,6 +165,7 @@
                             <thead class="dt-section dt-section-head">
                                 <tr class="dt-row header-row sortable-objects ember-view">
                                     <th id="txtConvId" style="display: none"></th>
+                                    <th id="txtConvType"></th>
                                     <th id="txtName"></th>
                                     <th id="txtANI"></th>
                                     <th id="txtDNIS"></th>
@@ -204,6 +205,7 @@
                     $("#txtConversations").text(data[langTag].Conversations);
                     $("#txtSubscribe").text(data[langTag].Subscribe + ": ");
                     $("#txtConvId").text(data[langTag].ConversationID);
+                    $("txtConvType").text("Type");
                     $("#txtName").text(data[langTag].Name);
                     $("#txtANI").text(data[langTag].ANI);
                     $("#txtDNIS").text(data[langTag].DNIS);
@@ -219,6 +221,7 @@
                 $("#txtConversations").text(data["en-us"].Conversations);
                 $("#txtSubscribe").text(data["en-us"].Subscribe + ": ");
                 $("#txtConvId").text(data["en-us"].ConversationID);
+                $("txtConvType").text("Type");
                 $("#txtName").text(data["en-us"].Name);
                 $("#txtANI").text(data["en-us"].ANI);
                 $("#txtDNIS").text(data["en-us"].DNIS);

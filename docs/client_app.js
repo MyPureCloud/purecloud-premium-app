@@ -317,21 +317,24 @@ clientApp.addTableRow = function(data) {
 
     var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
     
+    // Call Conversation Type
     if ((agent === undefined) && (acd.calls[0].state === "connected")) {
         // Caller on queue
         var newRow   = tableRef.insertRow(tableRef.rows.length);
 
         // Create Cell columns
         var idCell  = newRow.insertCell(0);
-        var nameCell  = newRow.insertCell(1);
-        var aniCell  = newRow.insertCell(2);
-        var dnisCell  = newRow.insertCell(3);
-        var stateCell  = newRow.insertCell(4);
-        var waitCell  = newRow.insertCell(5);
-        var durationCell  = newRow.insertCell(6);
+        var typeCell  = newRow.insertCell(1);
+        var nameCell  = newRow.insertCell(2);
+        var aniCell  = newRow.insertCell(3);
+        var dnisCell  = newRow.insertCell(4);
+        var stateCell  = newRow.insertCell(5);
+        var waitCell  = newRow.insertCell(6);
+        var durationCell  = newRow.insertCell(7);
 
         // Create text nodes
         var idText  = document.createTextNode(data.eventBody.id);
+        var typeText  = document.createTextNode("Call");
         var nameText  = document.createTextNode(caller.name);
         var aniText  = document.createTextNode(caller.address);
         var dnisText  = document.createTextNode(caller.calls[0].other.addressNormalized);
@@ -341,6 +344,7 @@ clientApp.addTableRow = function(data) {
 
         // Append text nodes to cell columns
         idCell.appendChild(idText);
+        typeCell.appendChild(typeText);
         nameCell.appendChild(nameText);
         aniCell.appendChild(aniText);
         dnisCell.appendChild(dnisText);
@@ -359,15 +363,17 @@ clientApp.addTableRow = function(data) {
 
         // Create Cell columns
         var idCell  = newRow.insertCell(0);
-        var nameCell  = newRow.insertCell(1);
-        var aniCell  = newRow.insertCell(2);
-        var dnisCell  = newRow.insertCell(3);
-        var stateCell  = newRow.insertCell(4);
-        var waitCell  = newRow.insertCell(5);
-        var durationCell  = newRow.insertCell(6);
+        var typeCell  = newRow.insertCell(1);
+        var nameCell  = newRow.insertCell(2);
+        var aniCell  = newRow.insertCell(3);
+        var dnisCell  = newRow.insertCell(4);
+        var stateCell  = newRow.insertCell(5);
+        var waitCell  = newRow.insertCell(6);
+        var durationCell  = newRow.insertCell(7);
 
         // Create text nodes
         var idText  = document.createTextNode(data.eventBody.id);
+        var typeText  = document.createTextNode("Call");
         var nameText  = document.createTextNode(caller.name);
         var aniText  = document.createTextNode(caller.address);
         var dnisText  = document.createTextNode(caller.calls[0].other.addressNormalized);
@@ -377,6 +383,88 @@ clientApp.addTableRow = function(data) {
 
         // Append text nodes to cell columns
         idCell.appendChild(idText);
+        typeCell.appendChild(typeText);
+        nameCell.appendChild(nameText);
+        aniCell.appendChild(aniText);
+        dnisCell.appendChild(dnisText);
+        stateCell.appendChild(stateText);
+        waitCell.appendChild(waitText);
+        durationCell.appendChild(durationText);
+
+        // Make sure Conversation ID column is always hidden
+        idCell.hidden = true;
+
+        // Makes sure that the field only changes the first time. 
+        clientApp.isCallActiveSup = true;
+    }
+
+    // Chat Conversation Type
+    if ((agent === undefined) && (acd.chats[0].state === "connected")) {
+        // Caller on queue
+        var newRow   = tableRef.insertRow(tableRef.rows.length);
+
+        // Create Cell columns
+        var idCell  = newRow.insertCell(0);
+        var typeCell  = newRow.insertCell(1);
+        var nameCell  = newRow.insertCell(2);
+        var aniCell  = newRow.insertCell(3);
+        var dnisCell  = newRow.insertCell(4);
+        var stateCell  = newRow.insertCell(5);
+        var waitCell  = newRow.insertCell(6);
+        var durationCell  = newRow.insertCell(7);
+
+        // Create text nodes
+        var idText  = document.createTextNode(data.eventBody.id);
+        var typeText  = document.createTextNode("Chat");
+        var nameText  = document.createTextNode(caller.name);
+        var aniText  = document.createTextNode(caller.address);
+        var dnisText  = document.createTextNode(caller.chats[0].roomId);
+        var stateText  = document.createTextNode("on queue");
+        var waitText  = document.createTextNode("--");
+        var durationText  = document.createTextNode("--");
+
+        // Append text nodes to cell columns
+        idCell.appendChild(idText);
+        typeCell.appendChild(typeText);
+        nameCell.appendChild(nameText);
+        aniCell.appendChild(aniText);
+        dnisCell.appendChild(dnisText);
+        stateCell.appendChild(stateText);
+        waitCell.appendChild(waitText);
+        durationCell.appendChild(durationText);
+
+        // Make sure Conversation ID column is always hidden
+        idCell.hidden = true;
+
+        // Makes sure that the field only changes the first time. 
+        clientApp.isCallActiveSup = false;
+    } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
+        // If incoming call
+        var newRow   = tableRef.insertRow(tableRef.rows.length);
+
+        // Create Cell columns
+        var idCell  = newRow.insertCell(0);
+        var typeCell  = newRow.insertCell(1);
+        var nameCell  = newRow.insertCell(2);
+        var aniCell  = newRow.insertCell(3);
+        var dnisCell  = newRow.insertCell(4);
+        var stateCell  = newRow.insertCell(5);
+        var waitCell  = newRow.insertCell(6);
+        var durationCell  = newRow.insertCell(7);
+
+        // Create text nodes
+        var idText  = document.createTextNode(data.eventBody.id);
+        var typeText  = document.createTextNode("Chat");
+        var nameText  = document.createTextNode(caller.name);
+        var aniText  = document.createTextNode(caller.address);
+        var dnisText  = document.createTextNode(caller.chats[0].roomId);
+        var stateText  = document.createTextNode(agent.calls[0].state);
+        var waitText  = document.createTextNode("--");
+        var durationText  = document.createTextNode("--");
+
+        // Append text nodes to cell columns
+        idCell.appendChild(idText);
+        typeCell.appendChild(typeText);
         nameCell.appendChild(nameText);
         aniCell.appendChild(aniText);
         dnisCell.appendChild(dnisText);
