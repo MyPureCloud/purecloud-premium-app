@@ -66,12 +66,6 @@ class WizardApp {
                     "url": "https://mypurecloud.github.io/purecloud-premium-app/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}",
                     "type": "widget",
                     "groups": ["Agents", "Supervisors"]
-                },
-                {
-                    "name": "Supervisor Widget",
-                    "url": "https://mypurecloud.github.io/purecloud-premium-app/supervisor.html?lang={{pcLangTag}}&environment={{pcEnvironment}}",
-                    "type": "standalone",
-                    "groups": ["Supervisors"]
                 }
             ]
         }
@@ -412,13 +406,13 @@ class WizardApp {
             .then(() => {
                 this.installationData.groups.forEach((group) => {
                     let groupBody = {
-                        "name": this.prefix + group.name,
+                        "name": this.prefix + group.name + "_",
                         "description": group.description,
                         "type": "official",
                         "rulesVisible": true,
                         "visibility": "members"
-                        }
-
+                    }
+                    console.log(groupBody);
                     groupPromises.push(
                         groupsApi.postGroups(groupBody)
                         .then((data) => {
@@ -427,79 +421,79 @@ class WizardApp {
                         })
                         .catch((err) => console.log(err))
                     );
-                });
+                })
 
                 // After groups are created, create instances
                 // There are two steps for creating the app instances
                 // 1. Create instance of a custom-client-app
                 // 2. Configure the app
                 // 3. Activate the instances
-                Promise.all(groupPromises)
-                .then(() => {
-                    this.installationData.appInstances.forEach((instance) => {
-                        let integrationBody = {
-                            "body": {
-                                "integrationType": {
-                                    "id": this.appName
-                                }
+                return Promise.all(groupPromises);
+            })
+            .then(() => {
+                this.installationData.appInstances.forEach((instance) => {
+                    let integrationBody = {
+                        "body": {
+                            "integrationType": {
+                                "id": this.appName
                             }
                         }
+                    }
 
-                        integrationPromises.push(
-                            integrationsApi.postIntegrations(integrationBody)
-                            .then((data) => {
-                                this.logInfo("Created instance: " + instance.name, this.currentStep++);
-                                let integrationConfig = {
-                                    "body": {
-                                        "name": this.prefix + instance.name,
-                                        "version": 1, 
-                                        "properties": {
-                                            "url" : instance.url,
-                                            "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
-                                            "displayType": instance.type,
-                                            "featureCategory": "", 
-                                            "groupFilter": instance.groups.map((groupName) => groupData[groupName])
-                                        },
-                                        "advanced": {},
-                                        "notes": "",
-                                        "credentials": {}
-                                    }
+                    integrationPromises.push(
+                        integrationsApi.postIntegrations(integrationBody)
+                        .then((data) => {
+                            this.logInfo("Created instance: " + instance.name, this.currentStep++);
+                            let integrationConfig = {
+                                "body": {
+                                    "name": this.prefix + instance.name,
+                                    "version": 1, 
+                                    "properties": {
+                                        "url" : instance.url,
+                                        "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
+                                        "displayType": instance.type,
+                                        "featureCategory": "", 
+                                        "groupFilter": instance.groups.map((groupName) => groupData[groupName])
+                                    },
+                                    "advanced": {},
+                                    "notes": "",
+                                    "credentials": {}
                                 }
-
-                                integrationsData.push(data);
-                                return integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig)
-                            })
-                            .then((data) => {
-                                this.logInfo("Configured instance: " + data.name, this.currentStep++);                           
-                            })
-                            .catch((err) => console.log(err))
-                        );
-                    });
-                    return Promise.all(integrationPromises);
-                })
-                .then(() => {
-                    let enablePromises = [];
-                    integrationsData.forEach((instance) => {
-                        let opts = {
-                            "body": {
-                                "intendedState": "ENABLED"
                             }
-                         }
 
-                        enablePromises.push(
-                            integrationsApi.patchIntegration(instance.id, opts)
-                            .then((data) => this.logInfo("Enabled instance: " + data.name, this.currentStep++))
-                            .catch((err) => console.log(err))
-                        );
-                    });
-                    
-                    return Promise.all(enablePromises);
-                })
-                .then(() => {
-                    this.logInfo("Installation Complete!", this.currentStep++);
-                    resolve();
-                })
-            });
+                            integrationsData.push(data);
+                            return integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig)
+                        })
+                        .then((data) => {
+                            this.logInfo("Configured instance: " + data.name, this.currentStep++);                           
+                        })
+                        .catch((err) => console.log(err))
+                    );
+                });
+                return Promise.all(integrationPromises);
+            })
+            .then(() => {
+                let enablePromises = [];
+                integrationsData.forEach((instance) => {
+                    let opts = {
+                        "body": {
+                            "intendedState": "ENABLED"
+                        }
+                        }
+
+                    enablePromises.push(
+                        integrationsApi.patchIntegration(instance.id, opts)
+                        .then((data) => this.logInfo("Enabled instance: " + data.name, this.currentStep++))
+                        .catch((err) => console.log(err))
+                    );
+                });
+                
+                return Promise.all(enablePromises);
+            })
+            .then(() => {
+                this.logInfo("Installation Complete!", this.currentStep++);
+                resolve();
+            })
         });
     }
 
