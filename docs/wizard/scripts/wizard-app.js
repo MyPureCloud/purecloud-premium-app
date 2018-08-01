@@ -373,6 +373,7 @@ class WizardApp {
         let integrationsData = [];
 
         return new Promise((resolve,reject) => { 
+            
             // Create the roles
             this.installationData.roles.forEach((role) => {
                 let roleBody = {
@@ -423,13 +424,15 @@ class WizardApp {
                     );
                 })
 
-                // After groups are created, create instances
-                // There are two steps for creating the app instances
-                // 1. Create instance of a custom-client-app
-                // 2. Configure the app
-                // 3. Activate the instances
+                
                 return Promise.all(groupPromises);
             })
+            
+            // After groups are created, create instances
+            // There are two steps for creating the app instances
+            // 1. Create instance of a custom-client-app
+            // 2. Configure the app
+            // 3. Activate the instances
             .then(() => {
                 this.installationData.appInstances.forEach((instance) => {
                     let integrationBody = {
@@ -472,6 +475,8 @@ class WizardApp {
                 });
                 return Promise.all(integrationPromises);
             })
+
+            // Activate the newly created application instances
             .then(() => {
                 let enablePromises = [];
                 integrationsData.forEach((instance) => {
@@ -490,6 +495,8 @@ class WizardApp {
                 
                 return Promise.all(enablePromises);
             })
+
+            // When everything's finished, log the output.
             .then(() => {
                 this.logInfo("Installation Complete!", this.currentStep++);
                 resolve();
