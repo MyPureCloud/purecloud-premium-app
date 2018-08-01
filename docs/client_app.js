@@ -750,9 +750,7 @@ clientApp.updateTableRow = function(data) {
                     // $(this).find('td:eq(6)').text("--");
                     // $(this).find('td:eq(7)').text("--");
 
-                    console.log("1" + this);
-
-                    clientApp.updateRow(agent.calls[0].state, "--", "--");
+                    clientApp.updateRow(this, agent.calls[0].state, "--", "--");
                 }
             })
     
@@ -768,10 +766,8 @@ clientApp.updateTableRow = function(data) {
                     // $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
                     // $(this).find('td:eq(7)').text("--");
 
-                    console.log("1" + this);
-
                     var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                    clientApp.updateRow(agent.calls[0].state, wait, "--");
+                    clientApp.updateRow(this, agent.calls[0].state, wait, "--");
                 }
             })
     
@@ -790,7 +786,7 @@ clientApp.updateTableRow = function(data) {
 
                         var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                         var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                        clientApp.updateRow(agent.calls[0].state, wait, duration);
+                        clientApp.updateRow(this, agent.calls[0].state, wait, duration);
                     }
                 })
     
@@ -812,7 +808,7 @@ clientApp.updateTableRow = function(data) {
                     // $(this).find('td:eq(6)').text("--");
                     // $(this).find('td:eq(7)').text("--");
 
-                    clientApp.updateRow(agent.chats[0].state, "--", "--");
+                    clientApp.updateRow(this, agent.chats[0].state, "--", "--");
                 }
             })
     
@@ -829,7 +825,7 @@ clientApp.updateTableRow = function(data) {
                     // $(this).find('td:eq(7)').text("--");
 
                     var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                    clientApp.updateRow(agent.chats[0].state, wait, "--");
+                    clientApp.updateRow(this, agent.chats[0].state, wait, "--");
                 }
             })
     
@@ -848,7 +844,7 @@ clientApp.updateTableRow = function(data) {
 
                         var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                         var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                        clientApp.updateRow(agent.chats[0].state, wait, duration);
+                        clientApp.updateRow(this, agent.chats[0].state, wait, duration);
                     }
                 })
     
@@ -870,7 +866,7 @@ clientApp.updateTableRow = function(data) {
                     // $(this).find('td:eq(6)').text("--");
                     // $(this).find('td:eq(7)').text("--");
 
-                    clientApp.updateRow(agent.callbacks[0].state, "--", "--");
+                    clientApp.updateRow(this, agent.callbacks[0].state, "--", "--");
                 }
             })
     
@@ -887,7 +883,7 @@ clientApp.updateTableRow = function(data) {
                     // $(this).find('td:eq(7)').text("--");
 
                     var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                    clientApp.updateRow(agent.callbacks[0].state, wait, "--");
+                    clientApp.updateRow(this, agent.callbacks[0].state, wait, "--");
                 }
             })
     
@@ -906,7 +902,7 @@ clientApp.updateTableRow = function(data) {
 
                         var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                         var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                        clientApp.updateRow(agent.callbacks[0].state, wait, duration);
+                        clientApp.updateRow(this, agent.callbacks[0].state, wait, duration);
                     }
                 })
     
@@ -928,7 +924,7 @@ clientApp.updateTableRow = function(data) {
                     // $(this).find('td:eq(6)').text("--");
                     // $(this).find('td:eq(7)').text("--");
 
-                    clientApp.updateRow(agent.emails[0].state, "--", "--");
+                    clientApp.updateRow(this, agent.emails[0].state, "--", "--");
                 }
             })
     
@@ -945,7 +941,7 @@ clientApp.updateTableRow = function(data) {
                     // $(this).find('td:eq(7)').text("--");
 
                     var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                    clientApp.updateRow(agent.emails[0].state, wait, "--");
+                    clientApp.updateRow(this, agent.emails[0].state, wait, "--");
                 }
             })
     
@@ -964,7 +960,7 @@ clientApp.updateTableRow = function(data) {
 
                         var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                         var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1)
-                        clientApp.updateRow(agent.emails[0].state, wait, duration);
+                        clientApp.updateRow(this, agent.emails[0].state, wait, duration);
                     }
                 })
     
@@ -1014,11 +1010,10 @@ clientApp.insertRow = function(id, type, name, ani, dnis, state, wait, duration)
     idCell.hidden = true;
 }
 
-clientApp.updateRow = function(state, wait, duration) {
-    console.log("2" + this);
-    $(this).find('td:eq(5)').text(state);
-    $(this).find('td:eq(6)').text(wait);
-    $(this).find('td:eq(7)').text(duration);
+clientApp.updateRow = function(pointer, state, wait, duration) {
+    $(pointer).find('td:eq(5)').text(state);
+    $(pointer).find('td:eq(6)').text(wait);
+    $(pointer).find('td:eq(7)').text(duration);
 }
 
 export default clientApp
