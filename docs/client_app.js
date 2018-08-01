@@ -815,7 +815,7 @@ clientApp.updateTableRow = function(data) {
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
-            if (agent.chats[0].state === "disconnected") {
+            if (agent.callbacks[0].state === "disconnected") {
                 // If disconnected callback
                 // Update State, Wait Time and Duration columns
                 $('#tblCallerDetails > tbody> tr').each(function() {
@@ -864,7 +864,7 @@ clientApp.updateTableRow = function(data) {
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
-            if (agent.chats[0].state === "disconnected") {
+            if (agent.emails[0].state === "disconnected") {
                 // If disconnected callback
                 // Update State, Wait Time and Duration columns
                 $('#tblCallerDetails > tbody> tr').each(function() {
