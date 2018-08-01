@@ -195,8 +195,6 @@ clientApp.subscribeToQueue = function(queue){
         ['application/json']
     ).then(data => {
         if(Object.keys(data).length > 0) {
-            console.log(JSON.stringify(data));
-
             (data.conversations).forEach(function(conversation) {
                 let caller = conversation.participants
                     .filter(participant => participant.purpose === "external")[0];
@@ -209,81 +207,11 @@ clientApp.subscribeToQueue = function(queue){
 
                 let agent = conversation.participants
                     .filter(participant => participant.purpose === "agent")[0];
-                
-                // var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
-                // var newRow = tableRef.insertRow(tableRef.rows.length);
 
                 if(caller === null) {
                     caller = conversation.participants
                         .filter(participant => participant.purpose === "customer")[0];
                 }
-
-                // // Create cell columns
-                // var idCell = newRow.insertCell(0);
-                // var typeCell = newRow.insertCell(1);
-                // var nameCell = newRow.insertCell(2);
-                // var aniCell = newRow.insertCell(3);
-                // var dnisCell = newRow.insertCell(4);
-                // var stateCell = newRow.insertCell(5);
-                // var waitCell = newRow.insertCell(6);
-                // var durationCell = newRow.insertCell(7);
-
-                // // Create text nodes
-                // var idText = document.createTextNode(conversation.conversationId);
-                // var nameText = document.createTextNode(caller.participantName);
-                
-                // if(caller.sessions[0].mediaType === "voice") {
-                //     var typeText = document.createTextNode("Call");
-                //     var aniText = document.createTextNode(caller.sessions[0].ani);
-                //     var dnisText = document.createTextNode(caller.sessions[0].dnis);                    
-                // } else if(caller.sessions[0].mediaType === "chat") {
-                //     var typeText = document.createTextNode("Chat");
-                //     var aniText = document.createTextNode(caller.sessions[0].roomId);
-                //     var dnisText = document.createTextNode(caller.sessions[0].roomId);
-                // } else if(caller.sessions[1].mediaType === "callback") {
-                //     var typeText = document.createTextNode("Callback");
-                //     var aniText = document.createTextNode(caller.sessions[0].ani);
-                //     var dnisText = document.createTextNode(caller.sessions[0].dnis);
-                // } else if(caller.sessions[1].mediaType === "email") {
-                //     var typeText = document.createTextNode("Email");
-                //     var aniText = document.createTextNode(caller.sessions[0].addressSelf);
-                //     var dnisText = document.createTextNode(caller.sessions[0].addressFrom);
-                // }
-
-                // if(agent !== undefined) {
-                //     // If active call
-                //     var stateText = document.createTextNode("connected");
-                //     var waitText = document.createTextNode(new Date(new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1));
-                //     var durationText = document.createTextNode("--");
-                // } else {
-                //     // Caller on queue
-                //     var stateText = document.createTextNode("on queue");
-                //     var waitText = document.createTextNode("--");
-                //     var durationText = document.createTextNode("--");
-                // }
-                
-                // // Append text nodes to cell columns
-                // idCell.appendChild(idText);
-                // typeCell.appendChild(typeText);
-                // nameCell.appendChild(nameText);
-                // aniCell.appendChild(aniText);
-                // dnisCell.appendChild(dnisText);
-                // stateCell.appendChild(stateText);
-                // waitCell.appendChild(waitText);
-                // durationCell.appendChild(durationText);
-
-                // // Add CSS Style
-                // idCell.className = "dt-cell value-cell";
-                // typeCell.className = "dt-cell value-cell";
-                // nameCell.className = "dt-cell value-cell";
-                // aniCell.className = "dt-cell value-cell";
-                // dnisCell.className = "dt-cell value-cell";
-                // stateCell.className = "dt-cell value-cell";
-                // waitCell.className = "dt-cell value-cell";
-                // durationCell.className = "dt-cell value-cell";
-
-                // // Make sure Conversation ID column is always hidden
-                // idCell.hidden = true;
 
                 // Get values to insert in table
                 var id = conversation.conversationId;
@@ -354,9 +282,7 @@ clientApp.onSocketMessageQueue = function(event){
     let data = JSON.parse(event.data);
     let topic = data.topicName;
 
-    console.log(JSON.stringify(data));
-
-    // If a voice interaction (from queue) comes in
+    // If an interaction (from queue) comes in
     if(topic === clientApp.topicId){
         // Check to see if Conversation details is already displayed in the view
         if ($('#tblCallerDetails td:contains(' + data.eventBody.id + ')').length) {
@@ -376,90 +302,18 @@ clientApp.addTableRow = function(data) {
     
     let acd = data.eventBody.participants
         .filter(participant => participant.purpose === "acd")[0];
-
-    // var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
     
     // Call Conversation Type
     if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks === undefined) && (caller.emails === undefined)) {
         if ((agent === undefined) && (acd.calls[0].state === "connected")) {
             // Call on queue
             clientApp.insertRow(data.eventBody.id, "Call", caller.name, caller.address, caller.calls[0].other.addressNormalized, "on queue", "--", "--");
-
-            // var newRow = tableRef.insertRow(tableRef.rows.length);
-    
-            // // Create Cell columns
-            // var idCell = newRow.insertCell(0);
-            // var typeCell = newRow.insertCell(1);
-            // var nameCell = newRow.insertCell(2);
-            // var aniCell = newRow.insertCell(3);
-            // var dnisCell = newRow.insertCell(4);
-            // var stateCell = newRow.insertCell(5);
-            // var waitCell = newRow.insertCell(6);
-            // var durationCell = newRow.insertCell(7);
-    
-            // // Create text nodes
-            // var idText = document.createTextNode(data.eventBody.id);
-            // var typeText = document.createTextNode("Call");
-            // var nameText = document.createTextNode(caller.name);
-            // var aniText = document.createTextNode(caller.address);
-            // var dnisText = document.createTextNode(caller.calls[0].other.addressNormalized);
-            // var stateText = document.createTextNode("on queue");
-            // var waitText = document.createTextNode("--");
-            // var durationText = document.createTextNode("--");
-    
-            // // Append text nodes to cell columns
-            // idCell.appendChild(idText);
-            // typeCell.appendChild(typeText);
-            // nameCell.appendChild(nameText);
-            // aniCell.appendChild(aniText);
-            // dnisCell.appendChild(dnisText);
-            // stateCell.appendChild(stateText);
-            // waitCell.appendChild(waitText);
-            // durationCell.appendChild(durationText);
-    
-            // // Make sure Conversation ID column is always hidden
-            // idCell.hidden = true;
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming call
             clientApp.insertRow(data.eventBody.id, "Call", caller.name, caller.address, caller.calls[0].other.addressNormalized, agent.calls[0].state, "--", "--");
-
-            // var newRow = tableRef.insertRow(tableRef.rows.length);
-    
-            // // Create Cell columns
-            // var idCell = newRow.insertCell(0);
-            // var typeCell = newRow.insertCell(1);
-            // var nameCell = newRow.insertCell(2);
-            // var aniCell = newRow.insertCell(3);
-            // var dnisCell = newRow.insertCell(4);
-            // var stateCell = newRow.insertCell(5);
-            // var waitCell = newRow.insertCell(6);
-            // var durationCell = newRow.insertCell(7);
-    
-            // // Create text nodes
-            // var idText = document.createTextNode(data.eventBody.id);
-            // var typeText = document.createTextNode("Call");
-            // var nameText = document.createTextNode(caller.name);
-            // var aniText = document.createTextNode(caller.address);
-            // var dnisText = document.createTextNode(caller.calls[0].other.addressNormalized);
-            // var stateText = document.createTextNode(agent.calls[0].state);
-            // var waitText = document.createTextNode("--");
-            // var durationText = document.createTextNode("--");
-    
-            // // Append text nodes to cell columns
-            // idCell.appendChild(idText);
-            // typeCell.appendChild(typeText);
-            // nameCell.appendChild(nameText);
-            // aniCell.appendChild(aniText);
-            // dnisCell.appendChild(dnisText);
-            // stateCell.appendChild(stateText);
-            // waitCell.appendChild(waitText);
-            // durationCell.appendChild(durationText);
-    
-            // // Make sure Conversation ID column is always hidden
-            // idCell.hidden = true;
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
@@ -471,82 +325,12 @@ clientApp.addTableRow = function(data) {
         if ((agent === undefined) && (acd.chats[0].state === "connected")) {
             // Chat on queue
             clientApp.insertRow(data.eventBody.id, "Chat", caller.name, caller.address, caller.chats[0].roomId, "on queue", "--", "--");
-
-            // var newRow = tableRef.insertRow(tableRef.rows.length);
-    
-            // // Create Cell columns
-            // var idCell = newRow.insertCell(0);
-            // var typeCell = newRow.insertCell(1);
-            // var nameCell = newRow.insertCell(2);
-            // var aniCell = newRow.insertCell(3);
-            // var dnisCell = newRow.insertCell(4);
-            // var stateCell = newRow.insertCell(5);
-            // var waitCell = newRow.insertCell(6);
-            // var durationCell = newRow.insertCell(7);
-    
-            // // Create text nodes
-            // var idText = document.createTextNode(data.eventBody.id);
-            // var typeText = document.createTextNode("Chat");
-            // var nameText = document.createTextNode(caller.name);
-            // var aniText = document.createTextNode(caller.address);
-            // var dnisText = document.createTextNode(caller.chats[0].roomId);
-            // var stateText = document.createTextNode("on queue");
-            // var waitText = document.createTextNode("--");
-            // var durationText = document.createTextNode("--");
-    
-            // // Append text nodes to cell columns
-            // idCell.appendChild(idText);
-            // typeCell.appendChild(typeText);
-            // nameCell.appendChild(nameText);
-            // aniCell.appendChild(aniText);
-            // dnisCell.appendChild(dnisText);
-            // stateCell.appendChild(stateText);
-            // waitCell.appendChild(waitText);
-            // durationCell.appendChild(durationText);
-    
-            // // Make sure Conversation ID column is always hidden
-            // idCell.hidden = true;
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming chat
             clientApp.insertRow(data.eventBody.id, "Chat", caller.name, caller.address, caller.chats[0].roomId, agent.calls[0].state, "--", "--");
-
-            // var newRow = tableRef.insertRow(tableRef.rows.length);
-    
-            // // Create Cell columns
-            // var idCell = newRow.insertCell(0);
-            // var typeCell = newRow.insertCell(1);
-            // var nameCell = newRow.insertCell(2);
-            // var aniCell = newRow.insertCell(3);
-            // var dnisCell = newRow.insertCell(4);
-            // var stateCell = newRow.insertCell(5);
-            // var waitCell = newRow.insertCell(6);
-            // var durationCell = newRow.insertCell(7);
-    
-            // // Create text nodes
-            // var idText = document.createTextNode(data.eventBody.id);
-            // var typeText = document.createTextNode("Chat");
-            // var nameText = document.createTextNode(caller.name);
-            // var aniText = document.createTextNode(caller.address);
-            // var dnisText = document.createTextNode(caller.chats[0].roomId);
-            // var stateText = document.createTextNode(agent.calls[0].state);
-            // var waitText = document.createTextNode("--");
-            // var durationText = document.createTextNode("--");
-    
-            // // Append text nodes to cell columns
-            // idCell.appendChild(idText);
-            // typeCell.appendChild(typeText);
-            // nameCell.appendChild(nameText);
-            // aniCell.appendChild(aniText);
-            // dnisCell.appendChild(dnisText);
-            // stateCell.appendChild(stateText);
-            // waitCell.appendChild(waitText);
-            // durationCell.appendChild(durationText);
-    
-            // // Make sure Conversation ID column is always hidden
-            // idCell.hidden = true;
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
@@ -558,82 +342,12 @@ clientApp.addTableRow = function(data) {
         if ((agent === undefined) && (acd.callbacks[0].state === "connected")) {
             // Callback on queue
             clientApp.insertRow(data.eventBody.id, "Callback", caller.name, caller.address, caller.calls[0].other.addressNormalized, "on queue", "--", "--");
-
-            // var newRow = tableRef.insertRow(tableRef.rows.length);
-    
-            // // Create Cell columns
-            // var idCell = newRow.insertCell(0);
-            // var typeCell = newRow.insertCell(1);
-            // var nameCell = newRow.insertCell(2);
-            // var aniCell = newRow.insertCell(3);
-            // var dnisCell = newRow.insertCell(4);
-            // var stateCell = newRow.insertCell(5);
-            // var waitCell = newRow.insertCell(6);
-            // var durationCell = newRow.insertCell(7);
-    
-            // // Create text nodes
-            // var idText = document.createTextNode(data.eventBody.id);
-            // var typeText = document.createTextNode("Callback");
-            // var nameText = document.createTextNode(caller.name);
-            // var aniText = document.createTextNode(caller.address);
-            // var dnisText = document.createTextNode(caller.calls[0].other.addressNormalized);
-            // var stateText = document.createTextNode("on queue");
-            // var waitText = document.createTextNode("--");
-            // var durationText = document.createTextNode("--");
-    
-            // // Append text nodes to cell columns
-            // idCell.appendChild(idText);
-            // typeCell.appendChild(typeText);
-            // nameCell.appendChild(nameText);
-            // aniCell.appendChild(aniText);
-            // dnisCell.appendChild(dnisText);
-            // stateCell.appendChild(stateText);
-            // waitCell.appendChild(waitText);
-            // durationCell.appendChild(durationText);
-    
-            // // Make sure Conversation ID column is always hidden
-            // idCell.hidden = true;
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming callback
             clientApp.insertRow(data.eventBody.id, "Callback", caller.name, caller.address, caller.calls[0].other.addressNormalized, agent.callbacks[0].state, "--", "--");
-
-            // var newRow = tableRef.insertRow(tableRef.rows.length);
-    
-            // // Create Cell columns
-            // var idCell = newRow.insertCell(0);
-            // var typeCell = newRow.insertCell(1);
-            // var nameCell = newRow.insertCell(2);
-            // var aniCell = newRow.insertCell(3);
-            // var dnisCell = newRow.insertCell(4);
-            // var stateCell = newRow.insertCell(5);
-            // var waitCell = newRow.insertCell(6);
-            // var durationCell = newRow.insertCell(7);
-    
-            // // Create text nodes
-            // var idText = document.createTextNode(data.eventBody.id);
-            // var typeText = document.createTextNode("Callback");
-            // var nameText = document.createTextNode(caller.name);
-            // var aniText = document.createTextNode(caller.address);
-            // var dnisText = document.createTextNode(caller.calls[0].other.addressNormalized);
-            // var stateText = document.createTextNode(agent.callbacks[0].state);
-            // var waitText = document.createTextNode("--");
-            // var durationText = document.createTextNode("--");
-    
-            // // Append text nodes to cell columns
-            // idCell.appendChild(idText);
-            // typeCell.appendChild(typeText);
-            // nameCell.appendChild(nameText);
-            // aniCell.appendChild(aniText);
-            // dnisCell.appendChild(dnisText);
-            // stateCell.appendChild(stateText);
-            // waitCell.appendChild(waitText);
-            // durationCell.appendChild(durationText);
-    
-            // // Make sure Conversation ID column is always hidden
-            // idCell.hidden = true;
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
@@ -645,82 +359,12 @@ clientApp.addTableRow = function(data) {
         if ((agent === undefined) && (acd.emails[0].state === "connected")) {
             // Email on queue
             clientApp.insertRow(data.eventBody.id, "Email", caller.name, caller.address, acd.address, "on queue", "--", "--");
-
-            // var newRow = tableRef.insertRow(tableRef.rows.length);
-    
-            // // Create Cell columns
-            // var idCell = newRow.insertCell(0);
-            // var typeCell = newRow.insertCell(1);
-            // var nameCell = newRow.insertCell(2);
-            // var aniCell = newRow.insertCell(3);
-            // var dnisCell = newRow.insertCell(4);
-            // var stateCell = newRow.insertCell(5);
-            // var waitCell = newRow.insertCell(6);
-            // var durationCell = newRow.insertCell(7);
-    
-            // // Create text nodes
-            // var idText = document.createTextNode(data.eventBody.id);
-            // var typeText = document.createTextNode("Email");
-            // var nameText = document.createTextNode(caller.name);
-            // var aniText = document.createTextNode(caller.address);
-            // var dnisText = document.createTextNode(acd.address);
-            // var stateText = document.createTextNode("on queue");
-            // var waitText = document.createTextNode("--");
-            // var durationText = document.createTextNode("--");
-    
-            // // Append text nodes to cell columns
-            // idCell.appendChild(idText);
-            // typeCell.appendChild(typeText);
-            // nameCell.appendChild(nameText);
-            // aniCell.appendChild(aniText);
-            // dnisCell.appendChild(dnisText);
-            // stateCell.appendChild(stateText);
-            // waitCell.appendChild(waitText);
-            // durationCell.appendChild(durationText);
-    
-            // // Make sure Conversation ID column is always hidden
-            // idCell.hidden = true;
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming email
             clientApp.insertRow(data.eventBody.id, "Email", caller.name, caller.address, acd.address, agent.emails[0].state, "--", "--");
-
-            // var newRow = tableRef.insertRow(tableRef.rows.length);
-    
-            // // Create Cell columns
-            // var idCell = newRow.insertCell(0);
-            // var typeCell = newRow.insertCell(1);
-            // var nameCell = newRow.insertCell(2);
-            // var aniCell = newRow.insertCell(3);
-            // var dnisCell = newRow.insertCell(4);
-            // var stateCell = newRow.insertCell(5);
-            // var waitCell = newRow.insertCell(6);
-            // var durationCell = newRow.insertCell(7);
-    
-            // // Create text nodes
-            // var idText = document.createTextNode(data.eventBody.id);
-            // var typeText = document.createTextNode("Email");
-            // var nameText = document.createTextNode(caller.name);
-            // var aniText = document.createTextNode(caller.address);
-            // var dnisText = document.createTextNode(acd.address);
-            // var stateText = document.createTextNode(agent.emails[0].state);
-            // var waitText = document.createTextNode("--");
-            // var durationText = document.createTextNode("--");
-    
-            // // Append text nodes to cell columns
-            // idCell.appendChild(idText);
-            // typeCell.appendChild(typeText);
-            // nameCell.appendChild(nameText);
-            // aniCell.appendChild(aniText);
-            // dnisCell.appendChild(dnisText);
-            // stateCell.appendChild(stateText);
-            // waitCell.appendChild(waitText);
-            // durationCell.appendChild(durationText);
-    
-            // // Make sure Conversation ID column is always hidden
-            // idCell.hidden = true;
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
@@ -742,53 +386,23 @@ clientApp.updateTableRow = function(data) {
     if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks === undefined) && (caller.emails === undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming call
-            // Update State column
-            $('#tblCallerDetails > tbody> tr').each(function() {
-                var firstTd = $(this).find('td:first');
-                if ($(firstTd).text() == data.eventBody.id) {
-                    // $(this).find('td:eq(5)').text(agent.calls[0].state);
-                    // $(this).find('td:eq(6)').text("--");
-                    // $(this).find('td:eq(7)').text("--");
-
-                    clientApp.updateRow(this, agent.calls[0].state, "--", "--");
-                }
-            })
+            clientApp.updateRow(agent.calls[0].state, "--", "--");
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active call
-            // Update State and Wait Time columns
-            $('#tblCallerDetails > tbody> tr').each(function() {
-                var firstTd = $(this).find('td:first');
-                if ($(firstTd).text() == data.eventBody.id) {
-                    // $(this).find('td:eq(5)').text(agent.calls[0].state);
-                    // $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                    // $(this).find('td:eq(7)').text("--");
-
-                    var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                    clientApp.updateRow(this, agent.calls[0].state, wait, "--");
-                }
-            })
+            var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
+            clientApp.updateRow(agent.calls[0].state, wait, "--");
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
             if (agent.calls[0].state === "disconnected") {
                 // If disconnected call
-                // Update State, Wait Time and Duration columns
-                $('#tblCallerDetails > tbody> tr').each(function() {
-                    var firstTd = $(this).find('td:first');
-                    if ($(firstTd).text() == data.eventBody.id) {
-                        // $(this).find('td:eq(5)').text(agent.calls[0].state);
-                        // $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                        // $(this).find('td:eq(7)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-
-                        var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                        var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                        clientApp.updateRow(this, agent.calls[0].state, wait, duration);
-                    }
-                })
+                var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
+                var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
+                clientApp.updateRow(agent.calls[0].state, wait, duration);
     
                 // Makes sure that the field only changes the first time. 
                 clientApp.isCallActiveSup = false;
@@ -800,53 +414,23 @@ clientApp.updateTableRow = function(data) {
     if((caller.calls === undefined) && (caller.chats !== undefined) && (caller.callbacks === undefined) && (caller.emails === undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming chat
-            // Update State column
-            $('#tblCallerDetails > tbody> tr').each(function() {
-                var firstTd = $(this).find('td:first');
-                if ($(firstTd).text() == data.eventBody.id) {
-                    // $(this).find('td:eq(5)').text(agent.chats[0].state);
-                    // $(this).find('td:eq(6)').text("--");
-                    // $(this).find('td:eq(7)').text("--");
-
-                    clientApp.updateRow(this, agent.chats[0].state, "--", "--");
-                }
-            })
+            clientApp.updateRow(agent.chats[0].state, "--", "--");
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active chat
-            // Update State and Wait Time columns
-            $('#tblCallerDetails > tbody> tr').each(function() {
-                var firstTd = $(this).find('td:first');
-                if ($(firstTd).text() == data.eventBody.id) {
-                    // $(this).find('td:eq(5)').text(agent.chats[0].state);
-                    // $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                    // $(this).find('td:eq(7)').text("--");
-
-                    var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                    clientApp.updateRow(this, agent.chats[0].state, wait, "--");
-                }
-            })
+            var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
+            clientApp.updateRow(agent.chats[0].state, wait, "--");
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
             if (agent.chats[0].state === "disconnected") {
                 // If disconnected chat
-                // Update State, Wait Time and Duration columns
-                $('#tblCallerDetails > tbody> tr').each(function() {
-                    var firstTd = $(this).find('td:first');
-                    if ($(firstTd).text() == data.eventBody.id) {
-                        // $(this).find('td:eq(5)').text(agent.chats[0].state);
-                        // $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                        // $(this).find('td:eq(7)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-
-                        var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                        var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                        clientApp.updateRow(this, agent.chats[0].state, wait, duration);
-                    }
-                })
+                var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
+                var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
+                clientApp.updateRow(agent.chats[0].state, wait, duration);
     
                 // Makes sure that the field only changes the first time. 
                 clientApp.isCallActiveSup = false;
@@ -858,53 +442,23 @@ clientApp.updateTableRow = function(data) {
     if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks !== undefined) && (caller.emails === undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming callback
-            // Update State column
-            $('#tblCallerDetails > tbody> tr').each(function() {
-                var firstTd = $(this).find('td:first');
-                if ($(firstTd).text() == data.eventBody.id) {
-                    // $(this).find('td:eq(5)').text(agent.callbacks[0].state);
-                    // $(this).find('td:eq(6)').text("--");
-                    // $(this).find('td:eq(7)').text("--");
-
-                    clientApp.updateRow(this, agent.callbacks[0].state, "--", "--");
-                }
-            })
+            clientApp.updateRow(agent.callbacks[0].state, "--", "--");
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active callback
-            // Update State and Wait Time columns
-            $('#tblCallerDetails > tbody> tr').each(function() {
-                var firstTd = $(this).find('td:first');
-                if ($(firstTd).text() == data.eventBody.id) {
-                    // $(this).find('td:eq(5)').text(agent.callbacks[0].state);
-                    // $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                    // $(this).find('td:eq(7)').text("--");
-
-                    var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                    clientApp.updateRow(this, agent.callbacks[0].state, wait, "--");
-                }
-            })
+            var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
+            clientApp.updateRow(agent.callbacks[0].state, wait, "--");
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
             if (agent.callbacks[0].state === "disconnected") {
                 // If disconnected callback
-                // Update State, Wait Time and Duration columns
-                $('#tblCallerDetails > tbody> tr').each(function() {
-                    var firstTd = $(this).find('td:first');
-                    if ($(firstTd).text() == data.eventBody.id) {
-                        // $(this).find('td:eq(5)').text(agent.callbacks[0].state);
-                        // $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                        // $(this).find('td:eq(7)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-
-                        var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                        var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                        clientApp.updateRow(this, agent.callbacks[0].state, wait, duration);
-                    }
-                })
+                var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
+                var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
+                clientApp.updateRow(agent.callbacks[0].state, wait, duration);
     
                 // Makes sure that the field only changes the first time. 
                 clientApp.isCallActiveSup = false;
@@ -916,53 +470,23 @@ clientApp.updateTableRow = function(data) {
     if((caller.calls === undefined) && (caller.chats === undefined) && (caller.callbacks === undefined) && (caller.emails !== undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming email
-            // Update State column
-            $('#tblCallerDetails > tbody> tr').each(function() {
-                var firstTd = $(this).find('td:first');
-                if ($(firstTd).text() == data.eventBody.id) {
-                    // $(this).find('td:eq(5)').text(agent.emails[0].state);
-                    // $(this).find('td:eq(6)').text("--");
-                    // $(this).find('td:eq(7)').text("--");
-
-                    clientApp.updateRow(this, agent.emails[0].state, "--", "--");
-                }
-            })
+            clientApp.updateRow(agent.emails[0].state, "--", "--");
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active email
-            // Update State and Wait Time columns
-            $('#tblCallerDetails > tbody> tr').each(function() {
-                var firstTd = $(this).find('td:first');
-                if ($(firstTd).text() == data.eventBody.id) {
-                    // $(this).find('td:eq(5)').text(agent.emails[0].state);
-                    // $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                    // $(this).find('td:eq(7)').text("--");
-
-                    var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                    clientApp.updateRow(this, agent.emails[0].state, wait, "--");
-                }
-            })
+            var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
+            clientApp.updateRow(agent.emails[0].state, wait, "--");
     
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
             if (agent.emails[0].state === "disconnected") {
                 // If disconnected email
-                // Update State, Wait Time and Duration columns
-                $('#tblCallerDetails > tbody> tr').each(function() {
-                    var firstTd = $(this).find('td:first');
-                    if ($(firstTd).text() == data.eventBody.id) {
-                        // $(this).find('td:eq(5)').text(agent.emails[0].state);
-                        // $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-                        // $(this).find('td:eq(7)').text(new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
-
-                        var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                        var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1)
-                        clientApp.updateRow(this, agent.emails[0].state, wait, duration);
-                    }
-                })
+                var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
+                var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
+                clientApp.updateRow(agent.emails[0].state, wait, duration);
     
                 // Makes sure that the field only changes the first time. 
                 clientApp.isCallActiveSup = false;
@@ -1010,10 +534,15 @@ clientApp.insertRow = function(id, type, name, ani, dnis, state, wait, duration)
     idCell.hidden = true;
 }
 
-clientApp.updateRow = function(pointer, state, wait, duration) {
-    $(pointer).find('td:eq(5)').text(state);
-    $(pointer).find('td:eq(6)').text(wait);
-    $(pointer).find('td:eq(7)').text(duration);
+clientApp.updateRow = function(state, wait, duration) {
+    $('#tblCallerDetails > tbody> tr').each(function() {
+        var firstTd = $(this).find('td:first');
+        if ($(firstTd).text() == data.eventBody.id) {
+            $(this).find('td:eq(5)').text(state);
+            $(this).find('td:eq(6)').text(wait);
+            $(this).find('td:eq(7)').text(duration);
+        }
+    })
 }
 
 export default clientApp
