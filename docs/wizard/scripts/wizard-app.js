@@ -21,12 +21,6 @@ class WizardApp {
         this.purecloudClient.setPersistSettings(true, 'premium_app');
         this.redirectUri = appConfig.redirectUri;
 
-        // Permissions required for using the app 
-        this.setupPermissionsRequired = appConfig.setupPermissionsRequired;
-
-        // Default permission to add to new roles
-        this.premiumAppPermission = appConfig.premiumAppPermission;
-
         // Language default is english
         // Language context is object containing the translations
         this.language = 'en-us';
@@ -69,10 +63,6 @@ class WizardApp {
                 }
             ]
         }
-
-        // Used to determine progress
-        //this.totalSteps = 11;
-        this.currentStep = 0;
     }
 
     /**
@@ -122,7 +112,7 @@ class WizardApp {
 
     /**
      * Authenticate to PureCloud (Implicit Grant)
-     * @todo Assign default or notify user if can't determine purecloud environment
+     * @return {Promise}
      */
     _pureCloudAuthenticate() {
         return new Promise((resolve, reject) => {
@@ -140,6 +130,10 @@ class WizardApp {
         });
     }
 
+    /**
+     * Renders the proper text language into the web pages
+     * @param {Object} text  Contains the keys and values from the language file
+     */
     displayPageText(text){
         $(document).ready(() => {
             for (let key in text){
@@ -149,6 +143,10 @@ class WizardApp {
         });
     }
 
+    /**
+     * Get details of the current user
+     * @return {Promise}
+     */
     getUserDetails(){
         let usersApi = new this.platformClient.UsersApi();
         let opts = {'expand': ['authorization']};
@@ -156,6 +154,10 @@ class WizardApp {
         return usersApi.getUsersMe(opts)
     }
 
+    /**
+     * Checks if the product is available in the current Purecloud org.
+     * @return {Promise}
+     */
     validateProductAvailability(){
         // premium-app-example
         return new Promise((resolve, reject) => {
@@ -173,16 +175,9 @@ class WizardApp {
     }
 
     /**
-     * Gets the org info
+     * Checks if any configured objects are still existing. This is based of the prefix
+     * @returns {Promise} 
      */
-    getOrgInfo(){
-        let organizationApi = new this.platformClient.OrganizationApi();
-
-        // Get organization information
-        return organizationApi.getOrganizationsMe()
-    }
-
-
     isExisting(){
         return new Promise((resolve, reject) => {
             let promiseArr = []; 
@@ -202,8 +197,7 @@ class WizardApp {
             promiseArr.push(
                 this.getExistingApps()
                 .then((data) => {
-                    let integrations = data.entities.filter(entity => entity.name.startsWith(this.prefix));
-                    if (integrations.length > 0) reject({"isExisting": true});
+                    if (data.length > 0) reject({"isExisting": true});
             }));
 
             return Promise.all(promiseArr)
@@ -211,6 +205,10 @@ class WizardApp {
         })
     }
 
+    /**
+     * Delete all existing Premium App PC objects
+     * @returns {Promise}
+     */
     clearConfigurations(){
         let configArr = [];
 
@@ -254,9 +252,7 @@ class WizardApp {
 
                 if (apps.total > 0){
                     // Filter results before deleting
-                    apps.entities
-                        .filter(entity => entity.name.startsWith(this.prefix))
-                        .map(entity => entity.id)
+                    apps.map(entity => entity.id)
                         .forEach(x => {
                             del_app.push(this.deletePureCloudApp(x));
                     });
@@ -303,8 +299,6 @@ class WizardApp {
 
     /**
      * Get existing roles in purecloud based on prefix
-     * @todo Get role based on permission. NOTE: if permission is on permissionPolicy instead of General,
-     *       PureCloud don't have API to easily search using it.
      */
     getExistingRoles(){
         const authApi = new this.platformClient.AuthorizationApi();
@@ -336,7 +330,15 @@ class WizardApp {
         let integrationsOpts = {
             'pageSize': 100
         }
-        return integrationApi.getIntegrations(integrationsOpts);
+        
+        return new Promise((resolve, reject) => {
+            integrationApi.getIntegrations(integrationsOpts)
+            .then((data) => {
+                resolve(data.entities
+                    .filter(entity => entity.name
+                        .startsWith(this.prefix)));
+            })
+        });
     }
 
     /**
@@ -382,12 +384,12 @@ class WizardApp {
                         "permissionPolicies": role.permissionPolicies
                 };
 
-                // TODO: Fix roles assingment not working
+                // Assign role to user
                 let roleId = null;
                 authPromises.push(
                     authApi.postAuthorizationRoles(roleBody)
                     .then((data) => {
-                        this.logInfo("Created role: " + role.name, this.currentStep++);
+                        this.logInfo("Created role: " + role.name);
                         roleId = data.id;
 
                         return this.getUserDetails();
@@ -396,7 +398,7 @@ class WizardApp {
                         return authApi.putAuthorizationRoleUsersAdd(roleId, [data.id]);
                     })
                     .then((data) => {
-                        this.logInfo("Assigned " + role.name + " to user", this.currentStep++);
+                        this.logInfo("Assigned " + role.name + " to user");
                     })
                     .catch((err) => console.log(err))
                 );
@@ -417,7 +419,7 @@ class WizardApp {
                     groupPromises.push(
                         groupsApi.postGroups(groupBody)
                         .then((data) => {
-                            this.logInfo("Created group: " + group.name, this.currentStep++);
+                            this.logInfo("Created group: " + group.name);
                             groupData[group.name] = data.id;
                         })
                         .catch((err) => console.log(err))
@@ -446,7 +448,7 @@ class WizardApp {
                     integrationPromises.push(
                         integrationsApi.postIntegrations(integrationBody)
                         .then((data) => {
-                            this.logInfo("Created instance: " + instance.name, this.currentStep++);
+                            this.logInfo("Created instance: " + instance.name);
                             let integrationConfig = {
                                 "body": {
                                     "name": this.prefix + instance.name,
@@ -468,7 +470,7 @@ class WizardApp {
                             return integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig)
                         })
                         .then((data) => {
-                            this.logInfo("Configured instance: " + data.name, this.currentStep++);                           
+                            this.logInfo("Configured instance: " + data.name);                           
                         })
                         .catch((err) => console.log(err))
                     );
@@ -488,7 +490,7 @@ class WizardApp {
 
                     enablePromises.push(
                         integrationsApi.patchIntegration(instance.id, opts)
-                        .then((data) => this.logInfo("Enabled instance: " + data.name, this.currentStep++))
+                        .then((data) => this.logInfo("Enabled instance: " + data.name))
                         .catch((err) => console.log(err))
                     );
                 });
@@ -498,18 +500,17 @@ class WizardApp {
 
             // When everything's finished, log the output.
             .then(() => {
-                this.logInfo("Installation Complete!", this.currentStep++);
+                this.logInfo("Installation Complete!");
                 resolve();
             })
         });
     }
 
-    logInfo(data, progress){
+    logInfo(data){
         if (!data || (typeof(data) !== 'string')) data = "";
-        if (!progress) progress = 0;
 
         $.LoadingOverlay("text", data);
-        $.LoadingOverlay("progress", progress * 11)
+        //$.LoadingOverlay("progress", progress * 11)
     }
 
     /**
