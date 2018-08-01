@@ -31,9 +31,6 @@
             <path d="M25.22,5H6.62c-2.37,0-4.3.5-4.41,2.87a.72.72,0,0,0,.44.66l11.59,5.9a3.69,3.69,0,0,0,1.71.39,4,4,0,0,0,1.6-.39L29.24,8.8A1,1,0,0,0,29.79,8V7.75C29.79,5.32,27.64,5,25.22,5Z"/>
             <path d="M3.26,12.44a.7.7,0,0,0-.66,0c-.44.22-.39.55-.39.88v10.1A3.58,3.58,0,0,0,5.79,27h20.8a3.2,3.2,0,0,0,3.2-3.2V13.1a.71.71,0,0,0-.5-.72,1.51,1.51,0,0,0-.88.11L17.44,18a3.39,3.39,0,0,1-3.09,0L3.26,12.44Z"/>
         </symbol>
-        <symbol viewBox="0 0 32 32" id="icon-comment-ellipsis">
-            <path d="M2.2,9.5v8A5.93,5.93,0,0,0,8.11,23.4h7.47a.82.82,0,0,1,.62.28,56,56,0,0,0,4.71,4.52,1,1,0,0,0,1.59-.68c.12-1.41-.28-4,.89-4.09l.5,0A5.93,5.93,0,0,0,29.8,17.5v-8a5.93,5.93,0,0,0-5.9-5.92H8.11A5.93,5.93,0,0,0,2.2,9.5ZM20,13.5a1.74,1.74,0,1,1,1.74,1.74A1.74,1.74,0,0,1,20,13.5Zm-5.75,0A1.74,1.74,0,1,1,16,15.23,1.74,1.74,0,0,1,14.26,13.5Zm-5.75,0a1.74,1.74,0,1,1,1.74,1.74A1.74,1.74,0,0,1,8.52,13.5Z"/>
-        </symbol>
         <symbol viewBox="0 0 32 32" id="icon-calendar-dots-day">
             <path d="M18.5,16A2.5,2.5,0,1,1,16,13.5,2.5,2.5,0,0,1,18.5,16Z"/>
         </symbol>
@@ -147,14 +144,6 @@
                                     </svg>
                                 </span>
                                 <span class="media-type-filter-name filter-name-phone">EMAIL</span>
-                            </span>
-                            <span class="media-type-filter-icon media-type-message" onClick="messageConversations()">
-                                <span class="media-icon ember-view">
-                                    <svg class="svg-icon icon-comment-ellipsis">
-                                        <use xlink:href="#icon-comment-ellipsis"></use>
-                                    </svg>
-                                </span>
-                                <span class="media-type-filter-name filter-name-phone">MESSAGE</span>
                             </span>
                         </div>
                     </div>
@@ -315,23 +304,6 @@
                 var td = tr[i].getElementsByTagName("td")[1];
                 if (td) {
                     if (td.innerHTML.search(/\bEmail\b/) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                } 
-            }
-        }
-
-        function messageConversations() {
-            var table = document.getElementById("tblCallerDetails");
-            var tr = table.getElementsByTagName("tr");
-
-            // Loop through all table rows, and hide those who don't match the search query
-            for (var i = 0; i < tr.length; i++) {
-                var td = tr[i].getElementsByTagName("td")[1];
-                if (td) {
-                    if (td.innerHTML.search(/\bMessage\b/) > -1) {
                         tr[i].style.display = "";
                     } else {
                         tr[i].style.display = "none";
