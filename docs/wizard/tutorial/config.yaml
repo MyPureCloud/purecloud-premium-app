@@ -1,0 +1,12 @@
+---
+javascript:
+    displayName: Javascript
+    steps:
+        - file: ""
+          highlight: "0-76"
+        - file: ""
+          highlight: "8-32"
+        - file: ""
+          highlight: "32-38"
+        - file: ""
+          highlight: "38-76"
