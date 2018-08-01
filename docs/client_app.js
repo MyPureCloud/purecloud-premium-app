@@ -750,6 +750,8 @@ clientApp.updateTableRow = function(data) {
                     // $(this).find('td:eq(6)').text("--");
                     // $(this).find('td:eq(7)').text("--");
 
+                    console.log("1" + this);
+
                     clientApp.updateRow(agent.calls[0].state, "--", "--");
                 }
             })
@@ -765,6 +767,8 @@ clientApp.updateTableRow = function(data) {
                     // $(this).find('td:eq(5)').text(agent.calls[0].state);
                     // $(this).find('td:eq(6)').text(new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1));
                     // $(this).find('td:eq(7)').text("--");
+
+                    console.log("1" + this);
 
                     var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                     clientApp.updateRow(agent.calls[0].state, wait, "--");
@@ -1011,6 +1015,7 @@ clientApp.insertRow = function(id, type, name, ani, dnis, state, wait, duration)
 }
 
 clientApp.updateRow = function(state, wait, duration) {
+    console.log("2" + this);
     $(this).find('td:eq(5)').text(state);
     $(this).find('td:eq(6)').text(wait);
     $(this).find('td:eq(7)').text(duration);
