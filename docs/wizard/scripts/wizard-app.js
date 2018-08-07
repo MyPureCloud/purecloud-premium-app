@@ -248,9 +248,10 @@ class WizardApp {
         configArr.push(
             this.getExistingApps()
             .then(apps => {
+                console.log(apps)
                 let del_app = [];
 
-                if (apps.total > 0){
+                if (apps.length > 0){
                     // Filter results before deleting
                     apps.map(entity => entity.id)
                         .forEach(x => {
@@ -348,7 +349,7 @@ class WizardApp {
     deletePureCloudApp(instanceId){
         let integrationsApi = new this.platformClient.IntegrationsApi();
 
-        return integrationsApi.deleteIntegration(instanceId)
+        integrationsApi.deleteIntegration(instanceId)
     }
 
 
