@@ -61,8 +61,7 @@ clientApp.onSocketMessage = function(event){
     console.log(eventBody);
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
-        let caller = eventBody.participants
-                .filter(participant => participant.purpose === "customer")[0];
+        let caller = eventBody.participants.filter(participant => participant.purpose === "customer")[0];
 
         // Put values to the fields
         if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
@@ -71,7 +70,6 @@ clientApp.onSocketMessage = function(event){
             $("#callerArea").text("");
 
             clientApp.isCallActive = false;
-
         } else {
             let callerLocation = '';
 
@@ -196,21 +194,13 @@ clientApp.subscribeToQueue = function(queue){
     ).then(data => {
         if(Object.keys(data).length > 0) {
             (data.conversations).forEach(function(conversation) {
-                let caller = conversation.participants
-                    .filter(participant => participant.purpose === "external")[0];
-            
-                let acd = conversation.participants
-                    .filter(participant => participant.purpose === "acd")[0];
-
-                let acdSegment = acd.sessions[0].segments
-                    .filter(segment => segment.segmentType === "interact")[0];
-
-                let agent = conversation.participants
-                    .filter(participant => participant.purpose === "agent")[0];
+                let caller = conversation.participants.filter(participant => participant.purpose === "external")[0];            
+                let acd = conversation.participants.filter(participant => participant.purpose === "acd")[0];
+                let acdSegment = acd.sessions[0].segments.filter(segment => segment.segmentType === "interact")[0];
+                let agent = conversation.participants.filter(participant => participant.purpose === "agent")[0];
 
                 if(caller === null) {
-                    caller = conversation.participants
-                        .filter(participant => participant.purpose === "customer")[0];
+                    caller = conversation.participants.filter(participant => participant.purpose === "customer")[0];
                 }
 
                 // Get values to insert in table
@@ -294,28 +284,19 @@ clientApp.onSocketMessageQueue = function(event){
 }
 
 clientApp.addTableRow = function(data) {
-    let caller = data.eventBody.participants
-        .filter(participant => participant.purpose === "customer")[0];
-    
-    let agent = data.eventBody.participants
-        .filter(participant => participant.purpose === "agent")[0];
-    
-    let acd = data.eventBody.participants
-        .filter(participant => participant.purpose === "acd")[0];
+    let caller = data.eventBody.participants.filter(participant => participant.purpose === "customer")[0];    
+    let agent = data.eventBody.participants.filter(participant => participant.purpose === "agent")[0];    
+    let acd = data.eventBody.participants.filter(participant => participant.purpose === "acd")[0];
     
     // Call Conversation Type
     if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks === undefined) && (caller.emails === undefined)) {
         if ((agent === undefined) && (acd.calls[0].state === "connected")) {
             // Call on queue
             clientApp.insertRow(data.eventBody.id, "Call", caller.name, caller.address, caller.calls[0].other.addressNormalized, "on queue", "--", "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming call
             clientApp.insertRow(data.eventBody.id, "Call", caller.name, caller.address, caller.calls[0].other.addressNormalized, agent.calls[0].state, "--", "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         }
     }    
@@ -325,14 +306,10 @@ clientApp.addTableRow = function(data) {
         if ((agent === undefined) && (acd.chats[0].state === "connected")) {
             // Chat on queue
             clientApp.insertRow(data.eventBody.id, "Chat", caller.name, caller.address, caller.chats[0].roomId, "on queue", "--", "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming chat
             clientApp.insertRow(data.eventBody.id, "Chat", caller.name, caller.address, caller.chats[0].roomId, agent.calls[0].state, "--", "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         }
     }
@@ -342,14 +319,10 @@ clientApp.addTableRow = function(data) {
         if ((agent === undefined) && (acd.callbacks[0].state === "connected")) {
             // Callback on queue
             clientApp.insertRow(data.eventBody.id, "Callback", caller.name, caller.address, caller.calls[0].other.addressNormalized, "on queue", "--", "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming callback
             clientApp.insertRow(data.eventBody.id, "Callback", caller.name, caller.address, caller.calls[0].other.addressNormalized, agent.callbacks[0].state, "--", "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         }
     }
@@ -359,52 +332,37 @@ clientApp.addTableRow = function(data) {
         if ((agent === undefined) && (acd.emails[0].state === "connected")) {
             // Email on queue
             clientApp.insertRow(data.eventBody.id, "Email", caller.name, caller.address, acd.address, "on queue", "--", "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming email
             clientApp.insertRow(data.eventBody.id, "Email", caller.name, caller.address, acd.address, agent.emails[0].state, "--", "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         }
     }
 }
 
 clientApp.updateTableRow = function(data) {
-    let caller = data.eventBody.participants
-        .filter(participant => participant.purpose === "customer")[0];
-
-    let agent = data.eventBody.participants
-        .filter(participant => participant.purpose === "agent")[0];
-    
-    let acd = data.eventBody.participants
-        .filter(participant => participant.purpose === "acd")[0];
+    let caller = data.eventBody.participants.filter(participant => participant.purpose === "customer")[0];
+    let agent = data.eventBody.participants.filter(participant => participant.purpose === "agent")[0];    
+    let acd = data.eventBody.participants.filter(participant => participant.purpose === "acd")[0];
 
     // Call Conversation Type
     if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks === undefined) && (caller.emails === undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming call
             clientApp.updateRow(agent.calls[0].state, "--", "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active call
             var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
             clientApp.updateRow(agent.calls[0].state, wait, "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
-            if (agent.calls[0].state === "disconnected") {
-                // If disconnected call
+            // If disconnected call
+            if (agent.calls[0].state === "disconnected") {                
                 var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                 var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                 clientApp.updateRow(agent.calls[0].state, wait, duration);
-    
-                // Makes sure that the field only changes the first time. 
                 clientApp.isCallActiveSup = false;
             }        
         }
@@ -415,24 +373,18 @@ clientApp.updateTableRow = function(data) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming chat
             clientApp.updateRow(agent.chats[0].state, "--", "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active chat
             var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
             clientApp.updateRow(agent.chats[0].state, wait, "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
-            if (agent.chats[0].state === "disconnected") {
-                // If disconnected chat
+            // If disconnected chat
+            if (agent.chats[0].state === "disconnected") {                
                 var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                 var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                 clientApp.updateRow(agent.chats[0].state, wait, duration);
-    
-                // Makes sure that the field only changes the first time. 
                 clientApp.isCallActiveSup = false;
             }        
         }
@@ -443,24 +395,18 @@ clientApp.updateTableRow = function(data) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming callback
             clientApp.updateRow(agent.callbacks[0].state, "--", "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active callback
             var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
             clientApp.updateRow(agent.callbacks[0].state, wait, "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
-            if (agent.callbacks[0].state === "disconnected") {
-                // If disconnected callback
+            // If disconnected callback
+            if (agent.callbacks[0].state === "disconnected") {                
                 var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                 var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                 clientApp.updateRow(agent.callbacks[0].state, wait, duration);
-    
-                // Makes sure that the field only changes the first time. 
                 clientApp.isCallActiveSup = false;
             }        
         }
@@ -471,24 +417,18 @@ clientApp.updateTableRow = function(data) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming email
             clientApp.updateRow(agent.emails[0].state, "--", "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active email
             var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
             clientApp.updateRow(agent.emails[0].state, wait, "--");
-    
-            // Makes sure that the field only changes the first time. 
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
-            if (agent.emails[0].state === "disconnected") {
-                // If disconnected email
+            // If disconnected email
+            if (agent.emails[0].state === "disconnected") {                
                 var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                 var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                 clientApp.updateRow(agent.emails[0].state, wait, duration);
-    
-                // Makes sure that the field only changes the first time. 
                 clientApp.isCallActiveSup = false;
             }        
         }
