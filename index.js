@@ -11,12 +11,8 @@ var https = require("https"),
     fs = require("fs");
 var express = require('express');
 var app = express();
-// var chronomouse = require('chronomouse');
-
-var clientApp = require('./docs/client_app');
 
 app.use(express.static(__dirname+ "/docs"));
-app.use('/', clientApp);
 
 app.set('port', 3000);
 
