@@ -63,6 +63,7 @@ clientApp.onSocketMessage = function(event){
 
     console.log(topic);
     console.log(eventBody);
+    console.log("isCallActive || " + clientApp.isCallActive);
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
         let caller = eventBody.participants.filter(participant => participant.purpose === "customer")[0];
@@ -98,6 +99,8 @@ clientApp.onSocketMessage = function(event){
 }
 
 clientApp.toastIncomingCall = function(callerLocation){
+    console.log("toastIncomingCall");
+
     if(clientApp.hasOwnProperty('purecloudClientApi')){
         if(clientApp.langTag !== null) {
             clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language[clientApp.langTag].IncomingCall, clientApp.language[clientApp.langTag].From + ": " + callerLocation);
@@ -128,7 +131,7 @@ clientApp.loadSupervisorView = function(){
 
 clientApp.subscribeToQueue = function(queue){
     // Check if there is an active conversation
-    clientApp.getActiveConversation();
+    clientApp.getActiveConversation(queue);
 
     // // Create a Notifications Channel
     // notificationsApi.postNotificationsChannels()
