@@ -75,7 +75,7 @@ clientApp.onSocketMessage = function(event){
             $("#callerArea").text("");
 
             clientApp.isCallActive = false;
-        } else if (clientApp.isCallActive) {
+        } else {
             let callerLocation = '';
 
             $("#callerName").text(caller.name);
@@ -94,14 +94,13 @@ clientApp.onSocketMessage = function(event){
             clientApp.isCallActive = true;
 
             clientApp.toastIncomingCall(callerLocation);
-        }
-
-        // clientApp.isCallActive = false;
+        }        
     }
 }
 
 clientApp.toastIncomingCall = function(callerLocation){
     console.log("toastIncomingCall");
+    clientApp.isCallActive = false;
 
     if(clientApp.hasOwnProperty('purecloudClientApi')){
         if(clientApp.langTag !== null) {
