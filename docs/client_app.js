@@ -47,7 +47,6 @@ clientApp.setup = function(pcEnv, langTag, html){
         $.getJSON('./language.json', function(data) {
             clientApp.language = data;
         })
-
     ).then(data => console.log("Succesfully set-up Client App."))
 
     // Error Handling
@@ -99,16 +98,8 @@ clientApp.onSocketMessage = function(event){
 clientApp.toastIncomingCall = function(callerLocation){
     if(clientApp.hasOwnProperty('purecloudClientApi')){
         if(clientApp.langTag !== null) {
-            // $.getJSON('./language.json', function(data) {
-            //     clientApp.purecloudClientApi.alerting.showToastPopup(data[clientApp.langTag].IncomingCall, data[clientApp.langTag].From + ": " + callerLocation);
-            // });
-
             clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language[clientApp.langTag].IncomingCall, data[clientApp.langTag].From + ": " + callerLocation);
         } else {
-            // $.getJSON('./language.json', function(data) {
-            //     clientApp.purecloudClientApi.alerting.showToastPopup(data["en-us"].IncomingCall, data["en-us"].From + ": " + callerLocation);
-            // });
-
             clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language["en-us"].IncomingCall, data["en-us"].From + ": " + callerLocation);
         }        
     }

@@ -11,8 +11,10 @@ var https = require("https"),
     fs = require("fs");
 var express = require('express');
 var app = express();
+var chronomouse = require('chronomouse');
 
 app.use(express.static(__dirname+ "/docs"));
+app.use(chronomouse());
 
 app.set('port', 3000);
 

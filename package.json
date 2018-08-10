@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/PrinceMerluza/purecloud-premium-app#readme",
   "dependencies": {
+    "chronomouse": "^2.4.0",
     "express": "^4.16.3"
   }
 }
