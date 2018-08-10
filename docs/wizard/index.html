@@ -17,15 +17,15 @@
     <script src="./scripts/util.js"></script>
 </head>
 <body>
-    <div style="position: fixed; top:0; left:0; z-index: -10; background: #FFFFFF; width: 100%; height: 100%;"></div>
-    <canvas id="bubbly-layer" style="position: fixed; top:0; left:0; z-index: -5; "></canvas>
+    <div id="background"></div>
+    <!-- <canvas id="bubbly-layer" style="position: fixed; top:0; left:0; z-index: -5; "></canvas> -->
 
     <noscript>
         For full functionality of this site it is necessary to enable JavaScript. Here are the <a href="http://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web browser</a>.
     </noscript>
 
     <header>
-        <img src="logo.png" alt="Logo">
+        <p>Premium App  /  Home</p>
     </header>
 
     <div id="loading" style="margin-top: 30px; text-align: center;">
@@ -79,9 +79,13 @@
         </div>
     </main>
 
+    <footer>
+            <img src="logo.png" alt="Logo">
+    </footer>
+
     <!-- Client Instances and PureCloud API will be encapsulated in the wizardApp module -->
     <script type="module">
-        import WizardApp from './scripts/wizard-app.js'
+        import WizardApp from './scripts/wizard-app.js';
 
         // Initiate the App
         let myApp = new WizardApp();
@@ -108,6 +112,7 @@
                 // Get the user information to display on the screen
                 return myApp.getUserDetails(); 
             }
+            //return myApp.getUserDetails(); 
         }).then((user) => {
             if(user){
                 // Display welcome message after everythin has been loaded
@@ -122,6 +127,6 @@
         .catch((e) => console.log(e));
     </script>
 
-<script src="./scripts/bubbles.js"></script>
+<!-- <script src="./scripts/bubbles.js"></script> -->
 </body>
 </html>

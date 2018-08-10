@@ -18,14 +18,17 @@
 
 </head>
 <body>
+    <div id="background"></div>
+    <!-- <canvas id="bubbly-layer" style="position: fixed; top:0; left:0; z-index: -5; "></canvas> -->
+
     <noscript>
         For full functionality of this site it is necessary to enable JavaScript. Here are the <a href="http://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web browser</a>.
     </noscript>
-    <div style="position: fixed; top:0; left:0; z-index: -10; background: #FFF; width: 100%; height: 100%;"></div>
+    
     <canvas id="bubbly-layer" style="position: fixed; top:0; left:0; z-index: -5; "></canvas>
 
     <header>
-        <img src="logo.png" alt="Logo">
+        <p>Premium App  /  Summary</p>
     </header>
 
     <div class="title">
@@ -56,12 +59,17 @@
             <span class="txt-back">Back</span>
         </button> -->
     </main>
+
+    <footer>
+        <img src="logo.png" alt="Logo">
+    </footer>
+
     <script type="module">
-        import WizardApp from './scripts/wizard-app.js'
+        import WizardApp from './scripts/wizard-app.js';
 
         // Initiate the App
         let myApp = new WizardApp();
-        myApp.start()
+        myApp.start();
     </script>
     <script>
         $(document).ready(() => {
@@ -70,6 +78,6 @@
             }, 2500);
         });
     </script>
-<script src="./scripts/bubbles.js"></script>
+<!-- <script src="./scripts/bubbles.js"></script> -->
 </body>
 </html>
