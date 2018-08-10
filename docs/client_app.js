@@ -5,6 +5,8 @@ import clientIDs from './clientIDs.js';
 
 let clientApp = {};
 
+var chronomouse = require('chronomouse');
+
 // PureCloud OAuth information
 const platformClient = require('platformClient');
 const client = platformClient.ApiClient.instance;
