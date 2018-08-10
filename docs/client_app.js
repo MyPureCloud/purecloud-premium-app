@@ -61,14 +61,13 @@ clientApp.onSocketMessage = function(event){
     let topic = data.topicName;
     let eventBody = data.eventBody;
 
-    console.log("TOPIC || " + topic);
-    console.log("EVENT BODY || " + eventBody);
-
-    console.log("DATA || " + JSON.stringify(data));
+    console.log(topic);
+    console.log(eventBody);
     
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicIdAgent){
         let caller = eventBody.participants.filter(participant => participant.purpose === "customer")[0];
+        let agent = eventBody.participants.filter(participant => participant.purpose === "agent")[0];
 
         // Put values to the fields
         if((caller.endTime !== undefined) && (!clientApp.isCallActive)){
@@ -77,7 +76,7 @@ clientApp.onSocketMessage = function(event){
             $("#callerArea").text("");
 
             clientApp.isCallActive = false;
-        } else {
+        } else if(agent.state === "alerting") {
             let callerLocation = '';
 
             $("#callerName").text(caller.name);
@@ -94,16 +93,15 @@ clientApp.onSocketMessage = function(event){
             
             // Makes sure that the field only changes the first time. 
             clientApp.isCallActive = true;
-
+            
             clientApp.toastIncomingCall(callerLocation);
-        }        
+        } else {
+            clientApp.isCallActive = false;
+        }
     }
 }
 
 clientApp.toastIncomingCall = function(callerLocation){
-    console.log("TOAST INCOMING CALL");
-    clientApp.isCallActive = false;
-
     if(clientApp.hasOwnProperty('purecloudClientApi')){
         if(clientApp.langTag !== null) {
             clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language[clientApp.langTag].IncomingCall, clientApp.language[clientApp.langTag].From + ": " + callerLocation);
