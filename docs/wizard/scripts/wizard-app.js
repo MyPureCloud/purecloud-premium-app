@@ -1,14 +1,12 @@
 /*
 *   NOTE: This sample uses ES6 features
 */
-import appConfig from './config.js'
+import appConfig from './config.js';
 
 const $ = window.$;
-const jQuery = window.jQuery;
 
 /**
  * WizardApp class that handles everything in the App.
- * @todo Make app persistent by using localStorage
  */
 class WizardApp {
     constructor(){
@@ -21,12 +19,18 @@ class WizardApp {
         this.purecloudClient.setPersistSettings(true, 'premium_app');
         this.redirectUri = appConfig.redirectUri;
 
+        // PureCloud API instances
+        this.usersApi = new this.platformClient.UsersApi();
+        this.integrationsApi = new this.platformClient.IntegrationsApi();
+        this.groupsApi = new this.platformClient.GroupsApi();
+        this.authApi = new this.platformClient.AuthorizationApi();
+
         // Language default is english
         // Language context is object containing the translations
         this.language = 'en-us';
 
         // PureCloud app name
-        this.appName = "premium-app-example"
+        this.appName = "premium-app-example";
 
         this.prefix = appConfig.prefix;
         this.installationData = {
@@ -59,10 +63,10 @@ class WizardApp {
                     "name": "Agent Widget",
                     "url": "https://mypurecloud.github.io/purecloud-premium-app/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}",
                     "type": "widget",
-                    "groups": ["Agents", "Supervisors"]
+                    "groups": ["Agents"]
                 }
             ]
-        }
+        };
     }
 
     /**
@@ -115,19 +119,10 @@ class WizardApp {
      * @return {Promise}
      */
     _pureCloudAuthenticate() {
-        return new Promise((resolve, reject) => {
-            // Authenticate through PureCloud
-            this.purecloudClient.loginImplicitGrant(appConfig.clientIDs[this.pcApp.pcEnvironment], 
-                                    this.redirectUri, 
-                                    {state: ('pcEnvironment=' + this.pcApp.pcEnvironment)})
-            
-            // Check user permissions
-            .then(data => {
-                console.log(data);
-                resolve();
-            // Error handler catch all
-            }).catch(err => console.log(err));
-        });
+        // Authenticate through PureCloud
+        return this.purecloudClient.loginImplicitGrant(appConfig.clientIDs[this.pcApp.pcEnvironment], 
+                                this.redirectUri, 
+                                {state: ('pcEnvironment=' + this.pcApp.pcEnvironment)});
     }
 
     /**
@@ -148,10 +143,9 @@ class WizardApp {
      * @return {Promise}
      */
     getUserDetails(){
-        let usersApi = new this.platformClient.UsersApi();
         let opts = {'expand': ['authorization']};
     
-        return usersApi.getUsersMe(opts)
+        return this.usersApi.getUsersMe(opts);
     }
 
     /**
@@ -160,10 +154,8 @@ class WizardApp {
      */
     validateProductAvailability(){
         // premium-app-example
-        return new Promise((resolve, reject) => {
-            let integrationsApi = new this.platformClient.IntegrationsApi();
-            
-            integrationsApi.getIntegrationsTypes({})
+        return new Promise((resolve, reject) => {            
+            this.integrationsApi.getIntegrationsTypes({})
             .then((data) => {
                 if (data.entities.filter((integType) => integType.id === this.appName)[0]){
                     resolve(true);
@@ -171,38 +163,42 @@ class WizardApp {
                     resolve(false);
                 }
             })
+            .catch(err => reject(err));
         });
     }
 
     /**
-     * Checks if any configured objects are still existing. This is based of the prefix
-     * @returns {Promise} 
+     * Checks if any configured objects are still existing. 
+     * This is based of the prefix
+     * @returns {bool} If any installed objects are still existing in the org. 
      */
     isExisting(){
         return new Promise((resolve, reject) => {
             let promiseArr = []; 
             
-            promiseArr.push(
-                this.getExistingGroups()
-                .then((data) => {
-                    if(data.total > 0) reject({"isExisting": true});
-            }));
-            
-            promiseArr.push(
-                this.getExistingRoles()
-                .then((data) => {
-                    if(data.total > 0) reject({"isExisting": true});
-            }));
-
-            promiseArr.push(
-                this.getExistingApps()
-                .then((data) => {
-                    if (data.length > 0) reject({"isExisting": true});
-            }));
+            promiseArr.push(this.getExistingGroups());
+            promiseArr.push(this.getExistingRoles());
+            promiseArr.push(this.getExistingApps());
 
             return Promise.all(promiseArr)
-            .then(() => resolve())
-        })
+            .then((results) => { 
+                if(
+                    // Check if any groups are still existing
+                    results[0].total > 0 || 
+
+                    // Check if any roles are existing
+                    results[1].total > 0 ||
+
+                    // Check if any apps are existing
+                    results[2].length > 0 ){
+
+                        resolve(true);
+                }
+
+                resolve(false);
+            })
+            .catch(err => reject(err));
+        });
     }
 
     /**
@@ -226,7 +222,7 @@ class WizardApp {
 
                 return Promise.all(del_group);
             })
-        )
+        );
 
         // Delete Roles
         configArr.push(
@@ -242,13 +238,13 @@ class WizardApp {
                 
                 return Promise.all(del_role);
             })
-        )
+        );
 
         // Delete instances
         configArr.push(
             this.getExistingApps()
             .then(apps => {
-                console.log(apps)
+                console.log(apps);
                 let del_app = [];
 
                 if (apps.length > 0){
@@ -261,7 +257,7 @@ class WizardApp {
 
                 return Promise.all(del_app);
             })
-        )
+        );
 
         return Promise.all(configArr);
     }
@@ -270,9 +266,6 @@ class WizardApp {
      * Gets the existing groups on PureCloud based on Prefix
      */
     getExistingGroups(){
-        // PureCloud API instances
-        const groupsApi = new this.platformClient.GroupsApi();
-
         // Query bodies
         var groupSearchBody = {
             "query": [
@@ -285,7 +278,7 @@ class WizardApp {
             ]
         };
 
-        return groupsApi.postGroupsSearch(groupSearchBody);
+        return this.groupsApi.postGroupsSearch(groupSearchBody);
     }
 
     /**
@@ -293,23 +286,19 @@ class WizardApp {
      * @param {String} groupId 
      */
     deletePureCloudGroup(groupId){
-        let groupsApi = new this.platformClient.GroupsApi();
-
-        return groupsApi.deleteGroup(groupId);
+        return this.groupsApi.deleteGroup(groupId);
     }
 
     /**
      * Get existing roles in purecloud based on prefix
      */
     getExistingRoles(){
-        const authApi = new this.platformClient.AuthorizationApi();
-
         let authOpts = { 
             'name': this.prefix + "*", // Wildcard to work like STARTS_WITH 
             'userCount': false
         };
 
-        return authApi.getAuthorizationRoles(authOpts);
+        return this.authApi.getAuthorizationRoles(authOpts);
     }
 
     /**
@@ -317,9 +306,7 @@ class WizardApp {
      * @param {String} roleId 
      */
     deletePureCloudRole(roleId){
-        let authApi = new this.platformClient.AuthorizationApi();
-
-        return authApi.deleteAuthorizationRole(roleId)
+        return this.authApi.deleteAuthorizationRole(roleId);
     }
 
     /**
@@ -327,18 +314,18 @@ class WizardApp {
      * @todo Get instances of a particular type of app.
      */
     getExistingApps(){
-        const integrationApi = new this.platformClient.IntegrationsApi();
         let integrationsOpts = {
             'pageSize': 100
-        }
+        };
         
         return new Promise((resolve, reject) => {
-            integrationApi.getIntegrations(integrationsOpts)
+            this.integrationsApi.getIntegrations(integrationsOpts)
             .then((data) => {
                 resolve(data.entities
                     .filter(entity => entity.name
                         .startsWith(this.prefix)));
             })
+            .catch(err => reject(err));
         });
     }
 
@@ -347,9 +334,7 @@ class WizardApp {
      * @param {String} instanceId 
      */
     deletePureCloudApp(instanceId){
-        let integrationsApi = new this.platformClient.IntegrationsApi();
-
-        integrationsApi.deleteIntegration(instanceId)
+        return this.integrationsApi.deleteIntegration(instanceId);
     }
 
 
@@ -357,11 +342,6 @@ class WizardApp {
      * Final Step of the installation wizard. Actually install every staged object.
      */
     installConfigurations(){
-        // Api instances
-        let groupsApi = new this.platformClient.GroupsApi();
-        let authApi = new this.platformClient.AuthorizationApi();
-        let integrationsApi = new this.platformClient.IntegrationsApi();
-
         // Keep the promises of the creation calls
         // This will be used to keep track once a particular batch resolves
         let groupPromises = [];
@@ -388,7 +368,7 @@ class WizardApp {
                 // Assign role to user
                 let roleId = null;
                 authPromises.push(
-                    authApi.postAuthorizationRoles(roleBody)
+                    this.authApi.postAuthorizationRoles(roleBody)
                     .then((data) => {
                         this.logInfo("Created role: " + role.name);
                         roleId = data.id;
@@ -396,7 +376,7 @@ class WizardApp {
                         return this.getUserDetails();
                     })
                     .then((data) => {
-                        return authApi.putAuthorizationRoleUsersAdd(roleId, [data.id]);
+                        return this.authApi.putAuthorizationRoleUsersAdd(roleId, [data.id]);
                     })
                     .then((data) => {
                         this.logInfo("Assigned " + role.name + " to user");
@@ -410,29 +390,29 @@ class WizardApp {
             .then(() => {
                 this.installationData.groups.forEach((group) => {
                     let groupBody = {
-                        "name": this.prefix + group.name + "_",
+                        "name": this.prefix + group.name + ".",
                         "description": group.description,
                         "type": "official",
                         "rulesVisible": true,
                         "visibility": "members"
-                    }
+                    };
                     console.log(groupBody);
                     groupPromises.push(
-                        groupsApi.postGroups(groupBody)
+                        this.groupsApi.postGroups(groupBody)
                         .then((data) => {
                             this.logInfo("Created group: " + group.name);
                             groupData[group.name] = data.id;
                         })
                         .catch((err) => console.log(err))
                     );
-                })
+                });
 
                 
                 return Promise.all(groupPromises);
             })
             
             // After groups are created, create instances
-            // There are two steps for creating the app instances
+            // There are 3 steps for creating the app instances
             // 1. Create instance of a custom-client-app
             // 2. Configure the app
             // 3. Activate the instances
@@ -444,10 +424,10 @@ class WizardApp {
                                 "id": this.appName
                             }
                         }
-                    }
+                    };
 
                     integrationPromises.push(
-                        integrationsApi.postIntegrations(integrationBody)
+                        this.integrationsApi.postIntegrations(integrationBody)
                         .then((data) => {
                             this.logInfo("Created instance: " + instance.name);
                             let integrationConfig = {
@@ -465,10 +445,10 @@ class WizardApp {
                                     "notes": "",
                                     "credentials": {}
                                 }
-                            }
+                            };
 
                             integrationsData.push(data);
-                            return integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig)
+                            return this.integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig);
                         })
                         .then((data) => {
                             this.logInfo("Configured instance: " + data.name);                           
@@ -487,10 +467,10 @@ class WizardApp {
                         "body": {
                             "intendedState": "ENABLED"
                         }
-                        }
+                    };
 
                     enablePromises.push(
-                        integrationsApi.patchIntegration(instance.id, opts)
+                        this.integrationsApi.patchIntegration(instance.id, opts)
                         .then((data) => this.logInfo("Enabled instance: " + data.name))
                         .catch((err) => console.log(err))
                     );
@@ -503,15 +483,18 @@ class WizardApp {
             .then(() => {
                 this.logInfo("Installation Complete!");
                 resolve();
-            })
+            });
         });
     }
 
+    /**
+     * Shows an overlay with the specified data string
+     * @param {string} data 
+     */
     logInfo(data){
         if (!data || (typeof(data) !== 'string')) data = "";
 
         $.LoadingOverlay("text", data);
-        //$.LoadingOverlay("progress", progress * 11)
     }
 
     /**
@@ -522,10 +505,10 @@ class WizardApp {
             this._setupClientApp()
             .then(() => this._pureCloudAuthenticate())
             .then(() => resolve())
-            .catch(() => reject())
+            .catch((err) => reject(err));
         });
     }
 }
 
 
-export default WizardApp
+export default WizardApp;

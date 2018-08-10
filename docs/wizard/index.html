@@ -101,26 +101,25 @@
 
         // Check if there is an existing installation and redirect to manage.html if so
         return myApp.isExisting(); 
-        }).then(() => {
-
-        // Get the user information to display on the screen
-        return myApp.getUserDetails(); 
+        }).then((exists) => {
+            if(exists){
+                goToPage('../supervisor');
+            }else{
+                // Get the user information to display on the screen
+                return myApp.getUserDetails(); 
+            }
         }).then((user) => {
-        
-        // Display welcome message after everythin has been loaded
-            $("main").removeClass("hidden");
-            $(".progress-bar").removeClass("hidden");
-            $("#loading").addClass("hidden");
-            $(".title").removeClass("hidden");
-            $("#username").text(user.name);
+            if(user){
+                // Display welcome message after everythin has been loaded
+                $("main").removeClass("hidden");
+                $(".progress-bar").removeClass("hidden");
+                $("#loading").addClass("hidden");
+                $(".title").removeClass("hidden");
+                $("#username").text(user.name);
+            }  
         })
 
-        .catch((e) => {
-            // If existing directly go to the manage page
-            if(e.isExisting){
-                goToPage('../supervisor');
-            }
-        });
+        .catch((e) => console.log(e));
     </script>
 
 <script src="./scripts/bubbles.js"></script>
