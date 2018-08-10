@@ -5,6 +5,8 @@ import clientIDs from './clientIDs.js';
 
 let clientApp = {};
 
+var chronomouse = require('chronomouse');
+
 // PureCloud OAuth information
 const platformClient = require('platformClient');
 const client = platformClient.ApiClient.instance;
@@ -78,7 +80,7 @@ clientApp.onSocketMessage = function(event){
             $("#callerName").text(caller.name);
             $("#callerNumber").text(caller.address);
 
-            getLocalInfo(caller.address,{
+            chronomouse.getLocalInfo(caller.address,{
                 military: false,
                 zone_display: 'area'
                 }, object => {
