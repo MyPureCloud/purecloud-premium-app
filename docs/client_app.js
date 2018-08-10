@@ -98,9 +98,9 @@ clientApp.onSocketMessage = function(event){
 clientApp.toastIncomingCall = function(callerLocation){
     if(clientApp.hasOwnProperty('purecloudClientApi')){
         if(clientApp.langTag !== null) {
-            clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language[clientApp.langTag].IncomingCall, data[clientApp.langTag].From + ": " + callerLocation);
+            clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language[clientApp.langTag].IncomingCall, clientApp.language[clientApp.langTag].From + ": " + callerLocation);
         } else {
-            clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language["en-us"].IncomingCall, data["en-us"].From + ": " + callerLocation);
+            clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language["en-us"].IncomingCall, clientApp.language["en-us"].From + ": " + callerLocation);
         }        
     }
 }
@@ -111,9 +111,8 @@ clientApp.loadSupervisorView = function(){
 
     var body = { pageSize : 300 }
 
-    routingApi.getRoutingQueues(body
-
-    ).then(data => {
+    routingApi.getRoutingQueues(body)
+    .then(data => {
         let queues = data.entities;
 
         let dropdown = $('#ddlQueues');
@@ -125,30 +124,6 @@ clientApp.loadSupervisorView = function(){
             dropdown.append($('<option></option>').attr('value', queues[i].id).text(queues[i].name));
         }
     })
-
-    // client.callApi(
-    //     '/api/v2/routing/queues', 
-    //     'GET', 
-    //     {  }, 
-    //     { 'pageSize': 300 }, 
-    //     {  }, 
-    //     {  }, 
-    //     null, 
-    //     ['PureCloud Auth'], 
-    //     ['application/json'], 
-    //     ['application/json']
-    // ).then(data => {
-    //     let queues = data.entities;
-
-    //     let dropdown = $('#ddlQueues');
-    //     dropdown.empty();
-    //     dropdown.append('<option selected="true" disabled">Queues</option>');
-    //     dropdown.prop('selectedIndex', 0);
-
-    //     for (var i = 1; i < queues.length; i++) {
-    //         dropdown.append($('<option></option>').attr('value', queues[i].id).text(queues[i].name));
-    //     }
-    // })
 }
 
 clientApp.subscribeToQueue = function(queue){
@@ -201,19 +176,6 @@ clientApp.subscribeToQueue = function(queue){
     const notificationsApi = new platformClient.NotificationsApi();
 
     analyticsApi.postAnalyticsConversationsDetailsQuery(body)
-
-    // client.callApi(
-    //     '/api/v2/analytics/conversations/details/query', 
-    //     'POST', 
-    //     {  }, 
-    //     {  }, 
-    //     {  }, 
-    //     {  }, 
-    //     body, 
-    //     ['PureCloud Auth'], 
-    //     ['application/json'], 
-    //     ['application/json']
-    // )
     .then(data => {
         if(Object.keys(data).length > 0) {
             (data.conversations).forEach(function(conversation) {
@@ -267,18 +229,6 @@ clientApp.subscribeToQueue = function(queue){
 
     // Create a Notifications Channel
     notificationsApi.postNotificationsChannels()
-    // client.callApi(
-    //     '/api/v2/notifications/channels', 
-    //     'POST', 
-    //     {  }, 
-    //     {  }, 
-    //     {  }, 
-    //     {  }, 
-    //     null, 
-    //     ['PureCloud Auth'], 
-    //     ['application/json'], 
-    //     ['application/json']
-    // )
     .then(data => {
         clientApp.websocketUri = data.connectUri;
         clientApp.channelID = data.id;
