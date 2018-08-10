@@ -14,6 +14,8 @@ const redirectUri = "https://mypurecloud.github.io/purecloud-premium-app/";
 // API instances
 const usersApi = new platformClient.UsersApi();
 const notificationsApi = new platformClient.NotificationsApi();
+const analyticsApi = new platformClient.AnalyticsApi();
+const routingApi = new platformClient.RoutingApi();
 
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
 clientApp.setup = function(pcEnv, langTag, html){
@@ -107,8 +109,6 @@ clientApp.toastIncomingCall = function(callerLocation){
 
 clientApp.loadSupervisorView = function(){
     // Get all Queues
-    const routingApi = new platformClient.RoutingApi();
-
     var body = { pageSize : 300 }
 
     routingApi.getRoutingQueues(body)
@@ -171,9 +171,6 @@ clientApp.subscribeToQueue = function(queue){
                 }
             ]
         }
-
-    const analyticsApi = new platformClient.AnalyticsApi();
-    const notificationsApi = new platformClient.NotificationsApi();
 
     analyticsApi.postAnalyticsConversationsDetailsQuery(body)
     .then(data => {
