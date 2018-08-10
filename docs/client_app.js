@@ -40,10 +40,10 @@ clientApp.setup = function(pcEnv, langTag, html){
         clientApp.channelID = data.id;
         clientApp.socket = new WebSocket(clientApp.websocketUri);
         clientApp.socket.onmessage = clientApp.onSocketMessage;
-        clientApp.topicId = "v2.users." + clientApp.userId + ".conversations.calls"
+        clientApp.topicIdAgent = "v2.users." + clientApp.userId + ".conversations.calls"
 
         // Subscribe to Call Conversations of Current user.
-        let topic = [{"id": clientApp.topicId}];
+        let topic = [{"id": clientApp.topicIdAgent}];
         return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
     }).then(
         $.getJSON('./language.json', function(data) {
@@ -63,9 +63,11 @@ clientApp.onSocketMessage = function(event){
 
     console.log(topic);
     console.log(eventBody);
-    console.log("isCallActive toast || " + clientApp.isCallActive);
+    
     // If a voice interaction (from queue) comes in
-    if(topic === clientApp.topicId){
+    if(topic === clientApp.topicIdAgent){
+        console.log("isCallActive toast || " + clientApp.isCallActive);
+
         let caller = eventBody.participants.filter(participant => participant.purpose === "customer")[0];
 
         // Put values to the fields
@@ -134,26 +136,12 @@ clientApp.subscribeToQueue = function(queue){
     // Check if there is an active conversation
     clientApp.getActiveConversation(queue);
 
-    // // Create a Notifications Channel
-    // notificationsApi.postNotificationsChannels()
-    // .then(data => {
-    //     clientApp.websocketUri = data.connectUri;
-    //     clientApp.channelID = data.id;
-    //     clientApp.socket = new WebSocket(clientApp.websocketUri);
-    //     clientApp.socket.onmessage = clientApp.onSocketMessageQueue;
-    //     clientApp.topicId = "v2.routing.queues." + queue + ".conversations"
-
-    //     // Subscribe to Call Conversations of selected queue.
-    //     let topic = [{"id": clientApp.topicId}];
-    //     return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
-    // })
-
     // Subscribe to Conversations of selected queue.
     clientApp.socket = new WebSocket(clientApp.websocketUri);
     clientApp.socket.onmessage = clientApp.onSocketMessageQueue;
-    clientApp.topicId = "v2.routing.queues." + queue + ".conversations";
+    clientApp.topicIdSup = "v2.routing.queues." + queue + ".conversations";
 
-    let topic = [{"id": clientApp.topicId}];
+    let topic = [{"id": clientApp.topicIdSup}];
     notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
 }
 
