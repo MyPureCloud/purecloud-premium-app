@@ -107,17 +107,12 @@ clientApp.toastIncomingCall = function(callerLocation){
 
 clientApp.loadSupervisorView = function(){
     // Get all Queues
-    client.callApi(
-        '/api/v2/routing/queues', 
-        'GET', 
-        {  }, 
-        { 'pageSize': 300 }, 
-        {  }, 
-        {  }, 
-        null, 
-        ['PureCloud Auth'], 
-        ['application/json'], 
-        ['application/json']
+    const routingApi = new platformClient.RoutingApi();
+
+    var body = { pageSize : 300 }
+
+    routingApi.getRoutingQueues(body
+
     ).then(data => {
         let queues = data.entities;
 
@@ -130,6 +125,30 @@ clientApp.loadSupervisorView = function(){
             dropdown.append($('<option></option>').attr('value', queues[i].id).text(queues[i].name));
         }
     })
+
+    // client.callApi(
+    //     '/api/v2/routing/queues', 
+    //     'GET', 
+    //     {  }, 
+    //     { 'pageSize': 300 }, 
+    //     {  }, 
+    //     {  }, 
+    //     null, 
+    //     ['PureCloud Auth'], 
+    //     ['application/json'], 
+    //     ['application/json']
+    // ).then(data => {
+    //     let queues = data.entities;
+
+    //     let dropdown = $('#ddlQueues');
+    //     dropdown.empty();
+    //     dropdown.append('<option selected="true" disabled">Queues</option>');
+    //     dropdown.prop('selectedIndex', 0);
+
+    //     for (var i = 1; i < queues.length; i++) {
+    //         dropdown.append($('<option></option>').attr('value', queues[i].id).text(queues[i].name));
+    //     }
+    // })
 }
 
 clientApp.subscribeToQueue = function(queue){
@@ -178,18 +197,24 @@ clientApp.subscribeToQueue = function(queue){
             ]
         }
 
-    client.callApi(
-        '/api/v2/analytics/conversations/details/query', 
-        'POST', 
-        {  }, 
-        {  }, 
-        {  }, 
-        {  }, 
-        body, 
-        ['PureCloud Auth'], 
-        ['application/json'], 
-        ['application/json']
-    ).then(data => {
+    const analyticsApi = new platformClient.AnalyticsApi();
+    const notificationsApi = new platformClient.NotificationsApi();
+
+    analyticsApi.postAnalyticsConversationsDetailsQuery(body)
+
+    // client.callApi(
+    //     '/api/v2/analytics/conversations/details/query', 
+    //     'POST', 
+    //     {  }, 
+    //     {  }, 
+    //     {  }, 
+    //     {  }, 
+    //     body, 
+    //     ['PureCloud Auth'], 
+    //     ['application/json'], 
+    //     ['application/json']
+    // )
+    .then(data => {
         if(Object.keys(data).length > 0) {
             (data.conversations).forEach(function(conversation) {
                 let caller = conversation.participants.filter(participant => participant.purpose === "external")[0];            
@@ -241,18 +266,20 @@ clientApp.subscribeToQueue = function(queue){
     }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + JSON.stringify(body)));
 
     // Create a Notifications Channel
-    client.callApi(
-        '/api/v2/notifications/channels', 
-        'POST', 
-        {  }, 
-        {  }, 
-        {  }, 
-        {  }, 
-        null, 
-        ['PureCloud Auth'], 
-        ['application/json'], 
-        ['application/json']
-    ).then(data => {
+    notificationsApi.postNotificationsChannels()
+    // client.callApi(
+    //     '/api/v2/notifications/channels', 
+    //     'POST', 
+    //     {  }, 
+    //     {  }, 
+    //     {  }, 
+    //     {  }, 
+    //     null, 
+    //     ['PureCloud Auth'], 
+    //     ['application/json'], 
+    //     ['application/json']
+    // )
+    .then(data => {
         clientApp.websocketUri = data.connectUri;
         clientApp.channelID = data.id;
         clientApp.socket = new WebSocket(clientApp.websocketUri);
