@@ -61,13 +61,13 @@ clientApp.onSocketMessage = function(event){
     let topic = data.topicName;
     let eventBody = data.eventBody;
 
-    console.log(topic);
-    console.log(eventBody);
+    console.log("TOPIC || " + topic);
+    console.log("EVENT BODY || " + eventBody);
+
+    console.log("DATA || " + JSON.stringify(data));
     
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicIdAgent){
-        console.log("isCallActive toast || " + clientApp.isCallActive);
-
         let caller = eventBody.participants.filter(participant => participant.purpose === "customer")[0];
 
         // Put values to the fields
@@ -101,7 +101,7 @@ clientApp.onSocketMessage = function(event){
 }
 
 clientApp.toastIncomingCall = function(callerLocation){
-    console.log("toastIncomingCall");
+    console.log("TOAST INCOMING CALL");
     clientApp.isCallActive = false;
 
     if(clientApp.hasOwnProperty('purecloudClientApi')){
@@ -249,7 +249,7 @@ clientApp.onSocketMessageQueue = function(event){
     let topic = data.topicName;
 
     // If an interaction (from queue) comes in
-    if(topic === clientApp.topicId){
+    if(topic === clientApp.topicIdSup){
         // Check to see if Conversation details is already displayed in the view
         if ($('#tblCallerDetails td:contains(' + data.eventBody.id + ')').length) {
             clientApp.updateTableRow(data);            
