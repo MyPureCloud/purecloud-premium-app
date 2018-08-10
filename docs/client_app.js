@@ -14,6 +14,8 @@ const redirectUri = "https://mypurecloud.github.io/purecloud-premium-app/";
 // API instances
 const usersApi = new platformClient.UsersApi();
 const notificationsApi = new platformClient.NotificationsApi();
+const analyticsApi = new platformClient.AnalyticsApi();
+const routingApi = new platformClient.RoutingApi();
 
 // Will Authenticate through PureCloud and subscribe to User Conversation Notifications
 clientApp.setup = function(pcEnv, langTag, html){
@@ -25,8 +27,6 @@ clientApp.setup = function(pcEnv, langTag, html){
     client.loginImplicitGrant(clientId, redirectUri + html, { state: "state" })
     .then(data => {
         console.log(data);
-        // Set access Token
-        client.setAccessToken(data.accessToken);
         
         // Get Details of current User and save to Client App
         return usersApi.getUsersMe();
@@ -45,7 +45,11 @@ clientApp.setup = function(pcEnv, langTag, html){
         // Subscribe to Call Conversations of Current user.
         let topic = [{"id": clientApp.topicId}];
         return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
-    }).then(data => console.log("Succesfully set-up Client App."))
+    }).then(
+        $.getJSON('./language.json', function(data) {
+            clientApp.language = data;
+        })
+    ).then(data => console.log("Succesfully set-up Client App."))
 
     // Error Handling
     .catch(e => console.log(e));
@@ -96,31 +100,19 @@ clientApp.onSocketMessage = function(event){
 clientApp.toastIncomingCall = function(callerLocation){
     if(clientApp.hasOwnProperty('purecloudClientApi')){
         if(clientApp.langTag !== null) {
-            $.getJSON('./language.json', function(data) {
-                clientApp.purecloudClientApi.alerting.showToastPopup(data[clientApp.langTag].IncomingCall, data[clientApp.langTag].From + ": " + callerLocation);
-            });
+            clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language[clientApp.langTag].IncomingCall, clientApp.language[clientApp.langTag].From + ": " + callerLocation);
         } else {
-            $.getJSON('./language.json', function(data) {
-                clientApp.purecloudClientApi.alerting.showToastPopup(data["en-us"].IncomingCall, data["en-us"].From + ": " + callerLocation);
-            });
+            clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language["en-us"].IncomingCall, clientApp.language["en-us"].From + ": " + callerLocation);
         }        
     }
 }
 
 clientApp.loadSupervisorView = function(){
     // Get all Queues
-    client.callApi(
-        '/api/v2/routing/queues', 
-        'GET', 
-        {  }, 
-        { 'pageSize': 300 }, 
-        {  }, 
-        {  }, 
-        null, 
-        ['PureCloud Auth'], 
-        ['application/json'], 
-        ['application/json']
-    ).then(data => {
+    var body = { pageSize : 300 }
+
+    routingApi.getRoutingQueues(body)
+    .then(data => {
         let queues = data.entities;
 
         let dropdown = $('#ddlQueues');
@@ -180,18 +172,8 @@ clientApp.subscribeToQueue = function(queue){
             ]
         }
 
-    client.callApi(
-        '/api/v2/analytics/conversations/details/query', 
-        'POST', 
-        {  }, 
-        {  }, 
-        {  }, 
-        {  }, 
-        body, 
-        ['PureCloud Auth'], 
-        ['application/json'], 
-        ['application/json']
-    ).then(data => {
+    analyticsApi.postAnalyticsConversationsDetailsQuery(body)
+    .then(data => {
         if(Object.keys(data).length > 0) {
             (data.conversations).forEach(function(conversation) {
                 let caller = conversation.participants.filter(participant => participant.purpose === "external")[0];            
@@ -243,18 +225,8 @@ clientApp.subscribeToQueue = function(queue){
     }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + JSON.stringify(body)));
 
     // Create a Notifications Channel
-    client.callApi(
-        '/api/v2/notifications/channels', 
-        'POST', 
-        {  }, 
-        {  }, 
-        {  }, 
-        {  }, 
-        null, 
-        ['PureCloud Auth'], 
-        ['application/json'], 
-        ['application/json']
-    ).then(data => {
+    notificationsApi.postNotificationsChannels()
+    .then(data => {
         clientApp.websocketUri = data.connectUri;
         clientApp.channelID = data.id;
         clientApp.socket = new WebSocket(clientApp.websocketUri);
@@ -350,19 +322,19 @@ clientApp.updateTableRow = function(data) {
     if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks === undefined) && (caller.emails === undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming call
-            clientApp.updateRow(agent.calls[0].state, "--", "--");
+            clientApp.updateRow(data, agent.calls[0].state, "--", "--");
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active call
             var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-            clientApp.updateRow(agent.calls[0].state, wait, "--");
+            clientApp.updateRow(data, agent.calls[0].state, wait, "--");
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
             // If disconnected call
             if (agent.calls[0].state === "disconnected") {                
                 var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                 var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                clientApp.updateRow(agent.calls[0].state, wait, duration);
+                clientApp.updateRow(data, agent.calls[0].state, wait, duration);
                 clientApp.isCallActiveSup = false;
             }        
         }
@@ -372,19 +344,19 @@ clientApp.updateTableRow = function(data) {
     if((caller.calls === undefined) && (caller.chats !== undefined) && (caller.callbacks === undefined) && (caller.emails === undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming chat
-            clientApp.updateRow(agent.chats[0].state, "--", "--");
+            clientApp.updateRow(data, agent.chats[0].state, "--", "--");
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active chat
             var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-            clientApp.updateRow(agent.chats[0].state, wait, "--");
+            clientApp.updateRow(data, agent.chats[0].state, wait, "--");
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
             // If disconnected chat
             if (agent.chats[0].state === "disconnected") {                
                 var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                 var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                clientApp.updateRow(agent.chats[0].state, wait, duration);
+                clientApp.updateRow(data, agent.chats[0].state, wait, duration);
                 clientApp.isCallActiveSup = false;
             }        
         }
@@ -394,19 +366,19 @@ clientApp.updateTableRow = function(data) {
     if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks !== undefined) && (caller.emails === undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming callback
-            clientApp.updateRow(agent.callbacks[0].state, "--", "--");
+            clientApp.updateRow(data, agent.callbacks[0].state, "--", "--");
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active callback
             var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-            clientApp.updateRow(agent.callbacks[0].state, wait, "--");
+            clientApp.updateRow(data, agent.callbacks[0].state, wait, "--");
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
             // If disconnected callback
             if (agent.callbacks[0].state === "disconnected") {                
                 var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                 var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                clientApp.updateRow(agent.callbacks[0].state, wait, duration);
+                clientApp.updateRow(data, agent.callbacks[0].state, wait, duration);
                 clientApp.isCallActiveSup = false;
             }        
         }
@@ -416,19 +388,19 @@ clientApp.updateTableRow = function(data) {
     if((caller.calls === undefined) && (caller.chats === undefined) && (caller.callbacks === undefined) && (caller.emails !== undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming email
-            clientApp.updateRow(agent.emails[0].state, "--", "--");
+            clientApp.updateRow(data, agent.emails[0].state, "--", "--");
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active email
             var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-            clientApp.updateRow(agent.emails[0].state, wait, "--");
+            clientApp.updateRow(data, agent.emails[0].state, wait, "--");
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
             // If disconnected email
             if (agent.emails[0].state === "disconnected") {                
                 var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
                 var duration = new Date((new Date(caller.endTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-                clientApp.updateRow(agent.emails[0].state, wait, duration);
+                clientApp.updateRow(data, agent.emails[0].state, wait, duration);
                 clientApp.isCallActiveSup = false;
             }        
         }
@@ -474,7 +446,7 @@ clientApp.insertRow = function(id, type, name, ani, dnis, state, wait, duration)
     idCell.hidden = true;
 }
 
-clientApp.updateRow = function(state, wait, duration) {
+clientApp.updateRow = function(data, state, wait, duration) {
     $('#tblCallerDetails > tbody> tr').each(function() {
         var firstTd = $(this).find('td:first');
         if ($(firstTd).text() == data.eventBody.id) {
