@@ -40,7 +40,7 @@ clientApp.setup = function(pcEnv, langTag, html){
         clientApp.channelID = data.id;
         clientApp.socket = new WebSocket(clientApp.websocketUri);
         clientApp.socket.onmessage = clientApp.onSocketMessage;
-        clientApp.topicIdAgent = "v2.users." + clientApp.userId + ".conversations.calls"
+        clientApp.topicIdAgent = "v2.users." + clientApp.userId + ".conversations.calls";
 
         // Subscribe to Call Conversations of Current user.
         let topic = [{"id": clientApp.topicIdAgent}];
@@ -53,7 +53,7 @@ clientApp.setup = function(pcEnv, langTag, html){
 
     // Error Handling
     .catch(e => console.log(e));
-}
+};
 
 // Handler for every Websocket message
 clientApp.onSocketMessage = function(event){
@@ -99,7 +99,7 @@ clientApp.onSocketMessage = function(event){
             clientApp.isCallActive = false;
         }
     }
-}
+};
 
 clientApp.toastIncomingCall = function(callerLocation){
     if(clientApp.hasOwnProperty('purecloudClientApi')){
@@ -109,11 +109,11 @@ clientApp.toastIncomingCall = function(callerLocation){
             clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language["en-us"].IncomingCall, clientApp.language["en-us"].From + ": " + callerLocation);
         }        
     }
-}
+};
 
 clientApp.loadSupervisorView = function(){
     // Get all Queues
-    var body = { pageSize : 300 }
+    var body = { pageSize : 300 };
 
     routingApi.getRoutingQueues(body)
     .then(data => {
@@ -127,8 +127,8 @@ clientApp.loadSupervisorView = function(){
         for (var i = 1; i < queues.length; i++) {
             dropdown.append($('<option></option>').attr('value', queues[i].id).text(queues[i].name));
         }
-    })
-}
+    });
+};
 
 clientApp.subscribeToQueue = function(queue){
     // Check if there is an active conversation
@@ -141,7 +141,7 @@ clientApp.subscribeToQueue = function(queue){
 
     let topic = [{"id": clientApp.topicIdSup}];
     notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
-}
+};
 
 clientApp.getActiveConversation = function(queue){
     var startDt = new Date();
@@ -186,7 +186,7 @@ clientApp.getActiveConversation = function(queue){
                     ]
                 }
             ]
-        }
+        };
 
     analyticsApi.postAnalyticsConversationsDetailsQuery(body)
     .then(data => {
@@ -204,42 +204,48 @@ clientApp.getActiveConversation = function(queue){
                 // Get values to insert in table
                 var id = conversation.conversationId;
                 var name = caller.participantName;
+                var type;
+                var ani;
+                var dnis;
+                var state;
+                var wait;
+                var duration;
                 
                 if(caller.sessions[0].mediaType === "voice") {
-                    var type = "Call";
-                    var ani = caller.sessions[0].ani;
-                    var dnis = caller.sessions[0].dnis;                    
+                    type = "Call";
+                    ani = caller.sessions[0].ani;
+                    dnis = caller.sessions[0].dnis;                    
                 } else if(caller.sessions[0].mediaType === "chat") {
-                    var type = "Chat";
-                    var ani = caller.sessions[0].roomId;
-                    var dnis = caller.sessions[0].roomId;
+                    type = "Chat";
+                    ani = caller.sessions[0].roomId;
+                    dnis = caller.sessions[0].roomId;
                 } else if(caller.sessions[1].mediaType === "callback") {
-                    var type = "Callback";
-                    var ani = caller.sessions[0].ani;
-                    var dnis = caller.sessions[0].dnis;
+                    type = "Callback";
+                    ani = caller.sessions[0].ani;
+                    dnis = caller.sessions[0].dnis;
                 } else if(caller.sessions[1].mediaType === "email") {
-                    var type = "Email";
-                    var ani = caller.sessions[0].addressSelf;
-                    var dnis = caller.sessions[0].addressFrom;
+                    type = "Email";
+                    ani = caller.sessions[0].addressSelf;
+                    dnis = caller.sessions[0].addressFrom;
                 }
 
                 if(agent !== undefined) {
                     // If active call
-                    var state = "connected";
-                    var wait = new Date(new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1);
-                    var duration = "--";
+                    state = "connected";
+                    wait = new Date(new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1);
+                    duration = "--";
                 } else {
                     // Caller on queue
-                    var state = "on queue";
-                    var wait = "--";
-                    var duration = "--";
+                    state = "on queue";
+                    wait = "--";
+                    duration = "--";
                 }
 
                 clientApp.insertRow(id, type, name, ani, dnis, state, wait, duration);
             });            
         }
     }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + JSON.stringify(body)));
-}
+};
 
 // Handler for every Websocket message
 clientApp.onSocketMessageQueue = function(event){
@@ -255,7 +261,7 @@ clientApp.onSocketMessageQueue = function(event){
             clientApp.addTableRow(data);
         }
     }
-}
+};
 
 clientApp.addTableRow = function(data) {
     let caller = data.eventBody.participants.filter(participant => participant.purpose === "customer")[0];    
@@ -313,7 +319,7 @@ clientApp.addTableRow = function(data) {
             clientApp.isCallActiveSup = true;
         }
     }
-}
+};
 
 clientApp.updateTableRow = function(data) {
     let caller = data.eventBody.participants.filter(participant => participant.purpose === "customer")[0];
@@ -407,7 +413,7 @@ clientApp.updateTableRow = function(data) {
             }        
         }
     }
-}
+};
 
 clientApp.insertRow = function(id, type, name, ani, dnis, state, wait, duration) {
     // Create table row
@@ -446,7 +452,7 @@ clientApp.insertRow = function(id, type, name, ani, dnis, state, wait, duration)
 
     // Make sure Conversation ID column is always hidden
     idCell.hidden = true;
-}
+};
 
 clientApp.updateRow = function(data, state, wait, duration) {
     $('#tblCallerDetails > tbody> tr').each(function() {
@@ -457,6 +463,6 @@ clientApp.updateRow = function(data, state, wait, duration) {
             $(this).find('td:eq(7)').text(duration);
         }
     })
-}
+};
 
 export default clientApp
