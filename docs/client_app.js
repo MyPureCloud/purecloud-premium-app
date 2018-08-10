@@ -63,7 +63,7 @@ clientApp.onSocketMessage = function(event){
 
     console.log(topic);
     console.log(eventBody);
-    console.log("isCallActive || " + clientApp.isCallActive);
+    console.log("isCallActive toast || " + clientApp.isCallActive);
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
         let caller = eventBody.participants.filter(participant => participant.purpose === "customer")[0];
@@ -75,7 +75,7 @@ clientApp.onSocketMessage = function(event){
             $("#callerArea").text("");
 
             clientApp.isCallActive = false;
-        } else {
+        } else if (clientApp.isCallActive) {
             let callerLocation = '';
 
             $("#callerName").text(caller.name);
@@ -95,6 +95,8 @@ clientApp.onSocketMessage = function(event){
 
             clientApp.toastIncomingCall(callerLocation);
         }
+
+        // clientApp.isCallActive = false;
     }
 }
 
