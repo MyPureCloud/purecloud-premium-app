@@ -63,6 +63,7 @@ clientApp.onSocketMessage = function(event){
 
     console.log(topic);
     console.log(eventBody);
+    console.log("isCallActive toast || " + clientApp.isCallActive);
     // If a voice interaction (from queue) comes in
     if(topic === clientApp.topicId){
         let caller = eventBody.participants.filter(participant => participant.purpose === "customer")[0];
@@ -93,11 +94,14 @@ clientApp.onSocketMessage = function(event){
             clientApp.isCallActive = true;
 
             clientApp.toastIncomingCall(callerLocation);
-        }
+        }        
     }
 }
 
 clientApp.toastIncomingCall = function(callerLocation){
+    console.log("toastIncomingCall");
+    clientApp.isCallActive = false;
+
     if(clientApp.hasOwnProperty('purecloudClientApi')){
         if(clientApp.langTag !== null) {
             clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language[clientApp.langTag].IncomingCall, clientApp.language[clientApp.langTag].From + ": " + callerLocation);
@@ -128,6 +132,32 @@ clientApp.loadSupervisorView = function(){
 
 clientApp.subscribeToQueue = function(queue){
     // Check if there is an active conversation
+    clientApp.getActiveConversation(queue);
+
+    // // Create a Notifications Channel
+    // notificationsApi.postNotificationsChannels()
+    // .then(data => {
+    //     clientApp.websocketUri = data.connectUri;
+    //     clientApp.channelID = data.id;
+    //     clientApp.socket = new WebSocket(clientApp.websocketUri);
+    //     clientApp.socket.onmessage = clientApp.onSocketMessageQueue;
+    //     clientApp.topicId = "v2.routing.queues." + queue + ".conversations"
+
+    //     // Subscribe to Call Conversations of selected queue.
+    //     let topic = [{"id": clientApp.topicId}];
+    //     return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
+    // })
+
+    // Subscribe to Conversations of selected queue.
+    clientApp.socket = new WebSocket(clientApp.websocketUri);
+    clientApp.socket.onmessage = clientApp.onSocketMessageQueue;
+    clientApp.topicId = "v2.routing.queues." + queue + ".conversations";
+
+    let topic = [{"id": clientApp.topicId}];
+    notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
+}
+
+clientApp.getActiveConversation = function(queue){
     var startDt = new Date();
     startDt.setHours(0,0,0,0);
     startDt.toUTCString();
@@ -223,20 +253,6 @@ clientApp.subscribeToQueue = function(queue){
             });            
         }
     }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + JSON.stringify(body)));
-
-    // Create a Notifications Channel
-    notificationsApi.postNotificationsChannels()
-    .then(data => {
-        clientApp.websocketUri = data.connectUri;
-        clientApp.channelID = data.id;
-        clientApp.socket = new WebSocket(clientApp.websocketUri);
-        clientApp.socket.onmessage = clientApp.onSocketMessageQueue;
-        clientApp.topicId = "v2.routing.queues." + queue + ".conversations"
-
-        // Subscribe to Call Conversations of selected queue.
-        let topic = [{"id": clientApp.topicId}];
-        return notificationsApi.postNotificationsChannelSubscriptions(clientApp.channelID, topic);
-    })
 }
 
 // Handler for every Websocket message
