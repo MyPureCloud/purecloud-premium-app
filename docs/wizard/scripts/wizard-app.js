@@ -170,7 +170,7 @@ class WizardApp {
     /**
      * Checks if any configured objects are still existing. 
      * This is based of the prefix
-     * @returns {bool} If any installed objects are still existing in the org. 
+     * @returns {Promise} If any installed objects are still existing in the org. 
      */
     isExisting(){
         return new Promise((resolve, reject) => {
