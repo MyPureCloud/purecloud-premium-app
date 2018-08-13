@@ -25,7 +25,7 @@
     </noscript>
 
     <header>
-        <p>Premium App  /  Home</p>
+        <p>Premium App /&nbsp; Home</p>
     </header>
 
     <div id="loading" style="margin-top: 30px; text-align: center;">
@@ -112,10 +112,9 @@
                 // Get the user information to display on the screen
                 return myApp.getUserDetails(); 
             }
-            //return myApp.getUserDetails(); 
         }).then((user) => {
             if(user){
-                // Display welcome message after everythin has been loaded
+                // Display welcome message after everything has been loaded
                 $("main").removeClass("hidden");
                 $(".progress-bar").removeClass("hidden");
                 $("#loading").addClass("hidden");
