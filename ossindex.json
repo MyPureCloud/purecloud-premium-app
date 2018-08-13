@@ -1,0 +1,20 @@
+
+{
+  "author": "Genesys App Foundry",
+  "title": "App Foundry Example Premium App",
+  "logo_url": "https://raw.githubusercontent.com/MyPureCloud/platform-client-sdk-dotnet/master/genesys_64.png",
+  "categories": [
+    "app foundry",
+    "examples"
+  ],
+  "tags": [
+    "example",
+    "javascript"
+  ],
+  "apis": [
+    "platform"
+  ],
+  "sdks": [
+    "javascript"
+  ]
+}
