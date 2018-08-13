@@ -232,17 +232,17 @@ clientApp.getActiveConversation = function(queue){
                     // If active call
                     state = "connected";
                     wait = new Date(new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1);
-                    // duration = "--";
+
+                    clientApp.insertRow(id, type, name, ani, dnis, state, wait, duration);
+                    clientApp.startDurationTimer(id, new Date(acdSegment.segmentStart));
                 } else {
                     // Caller on queue
                     state = "on queue";
-                    // wait = "--";
-                    // duration = "--";
-                }
 
-                clientApp.insertRow(id, type, name, ani, dnis, state, wait, duration);
-                clientApp.startDurationTimer(data.eventBody.id, new Date(acd.connectedTime));
-                clientApp.startWaitTimer(data.eventBody.id, new Date(acd.connectedTime));
+                    clientApp.insertRow(id, type, name, ani, dnis, state, wait, duration);
+                    clientApp.startDurationTimer(id, new Date(acdSegment.segmentStart));
+                    clientApp.startWaitTimer(id, new Date(acdSegment.segmentStart));
+                }
             });            
         }
     }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + JSON.stringify(body)));
@@ -459,7 +459,7 @@ clientApp.stopWaitTimer = function(id) {
     window.clearInterval($("#Wait" + id).attr("wait-timer-id"));
 }
 
-clientApp.insertRow = function(id, type, name, ani, dnis, state) {
+clientApp.insertRow = function(id, type, name, ani, dnis, state, wait, duration) {
     // Create table row
     var tableRef = document.getElementById('tblCallerDetails').getElementsByTagName('tbody')[0];
     var newRow = tableRef.insertRow(tableRef.rows.length);
@@ -481,8 +481,8 @@ clientApp.insertRow = function(id, type, name, ani, dnis, state) {
     var aniText = document.createTextNode(ani);
     var dnisText = document.createTextNode(dnis);
     var stateText = document.createTextNode(state);
-    var waitText = document.createTextNode("");
-    var durationText = document.createTextNode("");
+    var waitText = document.createTextNode(wait);
+    var durationText = document.createTextNode(duration);
 
     // Append text nodes to cell columns
     idCell.appendChild(idText);
@@ -493,6 +493,16 @@ clientApp.insertRow = function(id, type, name, ani, dnis, state) {
     stateCell.appendChild(stateText);
     waitCell.appendChild(waitText);
     durationCell.appendChild(durationText);
+
+    // CSS styles
+    idCell.style.padding = "5px";
+    typeCell.style.padding = "5px";
+    nameCell.style.padding = "5px";
+    aniCell.style.padding = "5px";
+    dnisCell.style.padding = "5px";
+    stateCell.style.padding = "5px";
+    waitCell.style.padding = "5px";
+    durationCell.style.padding = "5px";
 
     // Make sure Conversation ID column is always hidden
     idCell.hidden = true;

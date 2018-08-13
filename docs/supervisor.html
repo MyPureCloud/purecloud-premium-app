@@ -8,14 +8,16 @@
 
     <link href='//fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' async type='text/css'>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://dhqbrvplips7x.cloudfront.net/directory/5000/assets/vendor-076c7aa353d2434073d9cda6452233b2.css">
-    <link rel="stylesheet" href="https://dhqbrvplips7x.cloudfront.net/directory/5000/assets/web-directory-cf58866683f864f6e81ea7b74c9eb2d9.css">
+    <!-- <link rel="stylesheet" href="https://dhqbrvplips7x.cloudfront.net/directory/5000/assets/vendor-076c7aa353d2434073d9cda6452233b2.css">
+    <link rel="stylesheet" href="https://dhqbrvplips7x.cloudfront.net/directory/5000/assets/web-directory-cf58866683f864f6e81ea7b74c9eb2d9.css"> -->
+    <link rel="stylesheet" href="https://dhqbrvplips7x.cloudfront.net/directory/5021/assets/vendor-86308f6496a85eb87aa076901bf383ed.css">
+    <link rel="stylesheet" href="https://dhqbrvplips7x.cloudfront.net/directory/5021/assets/web-directory-42e39de6fc419de58d00cf867e36e804.css">
 
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/1.0.0/purecloud-client-app-sdk.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/javascript/28.0.0/purecloud-platform-client-v2.min.js"></script>
 </head>
-<body>
+<body class="purecloud-theme original-theme ember-application pace-done">
     <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <symbol viewBox="0 0 32 32" id="icon-phone">
             <path d="M13,12.77,15.4,10.4a3.22,3.22,0,0,0,.06-3.53L13.75,3.5a2.15,2.15,0,0,0-3.37-.77A11.57,11.57,0,0,0,6.63,8.36a6,6,0,0,0,.44,4.47l2,4L11.76,22l2.1,4.08a6,6,0,0,0,3.26,3,11.51,11.51,0,0,0,7,.28,2.11,2.11,0,0,0,1.32-3c-.66-1.32-1.32-2.59-2-3.92a3,3,0,0,0-2.65-1.6l-3.64.06Z"/>
@@ -32,7 +34,7 @@
             <path d="M3.26,12.44a.7.7,0,0,0-.66,0c-.44.22-.39.55-.39.88v10.1A3.58,3.58,0,0,0,5.79,27h20.8a3.2,3.2,0,0,0,3.2-3.2V13.1a.71.71,0,0,0-.5-.72,1.51,1.51,0,0,0-.88.11L17.44,18a3.39,3.39,0,0,1-3.09,0L3.26,12.44Z"/>
         </symbol>
     </svg>
-    <nav class="ember-engine-queues-navigation">
+    <nav class="ember-engine-queues-navigation" style="height: 50px">
         <div class="breadcrumb-bar ember-view" style="height: 50px">
             <ol class="breadcrumbs">
                 <li id="txtConversations" class=" breadcrumb-interaction-search"></li>
@@ -42,73 +44,77 @@
             <button class="btn-info right" onclick="window.location='./wizard/uninstall.html'">Uninstall App</button>
         </div>
     </nav>
-    <div class="ember-engine-queues-main-content">
-        <div class="interaction-search-content filter-view-content">
-            <div class="pager" style="margin-bottom: 20px; padding-top: 20px">
-                    <div id="txtSubscribe" class="floating field-title" style="display: inline-block;"></div>
-                    <select id="ddlQueues" name="queues" onChange="subscribeToQueue()" style="display: inline-block;" dir="ltr"></select>
-                </div>
-                <div class="filter-bar">
-                    <div class="filter-sections">
-                        <div class="filter-section filter-left media-type-filter ember-view">
-                            <span class="all-media-types" onClick="allConversations()">ALL</span>
-                            <span class="media-type-filter-icon media-type-phone" onClick="phoneConversations()">
-                                <span class="media-icon ember-view">
-                                    <svg class="svg-icon icon-phone">
-                                        <use xlink:href="#icon-phone"></use>
-                                    </svg>
-                                </span>
-                                <span class="media-type-filter-name filter-name-phone">PHONE</span>
-                            </span>
-                            <span class="media-type-filter-icon media-type-callback" onClick="callbackConversations()">
-                                <span class="media-icon ember-view">
-                                    <svg class="svg-icon icon-callback">
-                                        <use xlink:href="#icon-callback"></use>
-                                    </svg>
-                                </span>
-                                <span class="media-type-filter-name filter-name-phone">CALLBACK</span>
-                            </span>
-                            <span class="media-type-filter-icon media-type-chat" onClick="chatConversations()">
-                                <span class="media-icon ember-view">
-                                        <svg class="svg-icon icon-chat">
-                                            <use xlink:href="#icon-chat"></use>
+    <div class="ember-engine-queues-main-content" style="padding-top: 20px">
+        <div class="queues-engine-view default-filter-view interaction-search">
+            <div class="interaction-search-content filter-view-content">
+                <div class="main-content">
+                    <div class="pager" style="margin-bottom: 20px">
+                        <div id="txtSubscribe" class="floating field-title" style="display: inline-block;"></div>
+                        <select id="ddlQueues" name="queues" onChange="subscribeToQueue()" style="display: inline-block;" dir="ltr"></select>
+                    </div>                
+                    <div class="filter-bar">
+                        <div class="filter-sections">
+                            <div class="filter-section filter-left media-type-filter ember-view">
+                                <span class="all-media-types" onClick="allConversations()" style="font-size: 10px;">ALL</span>
+                                <span class="media-type-filter-icon media-type-phone" onClick="phoneConversations()">
+                                    <span class="media-icon ember-view">
+                                        <svg class="svg-icon icon-phone">
+                                            <use xlink:href="#icon-phone"></use>
                                         </svg>
                                     </span>
-                                    <span class="media-type-filter-name filter-name-phone">CHAT</span>
-                            </span>
-                            <span class="media-type-filter-icon media-type-email" onClick="emailConversations()">
-                                <span class="media-icon ember-view">
-                                    <svg class="svg-icon icon-envelope">
-                                        <use xlink:href="#icon-envelope"></use>
-                                    </svg>
+                                    <span class="media-type-filter-name filter-name-phone" style="font-size: 10px;">PHONE</span>
                                 </span>
-                                <span class="media-type-filter-name filter-name-phone">EMAIL</span>
-                            </span>
+                                <span class="media-type-filter-icon media-type-callback" onClick="callbackConversations()">
+                                    <span class="media-icon ember-view">
+                                        <svg class="svg-icon icon-callback">
+                                            <use xlink:href="#icon-callback"></use>
+                                        </svg>
+                                    </span>
+                                    <span class="media-type-filter-name filter-name-phone" style="font-size: 10px;">CALLBACK</span>
+                                </span>
+                                <span class="media-type-filter-icon media-type-chat" onClick="chatConversations()">
+                                    <span class="media-icon ember-view">
+                                            <svg class="svg-icon icon-chat">
+                                                <use xlink:href="#icon-chat"></use>
+                                            </svg>
+                                        </span>
+                                        <span class="media-type-filter-name filter-name-phone" style="font-size: 10px;">CHAT</span>
+                                </span>
+                                <span class="media-type-filter-icon media-type-email" onClick="emailConversations()">
+                                    <span class="media-icon ember-view">
+                                        <svg class="svg-icon icon-envelope">
+                                            <use xlink:href="#icon-envelope"></use>
+                                        </svg>
+                                    </span>
+                                    <span class="media-type-filter-name filter-name-phone" style="font-size: 10px;">EMAIL</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
+                    <div class="main-data-table l-scroll-table-stretch data-table column-picker-toggle ember-view">
+                        <div class="dt-horiz-scrollable">
+                            <table id="tblCallerDetails">
+                                <thead class="dt-section dt-section-head">
+                                    <tr class="dt-row header-row sortable-objects ember-view">
+                                        <th id="txtConvId" style="display: none; padding: 5px"></th>
+                                        <th id="txtConvType" style="padding: 5px"></th>
+                                        <th id="txtName" style="padding: 5px"></th>
+                                        <th id="txtANI" style="padding: 5px"></th>
+                                        <th id="txtDNIS" style="padding: 5px"></th>
+                                        <th id="txtState" style="padding: 5px"></th>
+                                        <th id="txtWait" style="padding: 5px"></th>
+                                        <th id="txtDuration" style="padding: 5px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="dt-section dt-section-body scrollable-section">
+                                </tbody>
+                            </table> 
+                        </div>            
+                    </div>
                 </div>
-                <div class="l-scroll-table-stretch data-table column-picker-toggle ember-view">
-                    <div class="dt-horiz-scrollable">
-                        <table id="tblCallerDetails">
-                            <thead class="dt-section dt-section-head">
-                                <tr class="dt-row header-row sortable-objects ember-view">
-                                    <th id="txtConvId" style="display: none"></th>
-                                    <th id="txtConvType"></th>
-                                    <th id="txtName"></th>
-                                    <th id="txtANI"></th>
-                                    <th id="txtDNIS"></th>
-                                    <th id="txtState"></th>
-                                    <th id="txtWait"></th>
-                                    <th id="txtDuration"></th>
-                                </tr>
-                            </thead>
-                            <tbody class="dt-section dt-section-body scrollable-section">
-                            </tbody>
-                        </table> 
-                    </div>            
-                </div>               
-        </div>        
-    </div>    
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import clientApp from './client_app.js';
