@@ -55,7 +55,7 @@ table {
   
   table, th, td {
     border: 0;
-    font-size: 12px;
+    font-size: 14px;
     font-family: Lato,"Helvetica Neue",Helvetica,Arial,sans-serif;
     font-weight: normal;
     padding-top: 10px;
@@ -101,4 +101,5 @@ table {
 
 #txtSubscribe, #ddlQueues {
     font-family: Lato,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 21px;
 }
