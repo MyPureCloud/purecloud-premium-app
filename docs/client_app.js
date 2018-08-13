@@ -135,7 +135,6 @@ clientApp.subscribeToQueue = function(queue){
     clientApp.getActiveConversation(queue);
 
     // Subscribe to Conversations of selected queue.
-    clientApp.socket = new WebSocket(clientApp.websocketUri);
     clientApp.socket.onmessage = clientApp.onSocketMessageQueue;
     clientApp.topicIdSup = "v2.routing.queues." + queue + ".conversations";
 
@@ -233,15 +232,17 @@ clientApp.getActiveConversation = function(queue){
                     // If active call
                     state = "connected";
                     wait = new Date(new Date(acdSegment.segmentEnd) - (new Date(acdSegment.segmentStart))).toISOString().slice(11, -1);
-                    duration = "--";
+
+                    clientApp.insertRow(id, type, name, ani, dnis, state, wait, duration);
+                    clientApp.startDurationTimer(id, new Date(acdSegment.segmentStart));
                 } else {
                     // Caller on queue
                     state = "on queue";
-                    wait = "--";
-                    duration = "--";
-                }
 
-                clientApp.insertRow(id, type, name, ani, dnis, state, wait, duration);
+                    clientApp.insertRow(id, type, name, ani, dnis, state, wait, duration);
+                    clientApp.startDurationTimer(id, new Date(acdSegment.segmentStart));
+                    clientApp.startWaitTimer(id, new Date(acdSegment.segmentStart));
+                }
             });            
         }
     }).catch(e => console.log("ERROR CALLING API: " + e + "|| REQUEST BODY: " + JSON.stringify(body)));
@@ -272,11 +273,15 @@ clientApp.addTableRow = function(data) {
     if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks === undefined) && (caller.emails === undefined)) {
         if ((agent === undefined) && (acd.calls[0].state === "connected")) {
             // Call on queue
-            clientApp.insertRow(data.eventBody.id, "Call", caller.name, caller.address, caller.calls[0].other.addressNormalized, "on queue", "--", "--");
+            clientApp.insertRow(data.eventBody.id, "Call", caller.name, caller.address, caller.calls[0].other.addressNormalized, "on queue");            
+            clientApp.startDurationTimer(data.eventBody.id, new Date(acd.connectedTime));
+            clientApp.startWaitTimer(data.eventBody.id, new Date(acd.connectedTime));
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming call
-            clientApp.insertRow(data.eventBody.id, "Call", caller.name, caller.address, caller.calls[0].other.addressNormalized, agent.calls[0].state, "--", "--");
+            clientApp.insertRow(data.eventBody.id, "Call", caller.name, caller.address, caller.calls[0].other.addressNormalized, agent.calls[0].state);            
+            clientApp.startDurationTimer(data.eventBody.id, new Date(acd.connectedTime));
+            clientApp.startWaitTimer(data.eventBody.id, new Date(acd.connectedTime));
             clientApp.isCallActiveSup = true;
         }
     }    
@@ -285,11 +290,15 @@ clientApp.addTableRow = function(data) {
     if((caller.calls === undefined) && (caller.chats !== undefined) && (caller.callbacks === undefined) && (caller.emails === undefined)) {
         if ((agent === undefined) && (acd.chats[0].state === "connected")) {
             // Chat on queue
-            clientApp.insertRow(data.eventBody.id, "Chat", caller.name, caller.address, caller.chats[0].roomId, "on queue", "--", "--");
+            clientApp.insertRow(data.eventBody.id, "Chat", caller.name, caller.address, caller.chats[0].roomId, "on queue");            
+            clientApp.startDurationTimer(data.eventBody.id, new Date(acd.connectedTime));
+            clientApp.startWaitTimer(data.eventBody.id, new Date(acd.connectedTime));
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming chat
-            clientApp.insertRow(data.eventBody.id, "Chat", caller.name, caller.address, caller.chats[0].roomId, agent.calls[0].state, "--", "--");
+            clientApp.insertRow(data.eventBody.id, "Chat", caller.name, caller.address, caller.chats[0].roomId, agent.calls[0].state);            
+            clientApp.startDurationTimer(data.eventBody.id, new Date(acd.connectedTime));
+            clientApp.startWaitTimer(data.eventBody.id, new Date(acd.connectedTime));
             clientApp.isCallActiveSup = true;
         }
     }
@@ -298,11 +307,15 @@ clientApp.addTableRow = function(data) {
     if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks !== undefined) && (caller.emails === undefined)) {
         if ((agent === undefined) && (acd.callbacks[0].state === "connected")) {
             // Callback on queue
-            clientApp.insertRow(data.eventBody.id, "Callback", caller.name, caller.address, caller.calls[0].other.addressNormalized, "on queue", "--", "--");
+            clientApp.insertRow(data.eventBody.id, "Callback", caller.name, caller.address, caller.calls[0].other.addressNormalized, "on queue");            
+            clientApp.startDurationTimer(data.eventBody.id, new Date(acd.connectedTime));
+            clientApp.startWaitTimer(data.eventBody.id, new Date(acd.connectedTime));
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming callback
-            clientApp.insertRow(data.eventBody.id, "Callback", caller.name, caller.address, caller.calls[0].other.addressNormalized, agent.callbacks[0].state, "--", "--");
+            clientApp.insertRow(data.eventBody.id, "Callback", caller.name, caller.address, caller.calls[0].other.addressNormalized, agent.callbacks[0].state);            
+            clientApp.startDurationTimer(data.eventBody.id, new Date(acd.connectedTime));
+            clientApp.startWaitTimer(data.eventBody.id, new Date(acd.connectedTime));
             clientApp.isCallActiveSup = true;
         }
     }
@@ -311,11 +324,15 @@ clientApp.addTableRow = function(data) {
     if((caller.calls === undefined) && (caller.chats === undefined) && (caller.callbacks === undefined) && (caller.emails !== undefined)) {
         if ((agent === undefined) && (acd.emails[0].state === "connected")) {
             // Email on queue
-            clientApp.insertRow(data.eventBody.id, "Email", caller.name, caller.address, acd.address, "on queue", "--", "--");
+            clientApp.insertRow(data.eventBody.id, "Email", caller.name, caller.address, acd.address, "on queue");            
+            clientApp.startDurationTimer(data.eventBody.id, new Date(acd.connectedTime));
+            clientApp.startWaitTimer(data.eventBody.id, new Date(acd.connectedTime));
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming email
-            clientApp.insertRow(data.eventBody.id, "Email", caller.name, caller.address, acd.address, agent.emails[0].state, "--", "--");
+            clientApp.insertRow(data.eventBody.id, "Email", caller.name, caller.address, acd.address, agent.emails[0].state);            
+            clientApp.startDurationTimer(data.eventBody.id, new Date(acd.connectedTime));
+            clientApp.startWaitTimer(data.eventBody.id, new Date(acd.connectedTime));
             clientApp.isCallActiveSup = true;
         }
     }
@@ -330,12 +347,13 @@ clientApp.updateTableRow = function(data) {
     if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks === undefined) && (caller.emails === undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming call
-            clientApp.updateRow(data, agent.calls[0].state, "--", "--");
+            clientApp.updateRow(data, agent.calls[0].state, $("#Wait" + data.eventBody.id).text(), $("#Duration" + data.eventBody.id).text());
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active call
             var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-            clientApp.updateRow(data, agent.calls[0].state, wait, "--");
+            clientApp.updateRow(data, agent.calls[0].state, wait, $("#Duration" + data.eventBody.id).text());
+            clientApp.stopWaitTimer(data.eventBody.id);
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
             // If disconnected call
@@ -352,12 +370,13 @@ clientApp.updateTableRow = function(data) {
     if((caller.calls === undefined) && (caller.chats !== undefined) && (caller.callbacks === undefined) && (caller.emails === undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming chat
-            clientApp.updateRow(data, agent.chats[0].state, "--", "--");
+            clientApp.updateRow(data, agent.chats[0].state, $("#Wait" + data.eventBody.id).text(), $("#Duration" + data.eventBody.id).text());
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active chat
             var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-            clientApp.updateRow(data, agent.chats[0].state, wait, "--");
+            clientApp.updateRow(data, agent.chats[0].state, wait, $("#Duration" + data.eventBody.id).text());
+            clientApp.stopWaitTimer(data.eventBody.id);
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
             // If disconnected chat
@@ -374,12 +393,13 @@ clientApp.updateTableRow = function(data) {
     if((caller.calls !== undefined) && (caller.chats === undefined) && (caller.callbacks !== undefined) && (caller.emails === undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming callback
-            clientApp.updateRow(data, agent.callbacks[0].state, "--", "--");
+            clientApp.updateRow(data, agent.callbacks[0].state, $("#Wait" + data.eventBody.id).text(), $("#Duration" + data.eventBody.id).text());
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active callback
             var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-            clientApp.updateRow(data, agent.callbacks[0].state, wait, "--");
+            clientApp.updateRow(data, agent.callbacks[0].state, wait, $("#Duration" + data.eventBody.id).text());
+            clientApp.stopWaitTimer(data.eventBody.id);
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
             // If disconnected callback
@@ -396,12 +416,13 @@ clientApp.updateTableRow = function(data) {
     if((caller.calls === undefined) && (caller.chats === undefined) && (caller.callbacks === undefined) && (caller.emails !== undefined)) {
         if((acd.endTime === undefined) && (!clientApp.isCallActiveSup) && (agent !== undefined)){
             // If incoming email
-            clientApp.updateRow(data, agent.emails[0].state, "--", "--");
+            clientApp.updateRow(data, agent.emails[0].state, $("#Wait" + data.eventBody.id).text(), $("#Duration" + data.eventBody.id).text());
             clientApp.isCallActiveSup = false;
         } else if((acd.endTime !== undefined) && (caller.endTime === undefined) && (agent !== undefined)) {
             // If active email
             var wait = new Date((new Date(acd.connectedTime)) - (new Date(caller.connectedTime))).toISOString().slice(11, -1);
-            clientApp.updateRow(data, agent.emails[0].state, wait, "--");
+            clientApp.updateRow(data, agent.emails[0].state, wait, $("#Duration" + data.eventBody.id).text());
+            clientApp.stopWaitTimer(data.eventBody.id);
             clientApp.isCallActiveSup = true;
         } else if(agent !== undefined) {
             // If disconnected email
@@ -414,6 +435,29 @@ clientApp.updateTableRow = function(data) {
         }
     }
 };
+
+clientApp.startDurationTimer = function(id, acdConnectedDt) {
+    // Set timer for duration
+	var intervalId1 = setInterval(function() {	
+        var currentDate = new Date();
+		$("#Duration" + id).text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);	
+	}, 1000);	
+	$("#Duration" + id).attr("wait-timer-id",intervalId1);
+}
+
+clientApp.startWaitTimer = function(id, acdConnectedDt) {
+    // Set timer for wait time
+	var intervalId = setInterval(function() {	
+        var currentDate = new Date();
+		$("#Wait" + id).text(new Date(currentDate - acdConnectedDt).toISOString().slice(11, -1).split('.')[0]);	
+	}, 1000);	
+	$("#Wait" + id).attr("wait-timer-id",intervalId);
+}
+
+clientApp.stopWaitTimer = function(id) {
+    // Stop wait timer
+    window.clearInterval($("#Wait" + id).attr("wait-timer-id"));
+}
 
 clientApp.insertRow = function(id, type, name, ani, dnis, state, wait, duration) {
     // Create table row
@@ -450,17 +494,41 @@ clientApp.insertRow = function(id, type, name, ani, dnis, state, wait, duration)
     waitCell.appendChild(waitText);
     durationCell.appendChild(durationText);
 
+    // CSS styles
+    idCell.style.padding = "5px";
+    typeCell.style.padding = "5px";
+    nameCell.style.padding = "5px";
+    aniCell.style.padding = "5px";
+    dnisCell.style.padding = "5px";
+    stateCell.style.padding = "5px";
+    waitCell.style.padding = "5px";
+    durationCell.style.padding = "5px";
+
     // Make sure Conversation ID column is always hidden
     idCell.hidden = true;
+
+    // Create element ID for timers
+    waitCell.setAttribute("id", "Wait" + id);
+    durationCell.setAttribute("id", "Duration" + id);
 };
 
 clientApp.updateRow = function(data, state, wait, duration) {
     $('#tblCallerDetails > tbody> tr').each(function() {
         var firstTd = $(this).find('td:first');
         if ($(firstTd).text() == data.eventBody.id) {
-            $(this).find('td:eq(5)').text(state);
-            $(this).find('td:eq(6)').text(wait);
-            $(this).find('td:eq(7)').text(duration);
+            if(state === "disconnected") {
+                // Stop duration timer
+                window.clearInterval($("#Duration" + data.eventBody.id).attr("wait-timer-id"));
+
+                // Remove row from table
+                var thisRow = $(this);
+                thisRow.remove();                
+            } else {
+                $(this).find('td:eq(5)').text(state);
+                $(this).find('td:eq(6)').text(wait);
+                $(this).find('td:eq(7)').text(duration);
+            }
+            
         }
     })
 };

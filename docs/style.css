@@ -54,13 +54,21 @@ table {
   }
   
   table, th, td {
-    border: 1px solid #9aa;
-    font-size: 12px;
+    border: 0;
+    font-size: 14px;
+    font-family: Lato,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: normal;
+    padding-top: 10px;
+    padding-right: 6px;
+    padding-bottom: 10px;
+    padding-left: 6px;
   }
   
   th, td {
-    padding: 5px;
-    text-align: center;
+    padding-top: 10px;
+    padding-right: 6px;
+    padding-bottom: 10px;
+    padding-left: 6px;
   }
 
   button {
@@ -89,4 +97,9 @@ table {
 
 .left {
     float: left;
+}
+
+#txtSubscribe, #ddlQueues {
+    font-family: Lato,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 21px;
 }
