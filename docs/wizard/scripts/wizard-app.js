@@ -390,11 +390,11 @@ class WizardApp {
             .then(() => {
                 this.installationData.groups.forEach((group) => {
                     let groupBody = {
-                        "name": this.prefix + group.name + ".",
+                        "name": this.prefix + group.name,
                         "description": group.description,
                         "type": "official",
                         "rulesVisible": true,
-                        "visibility": "members"
+                        "visibility": "public"
                     };
                     console.log(groupBody);
                     groupPromises.push(
