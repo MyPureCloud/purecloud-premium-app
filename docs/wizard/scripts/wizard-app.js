@@ -426,6 +426,7 @@ class WizardApp {
                         }
                     };
 
+                    // Rename and add Group Filtering
                     integrationPromises.push(
                         this.integrationsApi.postIntegrations(integrationBody)
                         .then((data) => {
@@ -439,7 +440,7 @@ class WizardApp {
                                         "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
                                         "displayType": instance.type,
                                         "featureCategory": "", 
-                                        "groupFilter": instance.groups.map((groupName) => groupData[groupName])
+                                        "groupFilter": instance.groups.map((groupName) => groupData[groupName]).filter(g => g != undefined)
                                     },
                                     "advanced": {},
                                     "notes": "",
