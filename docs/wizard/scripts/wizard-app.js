@@ -426,7 +426,7 @@ class WizardApp {
             };
 
             authPromises.push(
-                this.oauthApi.postOauthClients(oauthClient)
+                this.oAuthApi.postOauthClients(oauthClient)
                 .then((data) => {
                     authData.push(data);
 
@@ -469,7 +469,7 @@ class WizardApp {
      */
     installConfigurations(){
         // Create groups
-        this.addGroups()
+        return this.addGroups()
 
         // Create instances after groups for (optional) group filtering
         .then((groupData) => this.addInstances(groupData))
