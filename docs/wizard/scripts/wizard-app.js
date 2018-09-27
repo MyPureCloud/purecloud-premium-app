@@ -39,64 +39,6 @@ class WizardApp {
     }
 
     /**
-     * First thing that needs to be called to setup up the PureCloud Client App
-     */
-    _setupClientApp(){    
-        // Snippet from URLInterpolation example: 
-        // https://github.com/MyPureCloud/client-app-sdk
-        const queryString = window.location.search.substring(1);
-        const pairs = queryString.split('&');
-        let pcEnv = null;   
-        for (var i = 0; i < pairs.length; i++)
-        {
-            var currParam = pairs[i].split('=');
-
-            if(currParam[0] === 'langTag') {
-                this.language = currParam[1];
-            } else if(currParam[0] === 'pcEnvironment') {
-                pcEnv = currParam[1];
-            } else if(currParam[0] === 'environment' && pcEnv === null) {
-                pcEnv = currParam[1];
-            }
-        }
-
-        if(pcEnv){
-            this.pcApp = new window.purecloud.apps.ClientApp({pcEnvironment: pcEnv});
-        }else{
-            // Use default PureCloud region
-            this.pcApp = new window.purecloud.apps.ClientApp();
-        }
-        
-        console.log(this.pcApp.pcEnvironment);
-
-        // Get the language context file and assign it to the app
-        // For this example, the text is translated on-the-fly.
-        return new Promise((resolve, reject) => {
-            let fileUri = './languages/' + this.language + '.json';
-            $.getJSON(fileUri)
-            .done(data => {
-                this.displayPageText(data);
-                resolve();
-            })
-            .fail(xhr => {
-                console.log('Language file not found.');
-                resolve();
-            }); 
-        });
-    }
-
-    /**
-     * Authenticate to PureCloud (Implicit Grant)
-     * @return {Promise}
-     */
-    _pureCloudAuthenticate() {
-        return this.purecloudClient.loginImplicitGrant(
-                        appConfig.clientIDs[this.pcApp.pcEnvironment], 
-                        this.redirectUri, 
-                        {state: ('pcEnvironment=' + this.pcApp.pcEnvironment)});
-    }
-
-    /**
      * Get details of the current user
      * @return {Promise.<Object>} PureCloud User data
      */
@@ -153,8 +95,14 @@ class WizardApp {
         });
     }
 
+
+    //// =======================================================
+    ////      ROLES
+    //// =======================================================
+
     /**
      * Get existing roles in purecloud based on prefix
+     * @returns {Promise.<Array>} PureCloud Roles
      */
     getExistingRoles(){
         let authOpts = { 
@@ -190,6 +138,7 @@ class WizardApp {
      */
     addRoles(){
         let rolePromises = [];
+        let roleData = []; // Array of {"rolename": "roleid"}
 
         // Create the roles
         this.installationData.roles.forEach((role) => {
@@ -207,6 +156,8 @@ class WizardApp {
                     this.logInfo("Created role: " + role.name);
                     roleId = data.id;
 
+                    roleData[role.name] = roleId;
+
                     return this.getUserDetails();
                 })
                 .then((user) => {
@@ -221,11 +172,17 @@ class WizardApp {
             );
         });
 
-        return Promise.all(rolePromises);
+        return Promise.all(rolePromises)
+        .then(() => roleData);
     }
+
+    //// =======================================================
+    ////      GROUPS
+    //// =======================================================
 
     /**
      * Gets the existing groups on PureCloud based on Prefix
+     * @return {Promise.<Array>} PureCloud Group Objects
      */
     getExistingGroups(){
         // Query bodies
@@ -263,7 +220,7 @@ class WizardApp {
     }
 
     /**
-     * Add PureCLoud groups based on installation data
+     * Add PureCloud groups based on installation data
      * @returns {Promise.<Object>} Group Data Object {"grp-name": "grp-id"}
      */
     addGroups(){
@@ -294,9 +251,14 @@ class WizardApp {
         .then(() => groupData);
     }
 
+
+    //// =======================================================
+    ////      INTEGRATIONS (APP INSTANCES)
+    //// =======================================================
+
     /**
      * Get existing apps based on the prefix
-     * @returns {Promise}
+     * @returns {Promise.<Array>} PureCloud Integrations
      */
     getExistingApps(){
         let integrationsOpts = {
@@ -407,6 +369,14 @@ class WizardApp {
         });
     }
 
+    //// =======================================================
+    ////      OAUTH2 CLIENT
+    //// =======================================================
+
+    /**
+     * Get existing authetication clients based on the prefix
+     * @returns {Promise.<Array>} Array of PureCloud OAuth Clients
+     */
     getExistingAuthClients(){
         return this.integrationsApi.getOauthClients()
         .then((data) => {
@@ -416,6 +386,10 @@ class WizardApp {
         });
     }
 
+    /**
+     * Delete all existing PremiumApp instances
+     * @returns {Promise}
+     */
     deleteAuthClients(){
         return this.getExistingAuthClients()
         .then((instances) => {
@@ -433,10 +407,45 @@ class WizardApp {
         });
     }
 
-    addAuthClients(){
-        
+    /**
+     * Add PureCLoud instances based on installation data
+     * @returns {Promise.<Array>} PureCloud OAuth objects
+     */
+    addAuthClients(roleData){
+        let authPromises = [];
+        let authData = [];
+
+        this.installationData.oauth.forEach((oauth) => {
+            let oauthClient = {
+                "name": oauth.name,
+                "description": oauth.description,
+                "roleIds": oauth.roles.map((roleName) => 
+                    roleData[roleName]).filter(g => g != undefined),
+                "authorizedGrantType": "CLIENT_CREDENTIALS"
+            };
+
+            authPromises.push(
+                this.oauthApi.postOauthClients(oauthClient)
+                .then((data) => {
+                    authData.push(data);
+
+                    this.logInfo("Created " + data.name + " auth client");
+                })
+                .catch((err) => console.log(err))
+            );
+
+            
+        });
+
+        return Promise.all(authPromises)
+        .then(() => authData);
     }
     
+
+    //// =======================================================
+    ////      PROVISIONING / DEPROVISIONING
+    //// =======================================================
+
     /**
      * Delete all existing Premium App PC objects
      * @returns {Promise}
@@ -444,6 +453,7 @@ class WizardApp {
     clearConfigurations(){
         let configArr = [];
 
+        configArr.push(this.deleteAuthClients());
         configArr.push(this.deletePureCloudGroups());
         configArr.push(this.deletePureCloudRoles());
         configArr.push(this.deletePureCloudApps());
@@ -454,20 +464,56 @@ class WizardApp {
     /**
      * Final Step of the installation wizard. 
      * Create the PureCloud objects defined in provisioning configuration
+     * The order is important for some of the PureCloud entities.
      */
     installConfigurations(){
-        return this.addRoles()
-        .then(() => this.addGroups())
+        // Create groups
+        this.addGroups()
+
+        // Create instances after groups for (optional) group filtering
         .then((groupData) => this.addInstances(groupData))
 
-        // When everything's finished, log the output.
+        // Create Roles
+        .then(() => this.addRoles())
+
+        // Create OAuth client after role (required) and pass to server
+        .then((roleData) => this.addAuthClients(roleData))
+        .then((oAuthClients) => this.storeOAuthClient(oAuthClients))
+
+
+        // When everything's finished, log a success message.
         .then(() => {
             this.logInfo("Installation Complete!");
         })
         .catch((err) => console.log(err));
     }
 
-    
+    /**
+     * If an OAUTH Client is created pass the details over to a backend system.
+     * NOTE: This function is for demonstration purposes and is neither functional
+     *       nor production-ready.
+     * @param {Array} oAuthClients PureCloud OAuth objects. 
+     *         Normally there should only be 1 auth client created for an app.                     
+     */
+    storeOAuthClient(oAuthClients){
+        // TODO: Replace with something functional for production
+
+        // oAuthClients.forEach((client) => {
+        //     $.ajax({
+        //         url: "https://mycompany.org/premium-app",
+        //         method: "POST",
+        //         contentType: "application/json",
+        //         data: JSON.stringify(oAuthClients)
+        //     });
+        // });
+
+        console.log("Sent to server!");
+    }
+
+    //// =======================================================
+    ////      DISPLAY/UTILITY FUNCTIONS
+    //// =======================================================
+
     /**
      * Renders the proper text language into the web pages
      * @param {Object} text  Contains the keys and values from the language file
@@ -491,9 +537,9 @@ class WizardApp {
         $.LoadingOverlay("text", data);
     }
 
-    /**
-     * @description First thing that must be called to set-up the App
-     */
+    //// =======================================================
+    ////      ENTRY POINT
+    //// =======================================================
     start(){
         return new Promise((resolve, reject) => {
             this._setupClientApp()
@@ -501,6 +547,64 @@ class WizardApp {
             .then(() => resolve())
             .catch((err) => reject(err));
         });
+    }
+
+    /**
+     * First thing that needs to be called to setup up the PureCloud Client App
+     */
+    _setupClientApp(){    
+        // Snippet from URLInterpolation example: 
+        // https://github.com/MyPureCloud/client-app-sdk
+        const queryString = window.location.search.substring(1);
+        const pairs = queryString.split('&');
+        let pcEnv = null;   
+        for (var i = 0; i < pairs.length; i++)
+        {
+            var currParam = pairs[i].split('=');
+
+            if(currParam[0] === 'langTag') {
+                this.language = currParam[1];
+            } else if(currParam[0] === 'pcEnvironment') {
+                pcEnv = currParam[1];
+            } else if(currParam[0] === 'environment' && pcEnv === null) {
+                pcEnv = currParam[1];
+            }
+        }
+
+        if(pcEnv){
+            this.pcApp = new window.purecloud.apps.ClientApp({pcEnvironment: pcEnv});
+        }else{
+            // Use default PureCloud region
+            this.pcApp = new window.purecloud.apps.ClientApp();
+        }
+        
+        console.log(this.pcApp.pcEnvironment);
+
+        // Get the language context file and assign it to the app
+        // For this example, the text is translated on-the-fly.
+        return new Promise((resolve, reject) => {
+            let fileUri = './languages/' + this.language + '.json';
+            $.getJSON(fileUri)
+            .done(data => {
+                this.displayPageText(data);
+                resolve();
+            })
+            .fail(xhr => {
+                console.log('Language file not found.');
+                resolve();
+            }); 
+        });
+    }
+
+    /**
+     * Authenticate to PureCloud (Implicit Grant)
+     * @return {Promise}
+     */
+    _pureCloudAuthenticate() {
+        return this.purecloudClient.loginImplicitGrant(
+                        appConfig.clientIDs[this.pcApp.pcEnvironment], 
+                        this.redirectUri, 
+                        {state: ('pcEnvironment=' + this.pcApp.pcEnvironment)});
     }
 }
 

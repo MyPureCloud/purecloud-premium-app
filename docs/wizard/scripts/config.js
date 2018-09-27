@@ -52,7 +52,7 @@ export default {
             {
                 "name": "OAuth Client",
                 "description": "Generated Client that's passed to the App Backend",
-                "roleIds": ["Role"],
+                "roles": ["Role"],
                 "authorizedGrantType": "CLIENT_CREDENTIALS"
             }
         ]
