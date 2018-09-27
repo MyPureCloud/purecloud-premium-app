@@ -17,6 +17,8 @@
     "txt-create-group-msg": "crea un rol específicamente para proporcionar acceso a la aplicación",
     "txt-create-instance": "3. Crear instancia",
     "txt-create-instance-msg": "Se crearán más instancias de la aplicación con diferentes puntos finales URI para proporcionar diferentes funciones de la aplicación",
+    "txt-create-oauthclient": "4. Crear Cliente OAuth",
+    "txt-create-oauthclient-msg": "Se podría crear un Cliente OAuth opcional para la comunicación de servidor a servidor. Después de la creación, debe seguir un método que pasará la información del Cliente OAuth al servidor de la aplicación.",
     "txt-please-click": "Haga clic en el botón para comenzar la instalación",
     "txt-finish-install": "Espere mientras lo llevamos a la aplicación.",
     "txt-installed": "Instalado",
