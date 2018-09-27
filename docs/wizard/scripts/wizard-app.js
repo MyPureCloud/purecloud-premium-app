@@ -418,7 +418,7 @@ class WizardApp {
 
         this.installationData.oauth.forEach((oauth) => {
             let oauthClient = {
-                "name": oauth.name,
+                "name": this.prefix + oauth.name,
                 "description": oauth.description,
                 "roleIds": oauth.roles.map((roleName) => 
                     roleData[roleName]).filter(g => g != undefined),
