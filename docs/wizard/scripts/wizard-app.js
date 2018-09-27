@@ -2,7 +2,6 @@
 *   NOTE: This sample uses ES6 features
 */
 import appConfig from './config.js';
-import util from './util.js';
 
 // JQuery Alias
 const $ = window.$;
@@ -76,7 +75,7 @@ class WizardApp {
             let fileUri = './languages/' + this.language + '.json';
             $.getJSON(fileUri)
             .done(data => {
-                this.util.displayPageText(data);
+                this.displayPageText(data);
                 resolve();
             })
             .fail(xhr => {
@@ -112,17 +111,14 @@ class WizardApp {
      * @return {Promise.<Boolean>}
      */
     validateProductAvailability(){
-        // premium-app-example
-        return new Promise((resolve, reject) => {            
-            this.integrationsApi.getIntegrationsTypes({})
-            .then((data) => {
-                if (data.entities.filter((integType) => integType.id === this.appName)[0]){
-                    resolve(true);
-                } else {
-                    resolve(false);
-                }
-            })
-            .catch(err => reject(err));
+        // premium-app-example         
+        return this.integrationsApi.getIntegrationsTypes({})
+        .then((data) => {
+            if (data.entities.filter((integType) => integType.id === this.appName)[0]){
+                return(true);
+            } else {
+                return(false);
+            }
         });
     }
 
@@ -132,31 +128,28 @@ class WizardApp {
      * @returns {Promise.<Boolean>} If any installed objects are still existing in the org. 
      */
     isExisting(){
-        return new Promise((resolve, reject) => {
-            let promiseArr = []; 
-            
-            promiseArr.push(this.getExistingGroups());
-            promiseArr.push(this.getExistingRoles());
-            promiseArr.push(this.getExistingApps());
+        let promiseArr = []; 
+        
+        promiseArr.push(this.getExistingGroups());
+        promiseArr.push(this.getExistingRoles());
+        promiseArr.push(this.getExistingApps());
 
-            return Promise.all(promiseArr)
-            .then((results) => { 
-                if(
-                    // Check if any groups are still existing
-                    results[0].total > 0 || 
+        return Promise.all(promiseArr)
+        .then((results) => { 
+            if(
+                // Check if any groups are still existing
+                results[0].total > 0 || 
 
-                    // Check if any roles are existing
-                    results[1].total > 0 ||
+                // Check if any roles are existing
+                results[1].total > 0 ||
 
-                    // Check if any apps are existing
-                    results[2].length > 0 ){
+                // Check if any apps are existing
+                results[2].length > 0 ){
 
-                        resolve(true);
-                }
+                return(true);
+            }
 
-                resolve(false);
-            })
-            .catch(err => reject(err));
+            return(false);
         });
     }
 
@@ -226,7 +219,7 @@ class WizardApp {
      */
     getExistingGroups(){
         // Query bodies
-        var groupSearchBody = {
+        let groupSearchBody = {
             "query": [
                 {
                     "fields": ["name"],
@@ -277,15 +270,12 @@ class WizardApp {
             'pageSize': 100
         };
         
-        return new Promise((resolve, reject) => {
-            this.integrationsApi.getIntegrations(integrationsOpts)
-            .then((data) => {
-                resolve(data.entities
-                    .filter(entity => entity.name
-                        .startsWith(this.prefix)));
-            })
-            .catch(err => reject(err));
-        });
+        return this.integrationsApi.getIntegrations(integrationsOpts)
+        .then((data) => {
+            return(data.entities
+                .filter(entity => entity.name
+                    .startsWith(this.prefix)));
+        });  
     }
 
     /**
@@ -337,7 +327,7 @@ class WizardApp {
                 authPromises.push(
                     this.authApi.postAuthorizationRoles(roleBody)
                     .then((data) => {
-                        this.util.logInfo("Created role: " + role.name);
+                        this.logInfo("Created role: " + role.name);
                         roleId = data.id;
 
                         return this.getUserDetails();
@@ -346,7 +336,7 @@ class WizardApp {
                         return this.authApi.putAuthorizationRoleUsersAdd(roleId, [data.id]);
                     })
                     .then((data) => {
-                        this.util.logInfo("Assigned " + role.name + " to user");
+                        this.logInfo("Assigned " + role.name + " to user");
                     })
                     .catch((err) => console.log(err))
                 );
@@ -367,7 +357,7 @@ class WizardApp {
                     groupPromises.push(
                         this.groupsApi.postGroups(groupBody)
                         .then((data) => {
-                            this.util.logInfo("Created group: " + group.name);
+                            this.logInfo("Created group: " + group.name);
                             groupData[group.name] = data.id;
                         })
                         .catch((err) => console.log(err))
@@ -397,7 +387,7 @@ class WizardApp {
                     integrationPromises.push(
                         this.integrationsApi.postIntegrations(integrationBody)
                         .then((data) => {
-                            this.util.logInfo("Created instance: " + instance.name);
+                            this.logInfo("Created instance: " + instance.name);
                             let integrationConfig = {
                                 "body": {
                                     "name": this.prefix + instance.name,
@@ -419,7 +409,7 @@ class WizardApp {
                             return this.integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig);
                         })
                         .then((data) => {
-                            this.util.logInfo("Configured instance: " + data.name);                           
+                            this.logInfo("Configured instance: " + data.name);                           
                         })
                         .catch((err) => console.log(err))
                     );
@@ -439,7 +429,7 @@ class WizardApp {
 
                     enablePromises.push(
                         this.integrationsApi.patchIntegration(instance.id, opts)
-                        .then((data) => this.util.logInfo("Enabled instance: " + data.name))
+                        .then((data) => this.logInfo("Enabled instance: " + data.name))
                         .catch((err) => console.log(err))
                     );
                 });
@@ -449,10 +439,34 @@ class WizardApp {
 
             // When everything's finished, log the output.
             .then(() => {
-                this.util.logInfo("Installation Complete!");
+                this.logInfo("Installation Complete!");
                 resolve();
             });
         });
+    }
+
+    
+    /**
+     * Renders the proper text language into the web pages
+     * @param {Object} text  Contains the keys and values from the language file
+     */
+    displayPageText(text){
+        $(document).ready(() => {
+            for (let key in text){
+                if(!text.hasOwnProperty(key)) continue;
+                $("." + key).text(text[key]);
+            }
+        });
+    }
+
+    /**
+     * Shows an overlay with the specified data string
+     * @param {string} data 
+     */
+    logInfo(data){
+        if (!data || (typeof(data) !== 'string')) data = "";
+
+        $.LoadingOverlay("text", data);
     }
 
     /**
