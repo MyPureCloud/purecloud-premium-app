@@ -302,6 +302,7 @@ class WizardApp {
     addInstances(groupData){
         let integrationPromises = [];
         let enableIntegrationPromises = [];
+        let integrationsData = [];
 
         // After groups are created, create instances
         // There are 3 steps for creating the app instances
