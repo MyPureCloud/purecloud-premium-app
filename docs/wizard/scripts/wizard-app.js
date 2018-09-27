@@ -2,7 +2,9 @@
 *   NOTE: This sample uses ES6 features
 */
 import appConfig from './config.js';
+import util from './util.js';
 
+// JQuery Alias
 const $ = window.$;
 
 /**
@@ -24,6 +26,7 @@ class WizardApp {
         this.integrationsApi = new this.platformClient.IntegrationsApi();
         this.groupsApi = new this.platformClient.GroupsApi();
         this.authApi = new this.platformClient.AuthorizationApi();
+        this.oAuthApi = new this.platformClient.OAuthApi();
 
         // Language default is english
         // Language context is object containing the translations
@@ -33,40 +36,7 @@ class WizardApp {
         this.appName = "premium-app-example";
 
         this.prefix = appConfig.prefix;
-        this.installationData = {
-            "roles": [
-                {
-                    "name": "Role",
-                    "description": "Generated role for access to the app.",
-                    "permissionPolicies": [
-                        {
-                            "domain": "integration",
-                            "entityName": "examplePremiumApp",
-                            "actionSet": ["*"],
-                            "allowConditions": false
-                        }
-                    ]
-                }
-            ],
-            "groups": [
-                {
-                    "name": "Agents",
-                    "description": "Agents have access to a widget that gives US state information based on caller's number.",
-                },
-                {
-                    "name": "Supervisors",
-                    "description": "Supervisors have the ability to watch a queue for ACD conversations.",
-                }
-            ],
-            "appInstances": [
-                {
-                    "name": "Agent Widget",
-                    "url": "https://mypurecloud.github.io/purecloud-premium-app/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}",
-                    "type": "widget",
-                    "groups": ["Agents"]
-                }
-            ]
-        };
+        this.installationData = appConfig.provisioningInfo;
     }
 
     /**
@@ -101,15 +71,17 @@ class WizardApp {
         console.log(this.pcApp.pcEnvironment);
 
         // Get the language context file and assign it to the app
+        // For this example, the text is translated on-the-fly.
         return new Promise((resolve, reject) => {
             let fileUri = './languages/' + this.language + '.json';
             $.getJSON(fileUri)
             .done(data => {
-                this.displayPageText(data);
+                this.util.displayPageText(data);
                 resolve();
             })
             .fail(xhr => {
                 console.log('Language file not found.');
+                resolve();
             }); 
         });
     }
@@ -119,28 +91,15 @@ class WizardApp {
      * @return {Promise}
      */
     _pureCloudAuthenticate() {
-        // Authenticate through PureCloud
-        return this.purecloudClient.loginImplicitGrant(appConfig.clientIDs[this.pcApp.pcEnvironment], 
-                                this.redirectUri, 
-                                {state: ('pcEnvironment=' + this.pcApp.pcEnvironment)});
-    }
-
-    /**
-     * Renders the proper text language into the web pages
-     * @param {Object} text  Contains the keys and values from the language file
-     */
-    displayPageText(text){
-        $(document).ready(() => {
-            for (let key in text){
-                if(!text.hasOwnProperty(key)) continue;
-                $("." + key).text(text[key]);
-            }
-        });
+        return this.purecloudClient.loginImplicitGrant(
+                        appConfig.clientIDs[this.pcApp.pcEnvironment], 
+                        this.redirectUri, 
+                        {state: ('pcEnvironment=' + this.pcApp.pcEnvironment)});
     }
 
     /**
      * Get details of the current user
-     * @return {Promise}
+     * @return {Promise.<Object>} PureCloud User data
      */
     getUserDetails(){
         let opts = {'expand': ['authorization']};
@@ -150,7 +109,7 @@ class WizardApp {
 
     /**
      * Checks if the product is available in the current Purecloud org.
-     * @return {Promise}
+     * @return {Promise.<Boolean>}
      */
     validateProductAvailability(){
         // premium-app-example
@@ -169,8 +128,8 @@ class WizardApp {
 
     /**
      * Checks if any configured objects are still existing. 
-     * This is based of the prefix
-     * @returns {Promise} If any installed objects are still existing in the org. 
+     * This is based on the prefix
+     * @returns {Promise.<Boolean>} If any installed objects are still existing in the org. 
      */
     isExisting(){
         return new Promise((resolve, reject) => {
@@ -337,6 +296,14 @@ class WizardApp {
         return this.integrationsApi.deleteIntegration(instanceId);
     }
 
+    getExistingAuthClients(){
+        return this.integrationsApi.getOauthClients()
+        .then((data) => {
+            return(data.entities
+                .filter(entity => entity.name
+                    .startsWith(this.prefix)));
+        });
+    }
 
     /**
      * Final Step of the installation wizard. Actually install every staged object.
@@ -370,7 +337,7 @@ class WizardApp {
                 authPromises.push(
                     this.authApi.postAuthorizationRoles(roleBody)
                     .then((data) => {
-                        this.logInfo("Created role: " + role.name);
+                        this.util.logInfo("Created role: " + role.name);
                         roleId = data.id;
 
                         return this.getUserDetails();
@@ -379,7 +346,7 @@ class WizardApp {
                         return this.authApi.putAuthorizationRoleUsersAdd(roleId, [data.id]);
                     })
                     .then((data) => {
-                        this.logInfo("Assigned " + role.name + " to user");
+                        this.util.logInfo("Assigned " + role.name + " to user");
                     })
                     .catch((err) => console.log(err))
                 );
@@ -400,7 +367,7 @@ class WizardApp {
                     groupPromises.push(
                         this.groupsApi.postGroups(groupBody)
                         .then((data) => {
-                            this.logInfo("Created group: " + group.name);
+                            this.util.logInfo("Created group: " + group.name);
                             groupData[group.name] = data.id;
                         })
                         .catch((err) => console.log(err))
@@ -430,7 +397,7 @@ class WizardApp {
                     integrationPromises.push(
                         this.integrationsApi.postIntegrations(integrationBody)
                         .then((data) => {
-                            this.logInfo("Created instance: " + instance.name);
+                            this.util.logInfo("Created instance: " + instance.name);
                             let integrationConfig = {
                                 "body": {
                                     "name": this.prefix + instance.name,
@@ -452,7 +419,7 @@ class WizardApp {
                             return this.integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig);
                         })
                         .then((data) => {
-                            this.logInfo("Configured instance: " + data.name);                           
+                            this.util.logInfo("Configured instance: " + data.name);                           
                         })
                         .catch((err) => console.log(err))
                     );
@@ -472,7 +439,7 @@ class WizardApp {
 
                     enablePromises.push(
                         this.integrationsApi.patchIntegration(instance.id, opts)
-                        .then((data) => this.logInfo("Enabled instance: " + data.name))
+                        .then((data) => this.util.logInfo("Enabled instance: " + data.name))
                         .catch((err) => console.log(err))
                     );
                 });
@@ -482,20 +449,10 @@ class WizardApp {
 
             // When everything's finished, log the output.
             .then(() => {
-                this.logInfo("Installation Complete!");
+                this.util.logInfo("Installation Complete!");
                 resolve();
             });
         });
-    }
-
-    /**
-     * Shows an overlay with the specified data string
-     * @param {string} data 
-     */
-    logInfo(data){
-        if (!data || (typeof(data) !== 'string')) data = "";
-
-        $.LoadingOverlay("text", data);
     }
 
     /**
