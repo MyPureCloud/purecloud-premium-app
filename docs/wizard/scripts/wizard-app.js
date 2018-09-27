@@ -160,56 +160,9 @@ class WizardApp {
     clearConfigurations(){
         let configArr = [];
 
-        // Delete groups
-        configArr.push(
-            this.getExistingGroups()
-            .then(groups => {
-                let del_group = [];
-
-                if(groups.total > 0){
-                    groups.results.map(grp => grp.id).forEach(x => {
-                        del_group.push(this.deletePureCloudGroup(x));
-                    });
-                }
-
-                return Promise.all(del_group);
-            })
-        );
-
-        // Delete Roles
-        configArr.push(
-            this.getExistingRoles()
-            .then(roles => {
-                let del_role = [];
-
-                if(roles.total > 0){
-                    roles.entities.map(r => r.id).forEach(x => {
-                        del_role.push(this.deletePureCloudRole(x));
-                    });
-                }
-                
-                return Promise.all(del_role);
-            })
-        );
-
-        // Delete instances
-        configArr.push(
-            this.getExistingApps()
-            .then(apps => {
-                console.log(apps);
-                let del_app = [];
-
-                if (apps.length > 0){
-                    // Filter results before deleting
-                    apps.map(entity => entity.id)
-                        .forEach(x => {
-                            del_app.push(this.deletePureCloudApp(x));
-                    });
-                }
-
-                return Promise.all(del_app);
-            })
-        );
+        configArr.push(this.deletePureCloudGroups());
+        configArr.push(this.deletePureCloudRoles());
+        configArr.push(this.deletePureCloudApps());
 
         return Promise.all(configArr);
     }
@@ -234,11 +187,22 @@ class WizardApp {
     }
 
     /**
-     * Delete Group from PureCloud org
-     * @param {String} groupId 
+     * Delete existing groups from PureCloud org
+     * @returns {Promise}
      */
-    deletePureCloudGroup(groupId){
-        return this.groupsApi.deleteGroup(groupId);
+    deletePureCloudGroups(){
+        return this.getExistingGroups()
+        .then(groups => {
+            let del_group = [];
+
+            if(groups.total > 0){
+                groups.results.map(grp => grp.id).forEach(gid => {
+                    del_group.push(this.groupsApi.deleteGroup(gid));
+                });
+            }
+
+            return Promise.all(del_group);
+        });
     }
 
     /**
@@ -254,16 +218,27 @@ class WizardApp {
     }
 
     /**
-     * Delete the specified role
-     * @param {String} roleId 
+     * Delete existing roles from PureCloud
+     * @returns {Promise}
      */
-    deletePureCloudRole(roleId){
-        return this.authApi.deleteAuthorizationRole(roleId);
+    deletePureCloudRoles(){
+        return this.getExistingRoles()
+        .then(roles => {
+            let del_role = [];
+
+            if(roles.total > 0){
+                roles.entities.map(r => r.id).forEach(rid => {
+                    del_role.push(this.authApi.deleteAuthorizationRole(rid));
+                });
+            }
+            
+            return Promise.all(del_role);
+        });
     }
 
     /**
      * Get existing apps based on the prefix
-     * @todo Get instances of a particular type of app.
+     * @returns {Promise}
      */
     getExistingApps(){
         let integrationsOpts = {
@@ -279,14 +254,37 @@ class WizardApp {
     }
 
     /**
-     * Delete a PureCLoud instance
-     * @param {String} instanceId 
+     * Delete all existing PremiumApp instances
+     * @returns {Promise}
      */
-    deletePureCloudApp(instanceId){
-        return this.integrationsApi.deleteIntegration(instanceId);
+    deletePureCloudApps(){
+        return this.getExistingApps()
+        .then(apps => {
+            console.log(apps);
+            let del_app = [];
+
+            if (apps.length > 0){
+                // Filter results before deleting
+                apps.map(entity => entity.id)
+                    .forEach(iid => {
+                        del_app.push(this.integrationsApi.deleteIntegration(iid));
+                });
+            }
+
+            return Promise.all(del_app);
+        });
     }
 
     getExistingAuthClients(){
+        return this.integrationsApi.getOauthClients()
+        .then((data) => {
+            return(data.entities
+                .filter(entity => entity.name
+                    .startsWith(this.prefix)));
+        });
+    }
+
+    deleteAuthClients(){
         return this.integrationsApi.getOauthClients()
         .then((data) => {
             return(data.entities
@@ -313,7 +311,6 @@ class WizardApp {
         let integrationsData = [];
 
         return new Promise((resolve,reject) => { 
-            
             // Create the roles
             this.installationData.roles.forEach((role) => {
                 let roleBody = {
