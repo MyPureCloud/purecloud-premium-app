@@ -201,7 +201,7 @@ class WizardApp {
 
             // Assign role to user
             let roleId = null;
-            authPromises.push(
+            rolePromises.push(
                 this.authApi.postAuthorizationRoles(roleBody)
                 .then((data) => {
                     this.logInfo("Created role: " + role.name);
@@ -457,14 +457,14 @@ class WizardApp {
      */
     installConfigurations(){
         return this.addRoles()
-        .then(this.addGroups)
-        .then(this.addInstances)
+        .then(() => this.addGroups())
+        .then((groupData) => this.addInstances(groupData))
 
         // When everything's finished, log the output.
         .then(() => {
             this.logInfo("Installation Complete!");
         })
-        .catch(() => console.log(err));
+        .catch((err) => console.log(err));
     }
 
     
