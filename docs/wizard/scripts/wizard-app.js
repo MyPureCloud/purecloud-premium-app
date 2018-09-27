@@ -154,17 +154,74 @@ class WizardApp {
     }
 
     /**
-     * Delete all existing Premium App PC objects
+     * Get existing roles in purecloud based on prefix
+     */
+    getExistingRoles(){
+        let authOpts = { 
+            'name': this.prefix + "*", // Wildcard to work like STARTS_WITH 
+            'userCount': false
+        };
+
+        return this.authApi.getAuthorizationRoles(authOpts);
+    }
+
+    /**
+     * Delete existing roles from PureCloud
      * @returns {Promise}
      */
-    clearConfigurations(){
-        let configArr = [];
+    deletePureCloudRoles(){
+        return this.getExistingRoles()
+        .then(roles => {
+            let del_role = [];
 
-        configArr.push(this.deletePureCloudGroups());
-        configArr.push(this.deletePureCloudRoles());
-        configArr.push(this.deletePureCloudApps());
+            if(roles.total > 0){
+                roles.entities.map(r => r.id).forEach(rid => {
+                    del_role.push(this.authApi.deleteAuthorizationRole(rid));
+                });
+            }
+            
+            return Promise.all(del_role);
+        });
+    }
 
-        return Promise.all(configArr);
+    /**
+     * Add PureCLoud roles based on installation data
+     * @returns {Promise}
+     */
+    addRoles(){
+        let rolePromises = [];
+
+        // Create the roles
+        this.installationData.roles.forEach((role) => {
+            let roleBody = {
+                    "name": this.prefix + role.name,
+                    "description": "",
+                    "permissionPolicies": role.permissionPolicies
+            };
+
+            // Assign role to user
+            let roleId = null;
+            authPromises.push(
+                this.authApi.postAuthorizationRoles(roleBody)
+                .then((data) => {
+                    this.logInfo("Created role: " + role.name);
+                    roleId = data.id;
+
+                    return this.getUserDetails();
+                })
+                .then((user) => {
+                    // Assign the role to the user
+                    // Required before you can assign the role to an Auth Client.
+                    return this.authApi.putAuthorizationRoleUsersAdd(roleId, [user.id]);
+                })
+                .then((data) => {
+                    this.logInfo("Assigned " + role.name + " to user");
+                })
+                .catch((err) => console.log(err))
+            );
+        });
+
+        return Promise.all(rolePromises);
     }
 
     /**
@@ -206,34 +263,35 @@ class WizardApp {
     }
 
     /**
-     * Get existing roles in purecloud based on prefix
+     * Add PureCLoud groups based on installation data
+     * @returns {Promise.<Object>} Group Data Object {"grp-name": "grp-id"}
      */
-    getExistingRoles(){
-        let authOpts = { 
-            'name': this.prefix + "*", // Wildcard to work like STARTS_WITH 
-            'userCount': false
-        };
+    addGroups(){
+        let groupPromises = [];
+        let groupData = {};
 
-        return this.authApi.getAuthorizationRoles(authOpts);
-    }
+        this.installationData.groups.forEach((group) => {
+            let groupBody = {
+                "name": this.prefix + group.name,
+                "description": group.description,
+                "type": "official",
+                "rulesVisible": true,
+                "visibility": "public"
+            };
+            console.log(groupBody);
 
-    /**
-     * Delete existing roles from PureCloud
-     * @returns {Promise}
-     */
-    deletePureCloudRoles(){
-        return this.getExistingRoles()
-        .then(roles => {
-            let del_role = [];
-
-            if(roles.total > 0){
-                roles.entities.map(r => r.id).forEach(rid => {
-                    del_role.push(this.authApi.deleteAuthorizationRole(rid));
-                });
-            }
-            
-            return Promise.all(del_role);
+            groupPromises.push(
+                this.groupsApi.postGroups(groupBody)
+                .then((data) => {
+                    this.logInfo("Created group: " + group.name);
+                    groupData[group.name] = data.id;
+                })
+                .catch((err) => console.log(err))
+            );
         });
+
+        return Promise.all(groupPromises)
+        .then(() => groupData);
     }
 
     /**
@@ -275,6 +333,80 @@ class WizardApp {
         });
     }
 
+    /**
+     * Add PureCLoud instances based on installation data
+     * @returns {Promise}
+     */
+    addInstances(){
+        let integrationPromises = [];
+        let enableIntegrationPromises = [];
+
+        // After groups are created, create instances
+        // There are 3 steps for creating the app instances
+        // 1. Create instance of a custom-client-app
+        // 2. Configure the app
+        // 3. Activate the instances
+        this.installationData.appInstances.forEach((instance) => {
+            let integrationBody = {
+                "body": {
+                    "integrationType": {
+                        "id": this.appName
+                    }
+                }
+            };
+
+            // Rename and add Group Filtering
+            integrationPromises.push(
+                this.integrationsApi.postIntegrations(integrationBody)
+                .then((data) => {
+                    this.logInfo("Created instance: " + instance.name);
+                    let integrationConfig = {
+                        "body": {
+                            "name": this.prefix + instance.name,
+                            "version": 1, 
+                            "properties": {
+                                "url" : instance.url,
+                                "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
+                                "displayType": instance.type,
+                                "featureCategory": "", 
+                                "groupFilter": instance.groups.map((groupName) => groupData[groupName]).filter(g => g != undefined)
+                            },
+                            "advanced": {},
+                            "notes": "",
+                            "credentials": {}
+                        }
+                    };
+
+                    integrationsData.push(data);
+                    return this.integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig);
+                })
+                .then((data) => {
+                    this.logInfo("Configured instance: " + data.name);                           
+                })
+            );
+        });
+
+        return Promise.all(integrationPromises)
+        // Activate the newly created application instances
+        .then(() => {
+            integrationsData.forEach((instance) => {
+                let opts = {
+                    "body": {
+                        "intendedState": "ENABLED"
+                    }
+                };
+
+                enableIntegrationPromises.push(
+                    this.integrationsApi.patchIntegration(instance.id, opts)
+                    .then((data) => this.logInfo("Enabled instance: " + data.name))
+                    .catch((err) => console.log(err))
+                );
+            });
+            
+            return Promise.all(enableIntegrationPromises);
+        });
+    }
+
     getExistingAuthClients(){
         return this.integrationsApi.getOauthClients()
         .then((data) => {
@@ -285,161 +417,54 @@ class WizardApp {
     }
 
     deleteAuthClients(){
-        return this.integrationsApi.getOauthClients()
-        .then((data) => {
-            return(data.entities
-                .filter(entity => entity.name
-                    .startsWith(this.prefix)));
+        return this.getExistingAuthClients()
+        .then((instances) => {
+            let del_clients = [];
+
+            if (instances.length > 0){
+                // Filter results before deleting
+                instances.map(entity => entity.id)
+                    .forEach(cid => {
+                        del_clients.push(this.oAuthApi.deleteOauthClient(cid));
+                });
+            }
+
+            return Promise.all(del_clients);
         });
     }
 
+    addAuthClients(){
+        
+    }
+    
     /**
-     * Final Step of the installation wizard. Actually install every staged object.
+     * Delete all existing Premium App PC objects
+     * @returns {Promise}
+     */
+    clearConfigurations(){
+        let configArr = [];
+
+        configArr.push(this.deletePureCloudGroups());
+        configArr.push(this.deletePureCloudRoles());
+        configArr.push(this.deletePureCloudApps());
+
+        return Promise.all(configArr);
+    }
+
+    /**
+     * Final Step of the installation wizard. 
+     * Create the PureCloud objects defined in provisioning configuration
      */
     installConfigurations(){
-        // Keep the promises of the creation calls
-        // This will be used to keep track once a particular batch resolves
-        let groupPromises = [];
-        let authPromises = [];
-        let integrationPromises = [];
+        return this.addRoles()
+        .then(this.addGroups)
+        .then(this.addInstances)
 
-        // Once groups are created store the names and the ids
-        // object of (groupName: groupId) pairs
-        let groupData = {};
-
-        // Get info from created integrations
-        let integrationsData = [];
-
-        return new Promise((resolve,reject) => { 
-            // Create the roles
-            this.installationData.roles.forEach((role) => {
-                let roleBody = {
-                        "name": this.prefix + role.name,
-                        "description": "",
-                        "permissionPolicies": role.permissionPolicies
-                };
-
-                // Assign role to user
-                let roleId = null;
-                authPromises.push(
-                    this.authApi.postAuthorizationRoles(roleBody)
-                    .then((data) => {
-                        this.logInfo("Created role: " + role.name);
-                        roleId = data.id;
-
-                        return this.getUserDetails();
-                    })
-                    .then((data) => {
-                        return this.authApi.putAuthorizationRoleUsersAdd(roleId, [data.id]);
-                    })
-                    .then((data) => {
-                        this.logInfo("Assigned " + role.name + " to user");
-                    })
-                    .catch((err) => console.log(err))
-                );
-            });
-
-            // Create the groups
-            Promise.all(authPromises)
-            .then(() => {
-                this.installationData.groups.forEach((group) => {
-                    let groupBody = {
-                        "name": this.prefix + group.name,
-                        "description": group.description,
-                        "type": "official",
-                        "rulesVisible": true,
-                        "visibility": "public"
-                    };
-                    console.log(groupBody);
-                    groupPromises.push(
-                        this.groupsApi.postGroups(groupBody)
-                        .then((data) => {
-                            this.logInfo("Created group: " + group.name);
-                            groupData[group.name] = data.id;
-                        })
-                        .catch((err) => console.log(err))
-                    );
-                });
-
-                
-                return Promise.all(groupPromises);
-            })
-            
-            // After groups are created, create instances
-            // There are 3 steps for creating the app instances
-            // 1. Create instance of a custom-client-app
-            // 2. Configure the app
-            // 3. Activate the instances
-            .then(() => {
-                this.installationData.appInstances.forEach((instance) => {
-                    let integrationBody = {
-                        "body": {
-                            "integrationType": {
-                                "id": this.appName
-                            }
-                        }
-                    };
-
-                    // Rename and add Group Filtering
-                    integrationPromises.push(
-                        this.integrationsApi.postIntegrations(integrationBody)
-                        .then((data) => {
-                            this.logInfo("Created instance: " + instance.name);
-                            let integrationConfig = {
-                                "body": {
-                                    "name": this.prefix + instance.name,
-                                    "version": 1, 
-                                    "properties": {
-                                        "url" : instance.url,
-                                        "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
-                                        "displayType": instance.type,
-                                        "featureCategory": "", 
-                                        "groupFilter": instance.groups.map((groupName) => groupData[groupName]).filter(g => g != undefined)
-                                    },
-                                    "advanced": {},
-                                    "notes": "",
-                                    "credentials": {}
-                                }
-                            };
-
-                            integrationsData.push(data);
-                            return this.integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig);
-                        })
-                        .then((data) => {
-                            this.logInfo("Configured instance: " + data.name);                           
-                        })
-                        .catch((err) => console.log(err))
-                    );
-                });
-                return Promise.all(integrationPromises);
-            })
-
-            // Activate the newly created application instances
-            .then(() => {
-                let enablePromises = [];
-                integrationsData.forEach((instance) => {
-                    let opts = {
-                        "body": {
-                            "intendedState": "ENABLED"
-                        }
-                    };
-
-                    enablePromises.push(
-                        this.integrationsApi.patchIntegration(instance.id, opts)
-                        .then((data) => this.logInfo("Enabled instance: " + data.name))
-                        .catch((err) => console.log(err))
-                    );
-                });
-                
-                return Promise.all(enablePromises);
-            })
-
-            // When everything's finished, log the output.
-            .then(() => {
-                this.logInfo("Installation Complete!");
-                resolve();
-            });
-        });
+        // When everything's finished, log the output.
+        .then(() => {
+            this.logInfo("Installation Complete!");
+        })
+        .catch(() => console.log(err));
     }
 
     
