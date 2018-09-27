@@ -378,7 +378,7 @@ class WizardApp {
      * @returns {Promise.<Array>} Array of PureCloud OAuth Clients
      */
     getExistingAuthClients(){
-        return this.integrationsApi.getOauthClients()
+        return this.oAuthApi.getOauthClients()
         .then((data) => {
             return(data.entities
                 .filter(entity => entity.name
