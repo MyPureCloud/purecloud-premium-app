@@ -299,7 +299,7 @@ class WizardApp {
      * Add PureCLoud instances based on installation data
      * @returns {Promise}
      */
-    addInstances(){
+    addInstances(groupData){
         let integrationPromises = [];
         let enableIntegrationPromises = [];
 
