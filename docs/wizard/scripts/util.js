@@ -13,8 +13,13 @@ var getUrlParameter = function getUrlParameter(sParam) {
     }
 };
 
+/**
+ * Switches to a different page and attaches the language as query param
+ * This could also be stored in a cookie/session instead
+ * @param {Sring} page 
+ */
 var goToPage = function goToPage(page){
     window.location = getUrlParameter('langTag') ? 
         page + '.html?langTag=' + getUrlParameter('langTag') : 
-        page + '.html?langTag=en-us'
-}
+        page + '.html?langTag=en-us';
+};

@@ -3,6 +3,7 @@
 */
 import appConfig from './config.js';
 
+// JQuery Alias
 const $ = window.$;
 
 /**
@@ -24,6 +25,7 @@ class WizardApp {
         this.integrationsApi = new this.platformClient.IntegrationsApi();
         this.groupsApi = new this.platformClient.GroupsApi();
         this.authApi = new this.platformClient.AuthorizationApi();
+        this.oAuthApi = new this.platformClient.OAuthApi();
 
         // Language default is english
         // Language context is object containing the translations
@@ -33,40 +35,518 @@ class WizardApp {
         this.appName = "premium-app-example";
 
         this.prefix = appConfig.prefix;
-        this.installationData = {
-            "roles": [
+        this.installationData = appConfig.provisioningInfo;
+    }
+
+    /**
+     * Get details of the current user
+     * @return {Promise.<Object>} PureCloud User data
+     */
+    getUserDetails(){
+        let opts = {'expand': ['authorization']};
+    
+        return this.usersApi.getUsersMe(opts);
+    }
+
+    /**
+     * Checks if the product is available in the current Purecloud org.
+     * @return {Promise.<Boolean>}
+     */
+    validateProductAvailability(){
+        // premium-app-example         
+        return this.integrationsApi.getIntegrationsTypes({})
+        .then((data) => {
+            if (data.entities.filter((integType) => integType.id === this.appName)[0]){
+                return(true);
+            } else {
+                return(false);
+            }
+        });
+    }
+
+    /**
+     * Checks if any configured objects are still existing. 
+     * This is based on the prefix
+     * @returns {Promise.<Boolean>} If any installed objects are still existing in the org. 
+     */
+    isExisting(){
+        let promiseArr = []; 
+        
+        promiseArr.push(this.getExistingGroups());
+        promiseArr.push(this.getExistingRoles());
+        promiseArr.push(this.getExistingApps());
+
+        return Promise.all(promiseArr)
+        .then((results) => { 
+            if(
+                // Check if any groups are still existing
+                results[0].total > 0 || 
+
+                // Check if any roles are existing
+                results[1].total > 0 ||
+
+                // Check if any apps are existing
+                results[2].length > 0 ){
+
+                return(true);
+            }
+
+            return(false);
+        });
+    }
+
+
+    //// =======================================================
+    ////      ROLES
+    //// =======================================================
+
+    /**
+     * Get existing roles in purecloud based on prefix
+     * @returns {Promise.<Array>} PureCloud Roles
+     */
+    getExistingRoles(){
+        let authOpts = { 
+            'name': this.prefix + "*", // Wildcard to work like STARTS_WITH 
+            'userCount': false
+        };
+
+        return this.authApi.getAuthorizationRoles(authOpts);
+    }
+
+    /**
+     * Delete existing roles from PureCloud
+     * @returns {Promise}
+     */
+    deletePureCloudRoles(){
+        return this.getExistingRoles()
+        .then(roles => {
+            let del_role = [];
+
+            if(roles.total > 0){
+                roles.entities.map(r => r.id).forEach(rid => {
+                    del_role.push(this.authApi.deleteAuthorizationRole(rid));
+                });
+            }
+            
+            return Promise.all(del_role);
+        });
+    }
+
+    /**
+     * Add PureCLoud roles based on installation data
+     * @returns {Promise}
+     */
+    addRoles(){
+        let rolePromises = [];
+        let roleData = []; // Array of {"rolename": "roleid"}
+
+        // Create the roles
+        this.installationData.roles.forEach((role) => {
+            let roleBody = {
+                    "name": this.prefix + role.name,
+                    "description": "",
+                    "permissionPolicies": role.permissionPolicies
+            };
+
+            // Assign role to user
+            let roleId = null;
+            rolePromises.push(
+                this.authApi.postAuthorizationRoles(roleBody)
+                .then((data) => {
+                    this.logInfo("Created role: " + role.name);
+                    roleId = data.id;
+
+                    roleData[role.name] = roleId;
+
+                    return this.getUserDetails();
+                })
+                .then((user) => {
+                    // Assign the role to the user
+                    // Required before you can assign the role to an Auth Client.
+                    return this.authApi.putAuthorizationRoleUsersAdd(roleId, [user.id]);
+                })
+                .then((data) => {
+                    this.logInfo("Assigned " + role.name + " to user");
+                })
+                .catch((err) => console.log(err))
+            );
+        });
+
+        return Promise.all(rolePromises)
+        .then(() => roleData);
+    }
+
+    //// =======================================================
+    ////      GROUPS
+    //// =======================================================
+
+    /**
+     * Gets the existing groups on PureCloud based on Prefix
+     * @return {Promise.<Array>} PureCloud Group Objects
+     */
+    getExistingGroups(){
+        // Query bodies
+        let groupSearchBody = {
+            "query": [
                 {
-                    "name": "Role",
-                    "description": "Generated role for access to the app.",
-                    "permissionPolicies": [
-                        {
-                            "domain": "integration",
-                            "entityName": "examplePremiumApp",
-                            "actionSet": ["*"],
-                            "allowConditions": false
-                        }
-                    ]
-                }
-            ],
-            "groups": [
-                {
-                    "name": "Agents",
-                    "description": "Agents have access to a widget that gives US state information based on caller's number.",
-                },
-                {
-                    "name": "Supervisors",
-                    "description": "Supervisors have the ability to watch a queue for ACD conversations.",
-                }
-            ],
-            "appInstances": [
-                {
-                    "name": "Agent Widget",
-                    "url": "https://mypurecloud.github.io/purecloud-premium-app/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}",
-                    "type": "widget",
-                    "groups": ["Agents"]
+                    "fields": ["name"],
+                    "value": this.prefix,
+                    "operator": "OR",
+                    "type": "STARTS_WITH"
                 }
             ]
         };
+
+        return this.groupsApi.postGroupsSearch(groupSearchBody);
+    }
+
+    /**
+     * Delete existing groups from PureCloud org
+     * @returns {Promise}
+     */
+    deletePureCloudGroups(){
+        return this.getExistingGroups()
+        .then(groups => {
+            let del_group = [];
+
+            if(groups.total > 0){
+                groups.results.map(grp => grp.id).forEach(gid => {
+                    del_group.push(this.groupsApi.deleteGroup(gid));
+                });
+            }
+
+            return Promise.all(del_group);
+        });
+    }
+
+    /**
+     * Add PureCloud groups based on installation data
+     * @returns {Promise.<Object>} Group Data Object {"grp-name": "grp-id"}
+     */
+    addGroups(){
+        let groupPromises = [];
+        let groupData = {};
+
+        this.installationData.groups.forEach((group) => {
+            let groupBody = {
+                "name": this.prefix + group.name,
+                "description": group.description,
+                "type": "official",
+                "rulesVisible": true,
+                "visibility": "public"
+            };
+            console.log(groupBody);
+
+            groupPromises.push(
+                this.groupsApi.postGroups(groupBody)
+                .then((data) => {
+                    this.logInfo("Created group: " + group.name);
+                    groupData[group.name] = data.id;
+                })
+                .catch((err) => console.log(err))
+            );
+        });
+
+        return Promise.all(groupPromises)
+        .then(() => groupData);
+    }
+
+
+    //// =======================================================
+    ////      INTEGRATIONS (APP INSTANCES)
+    //// =======================================================
+
+    /**
+     * Get existing apps based on the prefix
+     * @returns {Promise.<Array>} PureCloud Integrations
+     */
+    getExistingApps(){
+        let integrationsOpts = {
+            'pageSize': 100
+        };
+        
+        return this.integrationsApi.getIntegrations(integrationsOpts)
+        .then((data) => {
+            return(data.entities
+                .filter(entity => entity.name
+                    .startsWith(this.prefix)));
+        });  
+    }
+
+    /**
+     * Delete all existing PremiumApp instances
+     * @returns {Promise}
+     */
+    deletePureCloudApps(){
+        return this.getExistingApps()
+        .then(apps => {
+            console.log(apps);
+            let del_app = [];
+
+            if (apps.length > 0){
+                // Filter results before deleting
+                apps.map(entity => entity.id)
+                    .forEach(iid => {
+                        del_app.push(this.integrationsApi.deleteIntegration(iid));
+                });
+            }
+
+            return Promise.all(del_app);
+        });
+    }
+
+    /**
+     * Add PureCLoud instances based on installation data
+     * @returns {Promise}
+     */
+    addInstances(){
+        let integrationPromises = [];
+        let enableIntegrationPromises = [];
+
+        // After groups are created, create instances
+        // There are 3 steps for creating the app instances
+        // 1. Create instance of a custom-client-app
+        // 2. Configure the app
+        // 3. Activate the instances
+        this.installationData.appInstances.forEach((instance) => {
+            let integrationBody = {
+                "body": {
+                    "integrationType": {
+                        "id": this.appName
+                    }
+                }
+            };
+
+            // Rename and add Group Filtering
+            integrationPromises.push(
+                this.integrationsApi.postIntegrations(integrationBody)
+                .then((data) => {
+                    this.logInfo("Created instance: " + instance.name);
+                    let integrationConfig = {
+                        "body": {
+                            "name": this.prefix + instance.name,
+                            "version": 1, 
+                            "properties": {
+                                "url" : instance.url,
+                                "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
+                                "displayType": instance.type,
+                                "featureCategory": "", 
+                                "groupFilter": instance.groups.map((groupName) => groupData[groupName]).filter(g => g != undefined)
+                            },
+                            "advanced": {},
+                            "notes": "",
+                            "credentials": {}
+                        }
+                    };
+
+                    integrationsData.push(data);
+                    return this.integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig);
+                })
+                .then((data) => {
+                    this.logInfo("Configured instance: " + data.name);                           
+                })
+            );
+        });
+
+        return Promise.all(integrationPromises)
+        // Activate the newly created application instances
+        .then(() => {
+            integrationsData.forEach((instance) => {
+                let opts = {
+                    "body": {
+                        "intendedState": "ENABLED"
+                    }
+                };
+
+                enableIntegrationPromises.push(
+                    this.integrationsApi.patchIntegration(instance.id, opts)
+                    .then((data) => this.logInfo("Enabled instance: " + data.name))
+                    .catch((err) => console.log(err))
+                );
+            });
+            
+            return Promise.all(enableIntegrationPromises);
+        });
+    }
+
+    //// =======================================================
+    ////      OAUTH2 CLIENT
+    //// =======================================================
+
+    /**
+     * Get existing authetication clients based on the prefix
+     * @returns {Promise.<Array>} Array of PureCloud OAuth Clients
+     */
+    getExistingAuthClients(){
+        return this.integrationsApi.getOauthClients()
+        .then((data) => {
+            return(data.entities
+                .filter(entity => entity.name
+                    .startsWith(this.prefix)));
+        });
+    }
+
+    /**
+     * Delete all existing PremiumApp instances
+     * @returns {Promise}
+     */
+    deleteAuthClients(){
+        return this.getExistingAuthClients()
+        .then((instances) => {
+            let del_clients = [];
+
+            if (instances.length > 0){
+                // Filter results before deleting
+                instances.map(entity => entity.id)
+                    .forEach(cid => {
+                        del_clients.push(this.oAuthApi.deleteOauthClient(cid));
+                });
+            }
+
+            return Promise.all(del_clients);
+        });
+    }
+
+    /**
+     * Add PureCLoud instances based on installation data
+     * @returns {Promise.<Array>} PureCloud OAuth objects
+     */
+    addAuthClients(roleData){
+        let authPromises = [];
+        let authData = [];
+
+        this.installationData.oauth.forEach((oauth) => {
+            let oauthClient = {
+                "name": oauth.name,
+                "description": oauth.description,
+                "roleIds": oauth.roles.map((roleName) => 
+                    roleData[roleName]).filter(g => g != undefined),
+                "authorizedGrantType": "CLIENT_CREDENTIALS"
+            };
+
+            authPromises.push(
+                this.oauthApi.postOauthClients(oauthClient)
+                .then((data) => {
+                    authData.push(data);
+
+                    this.logInfo("Created " + data.name + " auth client");
+                })
+                .catch((err) => console.log(err))
+            );
+
+            
+        });
+
+        return Promise.all(authPromises)
+        .then(() => authData);
+    }
+    
+
+    //// =======================================================
+    ////      PROVISIONING / DEPROVISIONING
+    //// =======================================================
+
+    /**
+     * Delete all existing Premium App PC objects
+     * @returns {Promise}
+     */
+    clearConfigurations(){
+        let configArr = [];
+
+        configArr.push(this.deleteAuthClients());
+        configArr.push(this.deletePureCloudGroups());
+        configArr.push(this.deletePureCloudRoles());
+        configArr.push(this.deletePureCloudApps());
+
+        return Promise.all(configArr);
+    }
+
+    /**
+     * Final Step of the installation wizard. 
+     * Create the PureCloud objects defined in provisioning configuration
+     * The order is important for some of the PureCloud entities.
+     */
+    installConfigurations(){
+        // Create groups
+        this.addGroups()
+
+        // Create instances after groups for (optional) group filtering
+        .then((groupData) => this.addInstances(groupData))
+
+        // Create Roles
+        .then(() => this.addRoles())
+
+        // Create OAuth client after role (required) and pass to server
+        .then((roleData) => this.addAuthClients(roleData))
+        .then((oAuthClients) => this.storeOAuthClient(oAuthClients))
+
+
+        // When everything's finished, log a success message.
+        .then(() => {
+            this.logInfo("Installation Complete!");
+        })
+        .catch((err) => console.log(err));
+    }
+
+    /**
+     * If an OAUTH Client is created pass the details over to a backend system.
+     * NOTE: This function is for demonstration purposes and is neither functional
+     *       nor production-ready.
+     * @param {Array} oAuthClients PureCloud OAuth objects. 
+     *         Normally there should only be 1 auth client created for an app.                     
+     */
+    storeOAuthClient(oAuthClients){
+        // TODO: Replace with something functional for production
+
+        // oAuthClients.forEach((client) => {
+        //     $.ajax({
+        //         url: "https://mycompany.org/premium-app",
+        //         method: "POST",
+        //         contentType: "application/json",
+        //         data: JSON.stringify(oAuthClients)
+        //     });
+        // });
+
+        console.log("Sent to server!");
+    }
+
+    //// =======================================================
+    ////      DISPLAY/UTILITY FUNCTIONS
+    //// =======================================================
+
+    /**
+     * Renders the proper text language into the web pages
+     * @param {Object} text  Contains the keys and values from the language file
+     */
+    displayPageText(text){
+        $(document).ready(() => {
+            for (let key in text){
+                if(!text.hasOwnProperty(key)) continue;
+                $("." + key).text(text[key]);
+            }
+        });
+    }
+
+    /**
+     * Shows an overlay with the specified data string
+     * @param {string} data 
+     */
+    logInfo(data){
+        if (!data || (typeof(data) !== 'string')) data = "";
+
+        $.LoadingOverlay("text", data);
+    }
+
+    //// =======================================================
+    ////      ENTRY POINT
+    //// =======================================================
+    start(){
+        return new Promise((resolve, reject) => {
+            this._setupClientApp()
+            .then(() => this._pureCloudAuthenticate())
+            .then(() => resolve())
+            .catch((err) => reject(err));
+        });
     }
 
     /**
@@ -101,6 +581,7 @@ class WizardApp {
         console.log(this.pcApp.pcEnvironment);
 
         // Get the language context file and assign it to the app
+        // For this example, the text is translated on-the-fly.
         return new Promise((resolve, reject) => {
             let fileUri = './languages/' + this.language + '.json';
             $.getJSON(fileUri)
@@ -110,6 +591,7 @@ class WizardApp {
             })
             .fail(xhr => {
                 console.log('Language file not found.');
+                resolve();
             }); 
         });
     }
@@ -119,395 +601,10 @@ class WizardApp {
      * @return {Promise}
      */
     _pureCloudAuthenticate() {
-        // Authenticate through PureCloud
-        return this.purecloudClient.loginImplicitGrant(appConfig.clientIDs[this.pcApp.pcEnvironment], 
-                                this.redirectUri, 
-                                {state: ('pcEnvironment=' + this.pcApp.pcEnvironment)});
-    }
-
-    /**
-     * Renders the proper text language into the web pages
-     * @param {Object} text  Contains the keys and values from the language file
-     */
-    displayPageText(text){
-        $(document).ready(() => {
-            for (let key in text){
-                if(!text.hasOwnProperty(key)) continue;
-                $("." + key).text(text[key]);
-            }
-        });
-    }
-
-    /**
-     * Get details of the current user
-     * @return {Promise}
-     */
-    getUserDetails(){
-        let opts = {'expand': ['authorization']};
-    
-        return this.usersApi.getUsersMe(opts);
-    }
-
-    /**
-     * Checks if the product is available in the current Purecloud org.
-     * @return {Promise}
-     */
-    validateProductAvailability(){
-        // premium-app-example
-        return new Promise((resolve, reject) => {            
-            this.integrationsApi.getIntegrationsTypes({})
-            .then((data) => {
-                if (data.entities.filter((integType) => integType.id === this.appName)[0]){
-                    resolve(true);
-                } else {
-                    resolve(false);
-                }
-            })
-            .catch(err => reject(err));
-        });
-    }
-
-    /**
-     * Checks if any configured objects are still existing. 
-     * This is based of the prefix
-     * @returns {Promise} If any installed objects are still existing in the org. 
-     */
-    isExisting(){
-        return new Promise((resolve, reject) => {
-            let promiseArr = []; 
-            
-            promiseArr.push(this.getExistingGroups());
-            promiseArr.push(this.getExistingRoles());
-            promiseArr.push(this.getExistingApps());
-
-            return Promise.all(promiseArr)
-            .then((results) => { 
-                if(
-                    // Check if any groups are still existing
-                    results[0].total > 0 || 
-
-                    // Check if any roles are existing
-                    results[1].total > 0 ||
-
-                    // Check if any apps are existing
-                    results[2].length > 0 ){
-
-                        resolve(true);
-                }
-
-                resolve(false);
-            })
-            .catch(err => reject(err));
-        });
-    }
-
-    /**
-     * Delete all existing Premium App PC objects
-     * @returns {Promise}
-     */
-    clearConfigurations(){
-        let configArr = [];
-
-        // Delete groups
-        configArr.push(
-            this.getExistingGroups()
-            .then(groups => {
-                let del_group = [];
-
-                if(groups.total > 0){
-                    groups.results.map(grp => grp.id).forEach(x => {
-                        del_group.push(this.deletePureCloudGroup(x));
-                    });
-                }
-
-                return Promise.all(del_group);
-            })
-        );
-
-        // Delete Roles
-        configArr.push(
-            this.getExistingRoles()
-            .then(roles => {
-                let del_role = [];
-
-                if(roles.total > 0){
-                    roles.entities.map(r => r.id).forEach(x => {
-                        del_role.push(this.deletePureCloudRole(x));
-                    });
-                }
-                
-                return Promise.all(del_role);
-            })
-        );
-
-        // Delete instances
-        configArr.push(
-            this.getExistingApps()
-            .then(apps => {
-                console.log(apps);
-                let del_app = [];
-
-                if (apps.length > 0){
-                    // Filter results before deleting
-                    apps.map(entity => entity.id)
-                        .forEach(x => {
-                            del_app.push(this.deletePureCloudApp(x));
-                    });
-                }
-
-                return Promise.all(del_app);
-            })
-        );
-
-        return Promise.all(configArr);
-    }
-
-    /**
-     * Gets the existing groups on PureCloud based on Prefix
-     */
-    getExistingGroups(){
-        // Query bodies
-        var groupSearchBody = {
-            "query": [
-                {
-                    "fields": ["name"],
-                    "value": this.prefix,
-                    "operator": "OR",
-                    "type": "STARTS_WITH"
-                }
-            ]
-        };
-
-        return this.groupsApi.postGroupsSearch(groupSearchBody);
-    }
-
-    /**
-     * Delete Group from PureCloud org
-     * @param {String} groupId 
-     */
-    deletePureCloudGroup(groupId){
-        return this.groupsApi.deleteGroup(groupId);
-    }
-
-    /**
-     * Get existing roles in purecloud based on prefix
-     */
-    getExistingRoles(){
-        let authOpts = { 
-            'name': this.prefix + "*", // Wildcard to work like STARTS_WITH 
-            'userCount': false
-        };
-
-        return this.authApi.getAuthorizationRoles(authOpts);
-    }
-
-    /**
-     * Delete the specified role
-     * @param {String} roleId 
-     */
-    deletePureCloudRole(roleId){
-        return this.authApi.deleteAuthorizationRole(roleId);
-    }
-
-    /**
-     * Get existing apps based on the prefix
-     * @todo Get instances of a particular type of app.
-     */
-    getExistingApps(){
-        let integrationsOpts = {
-            'pageSize': 100
-        };
-        
-        return new Promise((resolve, reject) => {
-            this.integrationsApi.getIntegrations(integrationsOpts)
-            .then((data) => {
-                resolve(data.entities
-                    .filter(entity => entity.name
-                        .startsWith(this.prefix)));
-            })
-            .catch(err => reject(err));
-        });
-    }
-
-    /**
-     * Delete a PureCLoud instance
-     * @param {String} instanceId 
-     */
-    deletePureCloudApp(instanceId){
-        return this.integrationsApi.deleteIntegration(instanceId);
-    }
-
-
-    /**
-     * Final Step of the installation wizard. Actually install every staged object.
-     */
-    installConfigurations(){
-        // Keep the promises of the creation calls
-        // This will be used to keep track once a particular batch resolves
-        let groupPromises = [];
-        let authPromises = [];
-        let integrationPromises = [];
-
-        // Once groups are created store the names and the ids
-        // object of (groupName: groupId) pairs
-        let groupData = {};
-
-        // Get info from created integrations
-        let integrationsData = [];
-
-        return new Promise((resolve,reject) => { 
-            
-            // Create the roles
-            this.installationData.roles.forEach((role) => {
-                let roleBody = {
-                        "name": this.prefix + role.name,
-                        "description": "",
-                        "permissionPolicies": role.permissionPolicies
-                };
-
-                // Assign role to user
-                let roleId = null;
-                authPromises.push(
-                    this.authApi.postAuthorizationRoles(roleBody)
-                    .then((data) => {
-                        this.logInfo("Created role: " + role.name);
-                        roleId = data.id;
-
-                        return this.getUserDetails();
-                    })
-                    .then((data) => {
-                        return this.authApi.putAuthorizationRoleUsersAdd(roleId, [data.id]);
-                    })
-                    .then((data) => {
-                        this.logInfo("Assigned " + role.name + " to user");
-                    })
-                    .catch((err) => console.log(err))
-                );
-            });
-
-            // Create the groups
-            Promise.all(authPromises)
-            .then(() => {
-                this.installationData.groups.forEach((group) => {
-                    let groupBody = {
-                        "name": this.prefix + group.name,
-                        "description": group.description,
-                        "type": "official",
-                        "rulesVisible": true,
-                        "visibility": "public"
-                    };
-                    console.log(groupBody);
-                    groupPromises.push(
-                        this.groupsApi.postGroups(groupBody)
-                        .then((data) => {
-                            this.logInfo("Created group: " + group.name);
-                            groupData[group.name] = data.id;
-                        })
-                        .catch((err) => console.log(err))
-                    );
-                });
-
-                
-                return Promise.all(groupPromises);
-            })
-            
-            // After groups are created, create instances
-            // There are 3 steps for creating the app instances
-            // 1. Create instance of a custom-client-app
-            // 2. Configure the app
-            // 3. Activate the instances
-            .then(() => {
-                this.installationData.appInstances.forEach((instance) => {
-                    let integrationBody = {
-                        "body": {
-                            "integrationType": {
-                                "id": this.appName
-                            }
-                        }
-                    };
-
-                    // Rename and add Group Filtering
-                    integrationPromises.push(
-                        this.integrationsApi.postIntegrations(integrationBody)
-                        .then((data) => {
-                            this.logInfo("Created instance: " + instance.name);
-                            let integrationConfig = {
-                                "body": {
-                                    "name": this.prefix + instance.name,
-                                    "version": 1, 
-                                    "properties": {
-                                        "url" : instance.url,
-                                        "sandbox" : "allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts",
-                                        "displayType": instance.type,
-                                        "featureCategory": "", 
-                                        "groupFilter": instance.groups.map((groupName) => groupData[groupName]).filter(g => g != undefined)
-                                    },
-                                    "advanced": {},
-                                    "notes": "",
-                                    "credentials": {}
-                                }
-                            };
-
-                            integrationsData.push(data);
-                            return this.integrationsApi.putIntegrationConfigCurrent(data.id, integrationConfig);
-                        })
-                        .then((data) => {
-                            this.logInfo("Configured instance: " + data.name);                           
-                        })
-                        .catch((err) => console.log(err))
-                    );
-                });
-                return Promise.all(integrationPromises);
-            })
-
-            // Activate the newly created application instances
-            .then(() => {
-                let enablePromises = [];
-                integrationsData.forEach((instance) => {
-                    let opts = {
-                        "body": {
-                            "intendedState": "ENABLED"
-                        }
-                    };
-
-                    enablePromises.push(
-                        this.integrationsApi.patchIntegration(instance.id, opts)
-                        .then((data) => this.logInfo("Enabled instance: " + data.name))
-                        .catch((err) => console.log(err))
-                    );
-                });
-                
-                return Promise.all(enablePromises);
-            })
-
-            // When everything's finished, log the output.
-            .then(() => {
-                this.logInfo("Installation Complete!");
-                resolve();
-            });
-        });
-    }
-
-    /**
-     * Shows an overlay with the specified data string
-     * @param {string} data 
-     */
-    logInfo(data){
-        if (!data || (typeof(data) !== 'string')) data = "";
-
-        $.LoadingOverlay("text", data);
-    }
-
-    /**
-     * @description First thing that must be called to set-up the App
-     */
-    start(){
-        return new Promise((resolve, reject) => {
-            this._setupClientApp()
-            .then(() => this._pureCloudAuthenticate())
-            .then(() => resolve())
-            .catch((err) => reject(err));
-        });
+        return this.purecloudClient.loginImplicitGrant(
+                        appConfig.clientIDs[this.pcApp.pcEnvironment], 
+                        this.redirectUri, 
+                        {state: ('pcEnvironment=' + this.pcApp.pcEnvironment)});
     }
 }
 
