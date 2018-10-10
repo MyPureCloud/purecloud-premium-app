@@ -57,8 +57,10 @@ class WizardApp {
         return this.integrationsApi.getIntegrationsTypes({})
         .then((data) => {
             if (data.entities.filter((integType) => integType.id === this.appName)[0]){
+                console.log("PRODUCT AVAILABLE");
                 return(true);
             } else {
+                console.log("PRODUCT NOT AVAILABLE");
                 return(false);
             }
         });
@@ -75,6 +77,7 @@ class WizardApp {
         promiseArr.push(this.getExistingGroups());
         promiseArr.push(this.getExistingRoles());
         promiseArr.push(this.getExistingApps());
+        promiseArr.push(this.getExistingAuthClients());
 
         return Promise.all(promiseArr)
         .then((results) => { 
@@ -86,7 +89,10 @@ class WizardApp {
                 results[1].total > 0 ||
 
                 // Check if any apps are existing
-                results[2].length > 0 ){
+                results[2].length > 0 ||
+
+                results[3].length > 0
+            ){
 
                 return(true);
             }
@@ -381,9 +387,15 @@ class WizardApp {
     getExistingAuthClients(){
         return this.oAuthApi.getOauthClients()
         .then((data) => {
+            console.log('==================================');
+            console.log(data);
             return(data.entities
-                .filter(entity => entity.name
-                    .startsWith(this.prefix)));
+                .filter(entity => {
+                    if(entity.name)
+                        return entity.name.startsWith(this.prefix);
+                    else
+                        return false;
+                }));
         });
     }
 
@@ -546,7 +558,7 @@ class WizardApp {
             this._setupClientApp()
             .then(() => this._pureCloudAuthenticate())
             .then(() => resolve())
-            .catch((err) => reject(err));
+            .catch((err) => console.log(err));
         });
     }
 
@@ -558,13 +570,16 @@ class WizardApp {
         // https://github.com/MyPureCloud/client-app-sdk
         const queryString = window.location.search.substring(1);
         const pairs = queryString.split('&');
+
         let pcEnv = null;   
+        let langTag = null;
+
         for (var i = 0; i < pairs.length; i++)
         {
             var currParam = pairs[i].split('=');
 
             if(currParam[0] === 'langTag') {
-                this.language = currParam[1];
+                langTag = currParam[1];
             } else if(currParam[0] === 'pcEnvironment') {
                 pcEnv = currParam[1];
             } else if(currParam[0] === 'environment' && pcEnv === null) {
@@ -572,11 +587,28 @@ class WizardApp {
             }
         }
 
+        // Stores the query parameters into localstorage
+        // If query parameters are not provided, try to get values from localstorage
+        // Default values if it does not exist.
         if(pcEnv){
             this.pcApp = new window.purecloud.apps.ClientApp({pcEnvironment: pcEnv});
-        }else{
+            localStorage.setItem(this.appName + ":environment", pcEnv);
+        }else if(localStorage.getItem(this.appName + ":environment")){
+            pcEnv = localStorage.getItem(this.appName + ":environment");
+            this.pcApp = new window.purecloud.apps.ClientApp({pcEnvironment: pcEnv});
+        } else {
             // Use default PureCloud region
             this.pcApp = new window.purecloud.apps.ClientApp();
+        }
+
+        if(langTag){
+            this.language = langTag;
+            localStorage.setItem(this.appName + ":langTag", langTag);
+        }else if(localStorage.getItem(this.appName + ":langTag")){
+            langTag = localStorage.getItem(this.appName + ":langTag");
+            this.language = langTag;
+        } else {
+            // Use default Language
         }
         
         console.log(this.pcApp.pcEnvironment);
