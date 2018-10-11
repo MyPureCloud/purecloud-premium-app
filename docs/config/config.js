@@ -1,14 +1,12 @@
 export default {
-    clientIDs: {
-        'mypurecloud.com': 'e7de8a75-62bb-43eb-9063-38509f8c21af',
-        
-        //'mypurecloud.com': '26255f2c-6a85-43bf-8d27-7761057bc72d',
+    clientIDs: {        
+        'mypurecloud.com': '26255f2c-6a85-43bf-8d27-7761057bc72d',
         'mypurecloud.ie': '939ab4dd-109f-4120-ba9f-051b973b9ecc',
         'mypurecloud.com.au': 'c8a4d721-3fbb-4f50-b3e0-aa49bf86ac87',
         'mypurecloud.jp': '28dbeebd-8128-4fe0-8f42-f2eebb767a71'
     },
-    //"redirectUri": "https://mypurecloud.github.io/purecloud-premium-app/",
-    "redirectUriBase": "https://localhost/",
+    "redirectUriBase": "https://mypurecloud.github.io/purecloud-premium-app/",
+    //"redirectUriBase": "https://localhost/",
 
     // PureCloud assigned name for the premium app
     // This should match the integration type name of the Premium App
@@ -17,7 +15,7 @@ export default {
     // Default Values for fail-safe/testing. Shouldn't have to be changed since the app
     // must be able to determine the environment from the query parameter 
     // of the integration's URL
-    "defaultPcEnv": "mypurecloud.com.au",
+    "defaultPcEnv": "mypurecloud.com",
     "defaultLangTag": "en-us",
 
     // Permissions required for running the Wizard App
