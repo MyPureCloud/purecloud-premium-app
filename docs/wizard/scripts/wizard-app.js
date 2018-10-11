@@ -1,10 +1,13 @@
 /*
 *   NOTE: This sample uses ES6 features
 */
-import appConfig from './config.js';
+import appConfig from '../../config/config.js';
 
 // JQuery Alias
 const $ = window.$;
+
+// Relative path to wizard page from config's redirectUri
+const WIZARD_PAGE = "wizard/index.html";
 
 /**
  * WizardApp class that handles everything in the App.
@@ -18,7 +21,7 @@ class WizardApp {
         this.platformClient = require('platformClient');
         this.purecloudClient = this.platformClient.ApiClient.instance;
         this.purecloudClient.setPersistSettings(true, 'premium_app');
-        this.redirectUri = appConfig.redirectUri;
+        this.redirectUri = appConfig.redirectUriBase + WIZARD_PAGE;
 
         // PureCloud API instances
         this.usersApi = new this.platformClient.UsersApi();
@@ -29,10 +32,10 @@ class WizardApp {
 
         // Language default is english
         // Language context is object containing the translations
-        this.language = 'en-us';
+        this.language = appConfig.defaultLangTag;
 
         // PureCloud app name
-        this.appName = "premium-app-example";
+        this.appName = appConfig.appName;
 
         this.prefix = appConfig.prefix;
         this.installationData = appConfig.provisioningInfo;
@@ -557,7 +560,7 @@ class WizardApp {
         return new Promise((resolve, reject) => {
             this._setupClientApp()
             .then(() => this._pureCloudAuthenticate())
-            .then(() => resolve())
+            .then((data) => { console.log(data); return resolve(); })
             .catch((err) => console.log(err));
         });
     }
@@ -591,15 +594,15 @@ class WizardApp {
         // If query parameters are not provided, try to get values from localstorage
         // Default values if it does not exist.
         if(pcEnv){
-            this.pcApp = new window.purecloud.apps.ClientApp({pcEnvironment: pcEnv});
             localStorage.setItem(this.appName + ":environment", pcEnv);
         }else if(localStorage.getItem(this.appName + ":environment")){
             pcEnv = localStorage.getItem(this.appName + ":environment");
-            this.pcApp = new window.purecloud.apps.ClientApp({pcEnvironment: pcEnv});
         } else {
             // Use default PureCloud region
-            this.pcApp = new window.purecloud.apps.ClientApp();
+            pcEnv = appConfig.defaultPcEnv;
         }
+        this.pcApp = new window.purecloud.apps.ClientApp({pcEnvironment: pcEnv});
+
 
         if(langTag){
             this.language = langTag;
@@ -634,6 +637,7 @@ class WizardApp {
      * @return {Promise}
      */
     _pureCloudAuthenticate() {
+        this.purecloudClient.setEnvironment(this.pcApp.pcEnvironment);
         return this.purecloudClient.loginImplicitGrant(
                         appConfig.clientIDs[this.pcApp.pcEnvironment], 
                         this.redirectUri, 
