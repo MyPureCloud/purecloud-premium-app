@@ -27,39 +27,40 @@
     
     <canvas id="bubbly-layer" style="position: fixed; top:0; left:0; z-index: -5; "></canvas>
 
-    <header>
-        <p>Premium App /&nbsp; Summary</p>
-    </header>
+    <div class="content">
+        <header>
+            <p>Premium App /&nbsp; Summary</p>
+        </header>
 
-    <div class="title">
-        Done
+        <div class="title">
+            Done
+        </div>
+
+        <ul class="progress-bar">
+            <li class="active">
+                <span class="txt-start">Start</span>
+            </li>
+            <li class="active">
+                <span class="txt-install">Install</span>
+            </li>
+            <li class="active current">
+                <span class="txt-summary">Summary</span>
+            </li>
+        </ul>
+        <main>
+            <p class="success">
+                <div class="txt-finish-install">
+                    Please wait while we take you to the application. 
+                </div>
+                <div id="loading" style="margin-top: 30px; text-align: center;">
+                    <i class="fa fa-spinner fa-spin" style="font-size:70px; color: #1997CA;"></i>
+                </div>
+            </p>
+            <!-- <button class="btn-info" onclick="goToPage('index')">
+                <span class="txt-back">Back</span>
+            </button> -->
+        </main>
     </div>
-
-    <ul class="progress-bar">
-        <li class="active">
-            <span class="txt-start">Start</span>
-        </li>
-        <li class="active">
-            <span class="txt-install">Install</span>
-        </li>
-        <li class="active current">
-            <span class="txt-summary">Summary</span>
-        </li>
-    </ul>
-    <main>
-        <p class="success">
-            <div class="txt-finish-install">
-                Please wait while we take you to the application. 
-            </div>
-            <div id="loading" style="margin-top: 30px; text-align: center;">
-                <i class="fa fa-spinner fa-spin" style="font-size:70px; color: #1997CA;"></i>
-            </div>
-        </p>
-        <!-- <button class="btn-info" onclick="goToPage('index')">
-            <span class="txt-back">Back</span>
-        </button> -->
-    </main>
-
     <footer>
         <img src="logo.png" alt="Logo">
     </footer>

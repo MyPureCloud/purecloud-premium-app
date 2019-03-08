@@ -4,10 +4,16 @@
     border: 0px;
 }
 
+html, body {
+    height: 100%;
+  }
+
 body {
     color: #4C4C4C;
     font-family: "HelveticaNeue", "Helvetica", "Arial", sans-serif;
     font-size: 0.9em;
+    display: flex;
+    flex-direction: column;
 }
 
 #background {
@@ -27,6 +33,10 @@ header {
     border-bottom: 2px solid #DDDDDD
 }
 
+.content {
+    flex: 1 0 auto;
+}
+
 footer img {
     height: 40px;
     margin-left: 10px;
@@ -35,15 +45,14 @@ footer img {
 }
 
 footer {
+    margin-top: 50px;
     padding-top: 10px;
     border-top: 2px solid #DDDDDD;
     background: #FFF;
-    position: absolute;
-    left: 0;
-    bottom: 0;
     height: 50px;
     width: 100%;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 #loading {
