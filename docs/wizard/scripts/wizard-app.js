@@ -39,6 +39,9 @@ class WizardApp {
 
         this.prefix = appConfig.prefix;
         this.installationData = appConfig.provisioningInfo;
+
+        // PureCloud user object (current user)
+        this.user = {};
     }
 
     /**
@@ -251,6 +254,12 @@ class WizardApp {
                 .then((data) => {
                     this.logInfo("Created group: " + group.name);
                     groupData[group.name] = data.id;
+                })
+                .then((group) => {
+                    return this.groupsApi.postGroupMembers(group.id, {
+                        memberIds: [this.user.id],
+                        version: 1
+                    })
                 })
                 .catch((err) => console.log(err))
             );
@@ -557,12 +566,18 @@ class WizardApp {
     ////      ENTRY POINT
     //// =======================================================
     start(){
-        return new Promise((resolve, reject) => {
-            this._setupClientApp()
+        return this._setupClientApp()
             .then(() => this._pureCloudAuthenticate())
-            .then((data) => { console.log(data); return resolve(); })
+            .then((data) => { 
+                console.log(data); 
+
+                return getUserDetails();
+            })
+            .then((user) => {
+                console.log(user);
+                this.user = user;
+            })
             .catch((err) => console.log(err));
-        });
     }
 
     /**
