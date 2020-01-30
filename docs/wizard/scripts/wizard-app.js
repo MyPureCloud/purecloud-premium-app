@@ -254,9 +254,8 @@ class WizardApp {
                 .then((data) => {
                     this.logInfo("Created group: " + group.name);
                     groupData[group.name] = data.id;
-                })
-                .then((group) => {
-                    return this.groupsApi.postGroupMembers(group.id, {
+
+                    return this.groupsApi.postGroupMembers(data.id, {
                         memberIds: [this.user.id],
                         version: 1
                     })
@@ -571,7 +570,7 @@ class WizardApp {
             .then((data) => { 
                 console.log(data); 
 
-                return getUserDetails();
+                return this.getUserDetails();
             })
             .then((user) => {
                 console.log(user);
