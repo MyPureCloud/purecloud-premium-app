@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Styles Test</title>
+    <link href='//fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' async type='text/css'>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    <link rel="stylesheet" href="./style.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.4/dist/loadingoverlay.min.js"></script>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Logo">
+    </header>
+
+    <div class="title">
+        Hi Dude, welcome to the premium app sample
+    </div>
+    
+    <ul class="progress-bar">
+        <li class="active">Start</li>
+        <li class="active current">Install</li>
+        <li class="">Summary</li>
+    </ul>
+    <main>
+        <p>
+            Qui officia excepteur sunt cupidatat culpa et irure nulla duis commodo laborum pariatur.
+        </p>
+        <p>
+            Qui officia excepteur sunt cupidatat culpa et irure nulla duis commodo laborum pariatur.
+        </p>
+        <p class="success">
+            Pwahahaha! :-P <i class="fas fa-check-circle enlarge"></i>
+        </p>
+        <p class="fail">
+            Fail <i class="fas fa-times-circle enlarge"></i>
+        </p>
+        
+
+        <div class="message">
+            <div class="message-title">Test</div>
+            <div class="message-content">Pwahahaha :-P</div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <button class="btn-info right" id="test">Pwahahaha :-P</button>
+            <button class="btn-info left">Pwahahaha :-P</button>
+        </div>
+    </main>
+
+
+
+    <script>
+        $(document).ready(function() {
+            $("#test").click(() => {
+                $.LoadingOverlay("show", {
+                    image: '<svg width="350px" height="350px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="lds-cube" style="background: none;"><g transform="translate(80,10)"><circle cx="0" cy="0" r="4" stroke="#ff3e04" stroke-width="3.5" fill="#fff"><animate attributeType="XML" attributeName="stroke" calcmode="linear" values="#ff3e04;#ffae64;#ff2e04" dur="1.3s" repeatCount="indefinite" begin="-0.5s"></animate><animate attributeType="XML" attributeName="r" calcmode="linear" values="5;6;4" dur="1.2s" repeatCount="indefinite" begin="-0.5s"></animate></circle></g><g transform="translate(54,23)"><rect x="-18" y="-5" rx="6" ry="6" width="36" height="10" stroke-width="3.5" stroke="#ff3e04" fill="#fff"><animate attributeType="XML" attributeName="stroke" calcmode="linear" values="#ff3e04;#ff7e64;#ff2e04" dur="1.3s" repeatCount="indefinite" begin="-0.3s"></animate></rect></g><g transform="translate(34,40)"><rect x="-22" y="-5" rx="6" ry="6" width="44" height="10" stroke-width="3.5" stroke="#ff3e04" fill="#fff"><animate attributeType="XML" attributeName="stroke" calcmode="linear" values="#ff3e04;#ff7e64;#ff2e04" dur="1.3s" repeatCount="indefinite" begin="-0.1s"></animate></rect></g><g transform="translate(57,57)"><rect x="-25" y="-5" rx="6" ry="6" width="50" height="10" stroke-width="3.5" stroke="#ff3e04" fill="#fff"><animate attributeType="XML" attributeName="stroke" calcmode="linear" values="#ff3e04;#ff7e64;#ff2e04" dur="1.3s" repeatCount="indefinite" begin="0.1s"></animate></rect></g><g transform="translate(75,74)"><rect x="-22" y="-5" rx="6" ry="6" width="44" height="10" stroke-width="3.5" stroke="#ff3e04" fill="#fff"><animate attributeType="XML" attributeName="stroke" calcmode="linear" values="#ff3e04;#ff7e64;#ff2e04" dur="1.3s" repeatCount="indefinite" begin="0.3s"></animate></rect></g><g transform="translate(54,91)"><rect x="-22" y="-5" rx="6" ry="6" width="44" height="10" stroke-width="3.5" stroke="#ff3e04" fill="#fff"><animate attributeType="XML" attributeName="stroke" calcmode="linear" values="#ff3e04;#ff7e64;#ff2e04" dur="1.3s" repeatCount="indefinite" begin="0.5s"></animate></rect></g></svg>',                    
+                    imageResizeFactor: 2.5,
+                    text: "Configuring the settings...",
+                    textResizeFactor: .3,
+                    textClass: "adjust-text",
+                    background: "rgba(240, 240, 255, 0.8)",
+                    imageAnimation: "",
+                    imageColor: ""
+                });
+            });
+        });
+    </script>
+</body>
+</html>

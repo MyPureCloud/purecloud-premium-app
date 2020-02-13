@@ -1,0 +1,30 @@
+PREMIUM APP
+
+App Foundry Style
+App Foundry Logo
+
+Welcome to the Premium client  Exsmple
+brought to you by AppFoundry
+
+we've validated your org is enabled of rthis integration.
+
+Progress.
+Start Setup -> Roles & permission -> App Instal -> Manage Agents
+
+APP SETUP WIZARD
+-----------
+Remove org features
+Add org products, authorizzation call(?)
+	- premium app prodct should show up.
+
+Wizard remove customization options
+-----------
+
+RESET IT ALL hwne everything is already installed.
+
+----------- 
+
+NZ/AUS. 
+
+=====================
+nGuvu does not change URLs. They have backend to check that PureCloud org is registered. No rollback.

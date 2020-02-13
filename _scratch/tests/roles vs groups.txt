@@ -1,0 +1,10 @@
+ROLES
+Minimal.
+independent of Management units.
+Assigning the rol (with permsision) will automaticaly grant the app access.
+
+
+GROUPS.
+Managed for you.
+Have group chat and members will be able to see other members.
+User still need to be assign the role with premium app permission
