@@ -1,7 +1,7 @@
 /* 
 *   NOTE: This sample uses ES6.
 */
-import appConfig from './config/config.js';
+import appConfig from '../config/config.js';
 
 let clientApp = {}; 
 

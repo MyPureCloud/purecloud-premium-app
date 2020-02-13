@@ -240,3 +240,35 @@ button {
     padding-left: 32px;
     text-align: left;
 }
+
+.overlay{
+    position: absolute; 
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+    background-color: #ffffffea;
+}
+
+
+.modal {
+    width: 400px;
+    position: fixed;
+    top: 20%; 
+    left: 50%;
+    margin-left: -200px;
+
+    border-radius: 40px;
+    text-align: center;
+    z-index: 11; 
+}
+
+.modal .logo {
+    max-width: 300px;
+}
+
+.modal .modal-message {
+    margin-top: 20px;
+    font-size: 30px;
+}

@@ -1,0 +1,148 @@
+import config from '../config/config.js';
+import view from './view.js';
+
+// Module scripts
+import roleModule from './modules/role.js';
+import groupModule from './modules/group.js';
+import appInstanceModule from './modules/app-instance.js';
+import OAuthClientModule from './modules/oauth-client.js';
+
+// Add new modules here
+// This will later be filtered in setup() to only use
+// what's in the config
+let modules = [
+    roleModule, 
+    groupModule, 
+    appInstanceModule, 
+    OAuthClientModule
+];
+
+const jobOrder = config.provisioningInfo;
+const prefix = config.prefix;
+
+// PureCloud
+const platformClient = require('platformClient');
+let client = null;
+
+let userMe = null;
+let installedData = {};
+
+
+/**
+ * Get's all the currently installed items as defined in the
+ * job order.
+ * @returns {Array}
+ */
+function getInstalledObjects(){
+    let promiseArr = [];
+
+    modules.forEach((module) => {
+        if(jobOrder[module.provisioningInfoKey]){
+            promiseArr.push(module.getExisting());
+        }
+    });
+
+    return Promise.all(promiseArr);
+}
+
+export default {
+    setup(pcClient, user){
+        client = pcClient;
+        userMe = user;
+
+        // Use only modules in provisioning info
+        modules = modules.filter((module) => {
+            return Object.keys(config.provisioningInfo)
+                    .includes(module.provisioningInfoKey);
+        });
+    },
+
+    getInstalledObjects: getInstalledObjects,
+
+    isExisting(){
+        let exists = false;
+
+        return getInstalledObjects()
+        .then((installed) => {
+            console.log(installed);
+            installed.forEach(item => {
+                if(item.total && item.total > 0){
+                    // If it's  a purecloud search reslts
+                    exists = true;
+                }else{
+                    // if it's just an array
+                    exists = item.length > 0 ? true : exists;
+                }
+            });
+
+            return exists;
+        })
+        .catch((e) => console.error(e));
+    },
+
+    install(){
+        let creationPromises = [];
+        let configurationPromises = [];
+        let finalFunctionPromises = [];
+
+        modules.forEach((module) => {
+            creationPromises.push(
+                module.create(
+                    view.showLoadingModal, 
+                    config.provisioningInfo[module.provisioningInfoKey]
+                )
+            );
+        });
+
+        // Create all the items
+        return Promise.all(creationPromises)
+        .then((result) => {
+            modules.forEach((module, i) => {
+                installedData[module.provisioningInfoKey] = result[i]; 
+            });
+
+            modules.forEach((module) => {
+                configurationPromises.push(
+                    module.configure(
+                        view.showLoadingModal,
+                        installedData,
+                        userMe.id
+                    )
+                );
+            });
+
+            return Promise.all(configurationPromises);
+        })
+        // Configure all items
+        .then(() => {
+            view.showLoadingModal('Executing Final Steps...');
+
+            // Loop through all items with finally 
+            Object.keys(config.provisioningInfo).forEach(key => {
+                let provisionItems = config.provisioningInfo[key];
+                provisionItems.forEach((item) => {
+                    if(item.finally){
+                        finalFunctionPromises.push(
+                            item.finally(installedData[key][item.name])
+                        );
+                    }
+                })
+            });
+
+            return Promise.all(finalFunctionPromises);
+        })
+        .catch((e) => console.error(e));
+    },
+
+    uninstall(){
+        let promiseArr = [];
+
+        modules.forEach((module) => {
+            promiseArr.push(
+                module.remove()
+            );
+        });
+
+        return Promise.all(promiseArr);
+    }
+}
