@@ -9,7 +9,7 @@ export default {
     //'redirectUriBase': 'https://mypurecloud.github.io/purecloud-premium-app/',
 
     // The actual URL of the landing page of your web app.
-    'premiumAppURL': 'http://localhost:8080/premium-app-sample',
+    'premiumAppURL': 'http://localhost:8080/premium-app-sample/',
     //'premiumAppURL': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/',
 
     // PureCloud assigned name for the premium app

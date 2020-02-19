@@ -1,7 +1,7 @@
 /* 
 *   NOTE: This sample uses ES6.
 */
-import appConfig from '../config/config.js';
+import appConfig from '../wizard/config/config.js';
 
 let clientApp = {}; 
 
@@ -45,7 +45,8 @@ clientApp.setup = function(pagePath){
     }else if(localStorage.getItem(appConfig.appName + ":environment")){
         pcEnv = localStorage.getItem(appConfig.appName + ":environment");
     } else {
-        pcEnv = appConfig.defaultPcEnv;
+        pcEnv = appConfig.defaultPcEnvironment;
+
     }
 
     if(langTag){
@@ -64,7 +65,7 @@ clientApp.setup = function(pagePath){
     // Authenticate via PureCloud
     client.setPersistSettings(true);
     client.setEnvironment(pcEnv);
-    return client.loginImplicitGrant(clientId, appConfig.redirectUriBase + pagePath)
+    return client.loginImplicitGrant(clientId, appConfig.premiumAppURL + pagePath)
     .then(data => {
         console.log(data);
         
