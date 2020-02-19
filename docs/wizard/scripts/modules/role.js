@@ -19,9 +19,12 @@ function getExisting(){
 
 /**
  * Delete existing roles from PureCloud
+ * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(){
+function remove(logFunc){
+    logFunc('Uninstalling Roles...');
+
     return getExisting()
     .then(roles => {
         let del_role = [];
@@ -38,9 +41,10 @@ function remove(){
 
 /**
  * Add PureCLoud roles based on installation data
- * @param {Function} logFunc logger function
- * @param {Object} data the installation data as defined in the config
- * @returns {Promise}
+ * @param {Function} logFunc logger for messages
+ * @param {Object} data the installation data for this type
+ * @returns {Promise.<Object>} were key is the unprefixed name and the values
+ *                          is the PureCloud object details of that type.
  */
 function create(logFunc, data){
     let rolePromises = [];
@@ -72,10 +76,11 @@ function create(logFunc, data){
 }
 
 /**
- * 
- * @param {Function} logFunc logger function
- * @param {Object} installedData Complete installation data of the wizard
- * @param {*} userId 
+ * Further configuration needed by this object
+ * Called after eveything has already been installed
+ * @param {Function} logFunc logger for messages
+ * @param {Object} installedData contains everything that was installed by the wizard
+ * @param {String} userId User id if needed
  */
 function configure(logFunc, installedData, userId){
     // Assign the role to the user

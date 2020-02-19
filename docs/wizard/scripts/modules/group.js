@@ -25,9 +25,12 @@ function getExisting(){
 
 /**
  * Delete existing groups from PureCloud org
+ * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(){
+function remove(logFunc){
+    logFunc('Uninstalling Groups...');
+
     return getExisting()
     .then(groups => {
         let del_group = [];
@@ -44,7 +47,10 @@ function remove(){
 
 /**
  * Add PureCloud groups based on installation data
- * @returns {Promise.<Object>} Group Data Object {"grp-name": "grp-id"}
+ * @param {Function} logFunc logger for messages
+ * @param {Object} data the installation data for this type
+ * @returns {Promise.<Object>} were key is the unprefixed name and the values
+ *                          is the PureCloud object details of that type.
  */
 function create(logFunc, data){
     let groupPromises = [];
@@ -74,6 +80,13 @@ function create(logFunc, data){
     .then(() => groupData);
 }
 
+/**
+ * Further configuration needed by this object
+ * Called after eveything has already been installed
+ * @param {Function} logFunc logger for messages
+ * @param {Object} installedData contains everything that was installed by the wizard
+ * @param {String} userId User id if needed
+ */
 function configure(logFunc, installedData, userId){
     let promiseArr = [];
     let groupData = installedData.group;

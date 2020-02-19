@@ -23,12 +23,14 @@ function getExisting(){
 
 /**
  * Delete all existing PremiumApp instances
+ * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(){
+function remove(logFunc){
+    logFunc('Uninstalling Other App Instances...');
+
     return getExisting()
     .then(apps => {
-        console.log(apps);
         let del_app = [];
 
         if (apps.length > 0){
@@ -45,7 +47,10 @@ function remove(){
 
 /**
  * Add PureCLoud instances based on installation data
- * @returns {Promise}
+ * @param {Function} logFunc logger for messages
+ * @param {Object} data the installation data for this type
+ * @returns {Promise.<Object>} were key is the unprefixed name and the values
+ *                          is the PureCloud object details of that type.
  */
 function create(logFunc, data){
     let integrationPromises = [];
@@ -75,6 +80,13 @@ function create(logFunc, data){
     .then(() => integrationsData);
 }
 
+/**
+ * Further configuration needed by this object
+ * Called after eveything has already been installed
+ * @param {Function} logFunc logger for messages
+ * @param {Object} installedData contains everything that was installed by the wizard
+ * @param {String} userId User id if needed
+ */
 function configure(logFunc, installedData, userId){
     let instanceInstallationData = config.provisioningInfo['app-instance'];
     let appInstancesData = installedData['app-instance'];
@@ -123,7 +135,7 @@ function configure(logFunc, installedData, userId){
                 return integrationsApi.patchIntegration(appInstance.id, opts)
             })
             .then((data) => logFunc('Enabled instance: ' + data.name))
-            .catch((err) => console.log(err))
+            .catch((err) => console.err(err))
         );
     });
 

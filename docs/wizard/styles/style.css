@@ -265,10 +265,10 @@ button {
 }
 
 .modal .logo {
-    max-width: 300px;
+    max-width: 200px;
 }
 
 .modal .modal-message {
     margin-top: 20px;
-    font-size: 30px;
+    font-size: 20px;
 }

@@ -146,7 +146,7 @@ function runPageScript(){
                 // Check if has an existing installation
                 .then((exists) => {
                     if(exists) {
-                        window.location.href = config.premiumAppURL;
+                       window.location.href = config.premiumAppURL;
                     } else {
                         view.showContent();
                         resolve();
@@ -177,12 +177,16 @@ function runPageScript(){
                 resolve();
                 break;
             case 'uninstall.html':
+                view.showContent();
+                view.showLoadingModal('Uninstalling...');
+
                 wizard.uninstall()
                 .then(() => {
-                    window.location.href = config.redirectUriBase 
+                    setTimeout(() => {
+                        window.location.href = config.redirectUriBase 
                                         + 'wizard/index.html';
+                    }, 2000);
                 });
-
                 resolve();
                 break;
             default:

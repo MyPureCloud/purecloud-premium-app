@@ -26,9 +26,12 @@ function getExisting(){
 
 /**
  * Delete all existing PremiumApp instances
+ * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(){
+function remove(logFunc){
+    logFunc('Uninstalling OAuth Clients...');
+
     return getExisting()
     .then((instances) => {
         let del_clients = [];
@@ -47,7 +50,10 @@ function remove(){
 
 /**
  * Add PureCLoud instances based on installation data
- * @returns {Promise.<Array>} PureCloud OAuth objects
+ * @param {Function} logFunc logger for messages
+ * @param {Object} data the installation data for this type
+ * @returns {Promise.<Object>} were key is the unprefixed name and the values
+ *                          is the PureCloud object details of that type.
  */
 function create(logFunc, data){
     let authData = {};
@@ -88,6 +94,13 @@ function create(logFunc, data){
     .then(() => authData);
 }
 
+/**
+ * Further configuration needed by this object
+ * Called after eveything has already been installed
+ * @param {Function} logFunc logger for messages
+ * @param {Object} installedData contains everything that was installed by the wizard
+ * @param {String} userId User id if needed
+ */
 function configure(logFunc, installedData, userId){
     let promiseArr = [];
     let oauthData = installedData['oauth-client'];

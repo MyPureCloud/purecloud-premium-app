@@ -2,12 +2,15 @@ const elLoadingModal = document.getElementById('loading-modal');
 
 export default {
     showLoadingModal(message){
+        console.info(`modal: ${message}`);
+
         elLoadingModal.style.display = '';
         let elMessage = elLoadingModal.querySelectorAll('.modal-message')[0]
                             .innerText = message;
     },
 
     hideLoadingModal(){
+        console.info('hide-modal');
         elLoadingModal.style.display = 'none';
     },
 

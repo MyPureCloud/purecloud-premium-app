@@ -6,6 +6,7 @@ import roleModule from './modules/role.js';
 import groupModule from './modules/group.js';
 import appInstanceModule from './modules/app-instance.js';
 import OAuthClientModule from './modules/oauth-client.js';
+import dataTableModule from './modules/data-table.js';
 
 // Add new modules here
 // This will later be filtered in setup() to only use
@@ -14,7 +15,8 @@ let modules = [
     roleModule, 
     groupModule, 
     appInstanceModule, 
-    OAuthClientModule
+    OAuthClientModule,
+    dataTableModule
 ];
 
 const jobOrder = config.provisioningInfo;
@@ -85,18 +87,24 @@ export default {
         let configurationPromises = [];
         let finalFunctionPromises = [];
 
+        // Create all the items
         modules.forEach((module) => {
+            let moduleProvisioningData = config.provisioningInfo[module.provisioningInfoKey];
+
+            if(!moduleProvisioningData) return;
+
             creationPromises.push(
                 module.create(
                     view.showLoadingModal, 
-                    config.provisioningInfo[module.provisioningInfoKey]
+                    moduleProvisioningData
                 )
             );
         });
 
-        // Create all the items
+        
         return Promise.all(creationPromises)
         .then((result) => {
+            // Configure all items
             modules.forEach((module, i) => {
                 installedData[module.provisioningInfoKey] = result[i]; 
             });
@@ -113,7 +121,6 @@ export default {
 
             return Promise.all(configurationPromises);
         })
-        // Configure all items
         .then(() => {
             view.showLoadingModal('Executing Final Steps...');
 
@@ -139,7 +146,7 @@ export default {
 
         modules.forEach((module) => {
             promiseArr.push(
-                module.remove()
+                module.remove(view.showLoadingModal)
             );
         });
 

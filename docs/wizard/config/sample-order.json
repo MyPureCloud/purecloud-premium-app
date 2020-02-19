@@ -1,5 +1,5 @@
 {
-    "roles": [
+    "role": [
         {
             "name": "Admin",
             "description": "Admins will be able to access the Premium App installation wizard and make changes to the configurations.",
@@ -19,7 +19,7 @@
             "assignToSelf": true
         }
     ],
-    "groups": [
+    "group": [
         {
             "name": "Agents",
             "description": "Agents have access to a widget that gives US state information based on caller's number.",
@@ -31,7 +31,7 @@
             "assignToSelf": true
         }
     ],
-    "appInstances": [
+    "app-instance": [
         {
             "name": "Agent Widget",
             "url": "https://mypurecloud.github.io/purecloud-premium-app/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}",
@@ -44,5 +44,24 @@
             "type": "standalone",
             "groups": ["Supervisors"]
         }
-    ]
+    ],
+    "data-table": [
+        {
+            "name": "Data Table",
+            "description": "Data table for various needs.",
+            "referenceKey": "id",
+            "customFields": [
+                {
+                    "name": "Column1",
+                    "type": "string",
+                    "default": ""
+                },
+                {
+                    "name": "Column2",
+                    "type": "string",
+                    "default": "Default Value"
+                }
+            ]
+        }
+    ] 
 }
