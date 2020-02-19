@@ -54,7 +54,7 @@ clientApp.setup = function(pagePath){
     }else if(localStorage.getItem(appConfig.appName + ":langTag")){
         langTag = localStorage.getItem(appConfig.appName + ":langTag");
     } else {
-        langTag =  appConfig.defaultLangTag;
+        langTag =  appConfig.defaultLanguage;
     }
 
 
@@ -65,7 +65,7 @@ clientApp.setup = function(pagePath){
     // Authenticate via PureCloud
     client.setPersistSettings(true);
     client.setEnvironment(pcEnv);
-    return client.loginImplicitGrant(clientId, appConfig.premiumAppURL + pagePath)
+    return client.loginImplicitGrant(clientId, appConfig.premiumAppURL + pagePath, appConfig.appName)
     .then(data => {
         console.log(data);
         
