@@ -46,11 +46,11 @@ function queryParamsConfig(){
 }
 
 function authenticatePureCloud(){
-    client.setEnvironment(pcEnvironment);
+ client.setEnvironment(pcEnvironment);
     client.setPersistSettings(true, appName);
     return client.loginImplicitGrant(
                 config.clientIDs[pcEnvironment], 
-                config.redirectUriBase + 'wizard/index.html'
+                config.wizardUriBase + 'index.html'
             );
 }
 
@@ -101,7 +101,7 @@ function setup(){
 function setPageLanguage(){
     return new Promise((resolve, reject) => {
         let fileUri = 
-            `${config.redirectUriBase}wizard/assets/languages/${pcLanguage}.json`;
+            `${config.wizardUriBase}assets/languages/${pcLanguage}.json`;
         $.getJSON(fileUri)
         .done(data => {
             Object.keys(data).forEach((key) => {
@@ -183,8 +183,8 @@ function runPageScript(){
                 wizard.uninstall()
                 .then(() => {
                     setTimeout(() => {
-                        window.location.href = config.redirectUriBase 
-                                        + 'wizard/index.html';
+                        window.location.href = config.wizardUriBase 
+                                        + 'index.html';
                     }, 2000);
                 });
                 resolve();
