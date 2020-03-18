@@ -63,7 +63,7 @@ export default {
         'app-instance': [
             {
                 'name': 'Agent Widget',
-                'url': 'https://mypurecloud.github.io/purecloud-premium-app/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}',
+                'url': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}',
                 'type': 'widget',
                 'groups': ['Agents']
             }
