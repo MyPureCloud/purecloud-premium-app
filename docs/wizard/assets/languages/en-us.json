@@ -22,5 +22,5 @@
     "txt-please-click": "Please click the button to start the installation.",
     "txt-finish-install": "Please wait while we take you to the application.",
     "txt-installed": "Installed",
-    "txt-still-installed-1": "Please wait while we're uninstalling."
+    "txt-still-installed-1": "Please wait while we're uninstalling. After installation, you'll be taken to the wizard start screen."
 }

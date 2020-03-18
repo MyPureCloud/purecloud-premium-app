@@ -1,14 +1,27 @@
 # PureCloud Premium Front-End App
 
-This projects contains a sample premium app and an automated on-boarding flow in setting up the app for the PureCloud organization.
+This projects contains a sample premium app and an automated on-boarding flow for setting up the app in the PureCloud organization.
 
-## Sample
-The quick sample is hosted in GH-Pages:
-https://mypurecloud.github.io/purecloud-premium-app/
+## Table of Contents
+- [PureCloud Premium Front-End App](#purecloud-premium-front-end-app)
+  - [Table of Contents](#table-of-contents)
+  - [What are Premium Client Applications?](#what-are-premium-client-applications)
+  - [Github Pages](#github-pages)
+  - [Requirements to run](#requirements-to-run)
+  - [File Structure](#file-structure)
+  - [Running Locally](#running-locally)
+  - [Developer Tutorial](#developer-tutorial)
+  - [Installation Wizard Features](#installation-wizard-features)
+  - [Uninstalling / Deprovisioning the Premium App](#uninstalling--deprovisioning-the-premium-app)
+  - [Sample Premium App Features](#sample-premium-app-features)
+- [Modifying the Wizard for your Premium App](#modifying-the-wizard-for-your-premium-app)
+  - [Technologies](#technologies)
+  - [Configuration File](#configuration-file)
+  - [Styles and Branding](#styles-and-branding)
+  - [Extending the Functionality](#extending-the-functionality)
+    - [Additional PureCloud objects](#additional-purecloud-objects)
 
-### Requirements to run sample:
-1. A working PureCloud Org with the 'premium-app-example' integration enabled.
-2. A user to log in with who has permissions for role/group/integration creation/deletion.
+
 
 ## What are Premium Client Applications?
  https://developer.mypurecloud.com/appfoundry/premium-client-applications.html
@@ -16,22 +29,58 @@ https://mypurecloud.github.io/purecloud-premium-app/
  TL;DR: Premium Client Applications are a type of Custom Client Applications that streamline and automate monetization through PureCloud.
 
 
-## Summary of File and Code Structure
 
-- Local Assets are contained inside the /docs folder. This is also the exact files that are hosted in the GitHub Pages link above.
+## Github Pages
+The Premium App sample is hosted in GH-Pages:
+https://mypurecloud.github.io/purecloud-premium-app/
 
-The docs/index.js script is for testing your own modifications with NodeJS (using Express).
-The 'redirectUriBase' values need to be updated from docs/config/config.js before being able to run locally. (ie. https://localhost/)
+The wizard or provisioning tool is located at:
+https://mypurecloud.github.io/purecloud-premium-app/wizard/
 
-If you'll be running the sample from a different host, then you'll also need to change the 'clientIds' from the config file to one that you've created(Implicit Grant Type) in your test PureCloud environment. This is for setting the valid redirectUri.
+
+
+## Requirements to run
+1. A working PureCloud Org with the 'premium-app-example' integration enabled.
+2. An admin user that will run the wizard and access the premium app. 
+
+
+
+## File Structure
+
+The entire web app is hosted in Github pages with the root directory being the docs folder.
+
+There are two folders inside /docs.
+
+1. premium-app-sample
+   - Contains the sample Premium App.
+2. wizard
+   - Contains the provisioning tool for the Premium App. This is the tool that is required for all Premium Apps. 
+
+
+
+## Running Locally
+
+Run
+```
+node index
+```
+
+It should run in localhost:8080
+
+If you're running the sample in a different host or port, then you'll also need to change the 'clientIds' from the config file to one that you've created(Implicit Grant Type) in your PureCloud environment. This is so you could add your testing URL in the Authorized Redirect URIs for that OAuth Client.
 
 Read More: https://help.mypurecloud.com/articles/create-an-oauth-client/
+
+
 
 ## Developer Tutorial 
 
 For a more in-depth look into the wizard sample codebase please go to:
 
 https://developer.mypurecloud.com/api/tutorials/premium-app-example-wizard/
+
+
+
 
 ## Installation Wizard Features
 1. Includes checking the organization if the Premium App is enabled.
@@ -46,10 +95,18 @@ https://developer.mypurecloud.com/api/tutorials/premium-app-example-wizard/
 
 ![Finish](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/finish.png "Finish")
 
+
+
+## Uninstalling / Deprovisioning the Premium App
+
+Going to the page docs/wizard/uninstall.html will run the deprovisioning of the Prremium App. This means deleting all the PureCloud objects (groups, roles, etc.) that were initially created by the tool. 
+
+
+
 ## Sample Premium App Features
 1.	The web page will use an implicit grant to authenticate with PureCloud. 
 
-1. The agent view subscribes to the user’s conversation notifications. 
+2. The agent view subscribes to the user’s conversation notifications. 
 
 ![Agent View](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/agent-view.png "Agent View")
 
@@ -58,4 +115,65 @@ https://developer.mypurecloud.com/api/tutorials/premium-app-example-wizard/
 ![Supervisor View](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/supervisor-view.png "Supervisor View")
 
 
+<hr>
 
+# Modifying the Wizard for your Premium App
+
+By default the wizard app allows you to automatically provision the following PureCloud objects:
+
+- Roles
+- Groups
+- Additional Integration Instances
+- Oauth Client
+- Data Tables
+
+Depending on the Premium App's needs it may need any number of those objects. The only object that is almost always required is a role. At least one role should be created that has the permission for your app. This role will grant users access to to view and use the premium app fom within PureCloud.
+
+## Technologies
+
+The Wizard app is mostly built with vanilla HTML, CSS and JS. This makes it independent from any particular libraries.
+
+## Configuration File
+
+The configuration file is the SSOT for the entire operation and also contains the details on what items are to be provisioned by the wizard.
+```
+./docs/wizard/config/config.js
+```
+The following values should be modified for production:
+- Regional client ids for your app to be provided by AppFoundry.
+- wizardUriBase 
+  - Uri for the wizard tool.
+- premiumAppURL 
+  - the landing page of the actual Premium App.
+- appName 
+  - This is the unique id that is generated for your integration.
+- prefix 
+  - A string that will be prefixed to all the names of the provisioned PureCloud Objects. It is up to the discretion of the vendor but a good rule of thumb is just use the name of the Premium App itself.
+- provisioningInfo
+  - An object containing the definition of objects to be created. Please consult the default config file and the sample-order.js for examples on how it should be formatted.
+
+## Styles and Branding
+
+While the default layout is sufficient for the provisioning process, you are free and encouraged to change elements and styling to reflect your branding.
+
+At the very least, Premium Apps are expected to replace the default logo with a logo of their app or company.
+
+Image assets
+```
+docs/wizard/assets/img/
+```
+CSS
+```
+docs/wizard/styles/style.css
+```
+
+## Extending the Functionality
+
+Some apps are simple to set up while some apps may require configuration not natively supported by the wizard tool. For feature requests for the wizard, feel free to open an issue in this Github repo. It would be the discretion of the developers (DevFoundry) whether to approve or reject feature requests.
+
+### Additional PureCloud objects
+Aside from the PureCloud Objects listed [here](#modifying-the-wizard-for-your-premium-app) you can create additional modules for other PureCloud object types. All of these modules are defined here:
+```
+./docs/wizard/scripts/modules/
+```
+Consult the folder README for creating new modules.
