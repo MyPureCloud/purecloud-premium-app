@@ -1,5 +1,5 @@
 export default {
-    clientIDs: {       
+    clientIDs: {        
         'mypurecloud.com': '26255f2c-6a85-43bf-8d27-7761057bc72d',
         'mypurecloud.ie': '939ab4dd-109f-4120-ba9f-051b973b9ecc',
         'mypurecloud.com.au': 'c8a4d721-3fbb-4f50-b3e0-aa49bf86ac87',
@@ -9,8 +9,8 @@ export default {
     'wizardUriBase': 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
 
     // The actual URL of the landing page of your web app.
-    //'premiumAppURL': 'http://localhost:8080/premium-app-sample/',
-    'premiumAppURL': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/',
+    // 'premiumAppURL': 'http://localhost:8080/premium-app-sample/supervisor.html',
+    'premiumAppURL': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/supervisor.html',
 
     // PureCloud assigned name for the premium app
     // This should match the integration type name of the Premium App
@@ -79,7 +79,8 @@ export default {
                  * This function is for other processing that needs
                  * to be done after creating an object.
                  * 'finally' is available for all the other
-                 * resources configured in this file.
+                 * resources configured in this config file.
+                 * NOTE: Finally functions must return a Promise.
                  * For Client Credentials, normally it means
                  * passing the details to the backend.
                  * @param {Object} installedData the PureCloud resource created

@@ -33,7 +33,7 @@ let installedData = {};
 /**
  * Get's all the currently installed items as defined in the
  * job order.
- * @returns {Array}
+ * @returns {Promise} Array of the installed objects
  */
 function getInstalledObjects(){
     let promiseArr = [];
@@ -48,6 +48,11 @@ function getInstalledObjects(){
 }
 
 export default {
+    /**
+     * Setup the wizard with references
+     * @param {Object} pcClient PureCloud API Client
+     * @param {Object} user PureCloud user object
+     */
     setup(pcClient, user){
         client = pcClient;
         userMe = user;
@@ -61,6 +66,10 @@ export default {
 
     getInstalledObjects: getInstalledObjects,
 
+    /**
+     * Checks if any installed objects are still existing
+     * @returns {Promise<boolean>}
+     */
     isExisting(){
         let exists = false;
 
@@ -82,6 +91,10 @@ export default {
         .catch((e) => console.error(e));
     },
 
+    /**
+     * Installs all the modules
+     * @returns {Promise<Array>} array of finally function resolves
+     */
     install(){
         let creationPromises = [];
         let configurationPromises = [];
@@ -141,6 +154,10 @@ export default {
         .catch((e) => console.error(e));
     },
 
+    /**
+     * Uninstall all the modules
+     * @returns {Promise<Array>} module remove promises
+     */
     uninstall(){
         let promiseArr = [];
 

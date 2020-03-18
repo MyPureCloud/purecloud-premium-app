@@ -63,7 +63,7 @@ clientApp.setup = function(pagePath){
     clientApp.pcEnv = pcEnv;
 
     // Authenticate via PureCloud
-    client.setPersistSettings(true);
+    client.setPersistSettings(true, appConfig.appName);
     client.setEnvironment(pcEnv);
     return client.loginImplicitGrant(clientId, appConfig.premiumAppURL + pagePath, appConfig.appName)
     .then(data => {
