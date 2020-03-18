@@ -32,7 +32,7 @@ export default {
     'setupPermissionsRequired': ['admin'],
 
     // To be added to names of PureCloud objects created by the wizard
-    'prefix': 'PREMIUM_EXAMPLE_2_',
+    'prefix': 'PREMIUM_EXAMPLE_',
 
     // These are the PureCloud items that will be added and provisioned by the wizard
     'provisioningInfo': {
