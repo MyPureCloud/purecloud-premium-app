@@ -2,6 +2,7 @@
 *   NOTE: This sample uses ES6.
 */
 import appConfig from '../wizard/config/config.js';
+import config from './config.js';
 
 let clientApp = {}; 
 
@@ -65,7 +66,8 @@ clientApp.setup = function(pagePath){
     // Authenticate via PureCloud
     client.setPersistSettings(true, appConfig.appName);
     client.setEnvironment(pcEnv);
-    return client.loginImplicitGrant(clientId, appConfig.premiumAppURL + pagePath, appConfig.appName)
+
+    return client.loginImplicitGrant(clientId, config.basePath + pagePath, appConfig.appName)
     .then(data => {
         console.log(data);
         
