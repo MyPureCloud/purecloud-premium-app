@@ -1,0 +1,248 @@
+  
+  .icon-box i {
+    font-size: 64px;
+    margin: -4px 0 0 -4px;
+    color: #2A60C8
+  }
+
+  .btn.active.focus, .btn.active:focus, .btn.focus, .btn.focus:active, .btn:active:focus, .btn:focus {
+    background-image: none;
+    outline: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  .form-control.active.focus, .form-control.active:focus, .form-control.focus, .form-control.focus:active, .form-control:active:focus, .form-control:focus {
+    background-image: #2A60C8 !important;
+    outline: 10;
+    border-color: #2A60C8 !important;
+    -webkit-box-shadow: #2A60C8 !important;
+    box-shadow: #2A60C8 !important;
+  }
+  .was-validated.active.focus, .was-validated.active:focus, .was-validated.focus, .was-validated.focus:active, .was-validated:active:focus, .was-validated:focus {
+    background-image: none !important;
+    outline: 0 !important;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  .btn-success-modified {
+    background-color:white; 
+    border-color:#FF4F1F; 
+    border-radius:25px; 
+    color: #FF4F1F; 
+    border-width: 2px;
+    user-select: unset;
+  }
+
+  .btn-success-modified.hover,.btn-success-modified:hover {
+    background-color:#FF4F1F; 
+    border-color:#FF4F1F; 
+    border-radius:25px; 
+    color: #FDFDFD; 
+    border-width: 2px
+  }
+
+
+  .btn.btn-primary.btn-lg {
+    background-color:#FF4F1F; 
+    border-color:#FF4F1F; 
+    border-radius:25px; 
+    color: #FDFDFD; 
+    border-width: 2px
+  }
+
+  .btn.btn-primary:hover {
+    background-color:white; 
+    border-color:#FF4F1F; 
+    border-radius:25px; 
+    color: #FF4F1F; 
+    border-width: 2px
+  }
+
+  .valid-feedback {
+    color: #2A60C8;
+  }
+
+  .custom-select.is-valid, .form-control.is-valid, .was-validated .custom-select:valid, .was-validated .form-control:valid {
+    border-color: #2A60C8;
+}
+
+  .invalid-feedback {
+    color: #F53131; 
+
+  }
+
+  .custom-select.is-invalid, .form-control.is-invalid, .was-validated .custom-select:invalid, .was-validated .form-control:invalid {
+    border-color: #F53131;
+}
+
+.bg-primary-modified {
+  background-color:#2A60C8;
+   border:#2A60C8;
+   cursor: pointer;
+
+}
+
+.bg-primary-modified:hover {
+  background-color:#75A8FF;
+  border:#75A8FF;
+
+}
+
+.display-4 {
+  color: white;
+}
+
+.jumbotron {
+  background-image: linear-gradient( to right, #5D3D5D, #FF4F1F);
+}
+
+a {
+  color: #FF4F1F; 
+}
+
+a:hover {
+  color: #FF4F1F; 
+}
+
+.form-control.focus {
+
+  border-color: #2A60C8 !important;
+  box-shadow: #2A60C8 !important;
+
+}
+
+
+.loader {
+	color: #FF4F1F;
+	position: fixed;
+	box-sizing: border-box;
+	left: -9999px;
+	top: -9999px;
+	width: 0;
+	height: 0;
+	overflow: hidden;
+	z-index: 999999
+}
+
+.loader:after,
+.loader:before {
+	box-sizing: border-box;
+	display: none
+}
+
+.loader.is-active {
+	background-color: rgba(19, 17, 17, 0.6);
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0
+}
+
+.loader.is-active:after,
+.loader.is-active:before {
+	display: block
+}
+
+@keyframes rotation {
+	0% {
+		transform: rotate(0)
+	}
+	to {
+		transform: rotate(359deg)
+	}
+}
+
+@keyframes blink {
+	0% {
+		opacity: .5
+	}
+	to {
+		opacity: 1
+	}
+}
+
+
+.modal-body{
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+
+.loader[data-text]:before {
+	position: fixed;
+	left: 0;
+	top: 50%;
+	color: currentColor;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: bold;
+	text-align: center;
+	width: 100%;
+	font-size: 15px
+}
+
+.loader[data-text=""]:before {
+	content: "Loading"
+}
+
+.loader[data-text]:not([data-text=""]):before {
+	content: attr(data-text)
+}
+
+.loader[data-text][data-blink]:before {
+	animation: blink 1s linear infinite alternate
+}
+
+.loader-default[data-text]:before {
+	top: calc(50% - 63px)
+}
+
+.loader-default:after {
+	content: "";
+	position: fixed;
+	width: 80px;
+	height: 80px;
+	border: 10px solid #FF4F1F;
+	border-left-color: transparent;
+	border-radius: 50%;
+	top: calc(50% - 24px);
+	left: calc(50% - 24px);
+	animation: rotation 1s linear infinite
+}
+
+.loader-default[data-half]:after {
+	border-right-color: transparent
+}
+
+.loader-default[data-inverse]:after {
+	animation-direction: reverse
+
+}
+
+.modal-body {
+  max-height: calc(100vh - 210px);
+  overflow-y: auto;
+} 
+
+.topnav {
+  background-color: #f2f2f2;
+  overflow: hidden;
+}
+
+.topnav a {
+  float: right;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+
+}
+
+button :focus {
+ outline: 0;
+
+}
+
+.material-icons {
+ color: #FF4F1F
+}

@@ -10,6 +10,7 @@ const ClientApp = window.purecloud.apps.ClientApp;
 // API 
 const usersApi = new platformClient.UsersApi();
 const integrationsApi = new platformClient.IntegrationsApi();
+const organizationApi = new platformClient.OrganizationApi();
 
 // Constants
 const appName = config.appName;
@@ -21,11 +22,8 @@ let pcEnvironment = localStorage.getItem(appName + ':environment') ||
                     config.defaultPcEnvironment;
 let clientApp = null;
 let userMe = null;
+let org = null
 
-
-/**
- * Get query parameters for language and purecloud region
- */
 function queryParamsConfig(){
     // Get Query Parameters
     const urlParams = new URLSearchParams(window.location.search);
@@ -41,11 +39,13 @@ function queryParamsConfig(){
         pcEnvironment = tempPcEnv;
         localStorage.setItem(appName + ':environment', pcEnvironment);
     }
+
+    // Setup Client App
+    clientApp = new ClientApp({
+        pcEnvironment: pcEnvironment
+    });
 }
 
-/**
- * Authenticate with PureCloud
- */
 function authenticatePureCloud(){
  client.setEnvironment(pcEnvironment);
     client.setPersistSettings(true, appName);
@@ -55,20 +55,12 @@ function authenticatePureCloud(){
             );
 }
 
-/**
- * Get user details with its roles
- * @returns {Promise} usersApi result
- */
 function getUserDetails(){
     let opts = {'expand': ['authorization']};
     
     return usersApi.getUsersMe(opts);
 }
 
-/**
- * Checks if the PureCloud org has the premium app product enabled
- * @returns {Promise}
- */
 function validateProductAvailability(){      
     return integrationsApi.getIntegrationsTypes({})
     .then((data) => {
@@ -82,32 +74,27 @@ function validateProductAvailability(){
     });
 }
 
-/**
- * Setup function
- * @returns {Promise}
- */
 function setup(){
     view.showLoadingModal('Loading...');
     view.hideContent();
 
     queryParamsConfig();
-    
-    // Setup Client App
-    clientApp = new ClientApp({
-        pcEnvironment: pcEnvironment
-    });
-
-    return authenticatePureCloud()
+    authenticatePureCloud()
     .then(() => {
         return getUserDetails();
     })
     .then((user) => {
         userMe = user;
 
+        return organizationApi.getOrganizationsMe();
+    })
+    .then((result) => {
+        org = result;
+
         return setPageLanguage();
     })  
     .then(() => {
-        wizard.setup(client, userMe);
+        wizard.setup(client, userMe, org, pcEnvironment);
 
         return runPageScript();
     })  
@@ -117,10 +104,6 @@ function setup(){
     .catch((e) => console.error(e));    
 }
 
-/**
- * Sets and loads the language file based on the pcLanguage global var
- * @returns {Promise}
- */
 function setPageLanguage(){
     return new Promise((resolve, reject) => {
         let fileUri = 
@@ -142,10 +125,6 @@ function setPageLanguage(){
     });
 }
 
-/**
- * Runs page specific script.
- * @returns {Promise}
- */
 function runPageScript(){
     return new Promise((resolve, reject) => {
         let pathParts = window.location.pathname.split('/');

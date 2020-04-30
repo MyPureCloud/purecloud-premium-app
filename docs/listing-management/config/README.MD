@@ -1,0 +1,1 @@
+Config files used by both agent-side and partner-side

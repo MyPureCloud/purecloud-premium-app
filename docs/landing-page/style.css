@@ -1,0 +1,198 @@
+html {
+  scroll-behavior: smooth;
+}
+
+.row {
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+.menu-list {
+  list-style-type: none;
+  margin: 5px;
+  padding: 5px;
+  display: flex;
+}
+
+.menu-container {
+  display: flex;
+  justify-content: center;
+}
+
+.menu-list li a { 
+  margin: 15px; 
+  display: block; 
+  width: 145px; 
+  height: 100%; 
+  padding: 15px 30px;
+  text-align: center;
+}
+
+li {
+  display: flex;
+  border: none;
+}
+
+.menu-provisioning-url {
+  background-image: url('./assets/process.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%; 
+  margin-bottom: 10px;
+}
+
+.menu-listing-url {
+  background-image: url('./assets/rocket.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%; 
+  margin-bottom: 10px;
+}
+
+.menu-uninstall-url {
+  background-image: url('./assets/caution.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%; 
+  margin-bottom: 10px;
+}
+
+#menu-provisioning-url:hover, #menu-listing-url:hover, #menu-uninstall-url:hover {
+  border: 1px solid #FF4F1F;
+  border-radius: .5rem;
+}
+
+.tools-container {
+  padding: 0px;
+  margin: 0px;
+}
+
+#btnUninstall {
+  background-color:white; 
+  border-color:#FF4F1F; 
+  border-radius:25px; 
+  color: #FF4F1F; 
+  border-width: 2px;
+  user-select: unset;
+}
+
+#btnUninstall:hover {
+  background-color:#FF4F1F; 
+  border-color:#FF4F1F; 
+  border-radius:25px; 
+  color: #FDFDFD; 
+  border-width: 2px
+}
+
+#btnLearnMore {
+  background-color:#FF4F1F; 
+  border-color:#FF4F1F; 
+  border-radius:25px; 
+  color: #FDFDFD; 
+  border-width: 2px
+}
+
+#btnLearnMore:hover {
+  background-color:white; 
+  border-color:#FF4F1F; 
+  border-radius:25px; 
+  color: #FF4F1F; 
+  border-width: 2px;
+  user-select: unset;
+}
+
+.display-4 {
+  color: white;
+} 
+
+.jumbotron {
+  background-image: linear-gradient( to right, #5D3D5D, #FF4F1F);
+  padding: 1rem !important;
+  margin-bottom: 10px !important;
+}
+
+a {
+  color: black;
+}
+
+a:hover {
+  color: black;
+  text-decoration-line: none;
+}
+
+.topnav {
+  background-color: #f2f2f2;
+  overflow: hidden;
+}
+
+.topnav a {
+  float: right;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+}
+
+button :focus {
+  outline: 0;
+}
+
+.sidebar-list {
+  list-style-type: none;
+  margin: 5px;
+  padding: 5px;
+}
+
+.sidebar-list li {
+  width: 210px;
+  padding: 5px;
+}
+
+.sidebar-list img {
+  margin-right: 10px;
+}
+
+.sidebar-list li:hover {
+  border: 1px solid #FF4F1F;
+  border-radius: .5rem;
+}
+
+.sidebar-list li a { 
+  margin: 0px; 
+  display: block; 
+  width: 100%; 
+  height: 100%; 
+}
+
+.bar-block .bar-item{
+  width:100%;
+  display:block;
+  padding:8px 16px;
+  text-align:left;
+  border:none;
+  white-space:normal;
+  float:none;
+  outline:0
+}
+
+.bar-button{
+  border:none;
+  display:inline-block;
+  padding:8px 16px;
+  vertical-align:middle;
+  overflow:hidden;
+  text-decoration:none;
+  color: #FF4F1F;
+  background-color:inherit;
+  text-align:center;
+  cursor:pointer;
+  white-space:nowrap
+}
+
+.tool-iframe {
+  width: 100%;
+  height: 800px;
+}
+
+img {
+  margin-bottom: 10px;
+}
