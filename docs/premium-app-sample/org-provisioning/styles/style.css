@@ -2,7 +2,7 @@
   .icon-box i {
     font-size: 64px;
     margin: -4px 0 0 -4px;
-    color: #2A60C8
+    color: #FF4F1F;
   }
 
   .btn.active.focus, .btn.active:focus, .btn.focus, .btn.focus:active, .btn:active:focus, .btn:focus {
@@ -78,16 +78,16 @@
 }
 
 .bg-primary-modified {
-  background-color:#2A60C8;
-   border:#2A60C8;
-   cursor: pointer;
-
+  background-color:#FF4F1F;
+  border:#FF4F1F;
+  cursor: pointer;
+  border-radius:25px;
 }
 
 .bg-primary-modified:hover {
-  background-color:#75A8FF;
-  border:#75A8FF;
-
+  background-color:#FF4F1F;
+  border:#FF4F1F;
+  border-radius:25px;
 }
 
 .display-4 {

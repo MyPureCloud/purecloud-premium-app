@@ -1,5 +1,5 @@
 // Toggle if running in localhost or GH pages
-let isTestEnvironment = false;
+let isTestEnvironment = true;
 
 console.log(`Running in ${isTestEnvironment ? 'TEST' : 'PROD'} environment`);
 
@@ -34,5 +34,5 @@ export default {
     appName: appName,
     prefix: prefix,
     root: root,
-    landingAssetURL: `${root}/landing-page/assets`
+    landingAssetURL: `${root}/premium-app-sample/landing-page/assets`
 }

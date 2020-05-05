@@ -1,5 +1,5 @@
 import cheatChat from '../../listing-management/partner-side/scripts/cheat-chat.js';
-import globalConfig from '../../config/global-config.js';
+import globalConfig from '../../premium-app-sample/config/global-config.js';
 
 export default {
     clientIDs: globalConfig.clientIDs,

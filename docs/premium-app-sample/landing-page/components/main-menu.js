@@ -11,13 +11,13 @@ let t = document.createElement('template');
 //     <div class="row menu-container">
 //         <ul class="menu-list">
 //             <li id="menu-provisioning-url">
-//                 <a href="${config.root}/org-provisioning/index.html">
+//                 <a href="${config.root}/premium-app-sample/org-provisioning/index.html">
 //                     <div class="menu-provisioning-url" style="width:90px; height:80px"></div>
 //                     <span>Dev Org Provisioning</span>
 //                 </a>
 //             </li>
 //             <li id="menu-listing-url">
-//                 <a href="${config.root}/listing-management/partner-side/index.html">
+//                 <a href="${config.root}/premium-app-sample/listing-management/partner-side/index.html">
 //                     <div class="menu-listing-url" style="width:90px; height:80px"></div>
 //                     <span>Listing Management</span>
 //                 </a>
@@ -31,7 +31,7 @@ t.innerHTML =
     <div class="row menu-container">
         <ul class="menu-list">
             <li id="menu-provisioning-url">
-                <a href="${config.root}/org-provisioning/index.html">
+                <a href="${config.root}/premium-app-sample/org-provisioning/index.html">
                     <div class="menu-provisioning-url" style="width:90px; height:80px"></div>
                     <span>Dev Org Provisioning</span>
                 </a>
