@@ -1,5 +1,5 @@
 // Toggle if running in localhost or GH pages
-let isTestEnvironment = true;
+let isTestEnvironment = false;
 
 console.log(`Running in ${isTestEnvironment ? 'TEST' : 'PROD'} environment`);
 
