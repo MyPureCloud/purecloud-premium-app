@@ -10,8 +10,8 @@ if(globalConfig.isTestEnvironment){
 // to check post messages in preview listing.
 // root would be the actual root URI of the project.
 const root = (origin == 'https://genesysappfoundry.github.io') ?
-                origin + '/partner-enablement-tools/listing-management' :
-                origin + '/listing-management';
+                origin + '/premium-app-sample/listing-management' :
+                origin + '/premium-app-sample/listing-management';
 
 export default {    
     clientIDs: globalConfig.clientIDs,
