@@ -1,4 +1,4 @@
-import cheatChat from '../../listing-management/partner-side/scripts/cheat-chat.js';
+import cheatChat from '../../premium-app-sample/listing-management/partner-side/scripts/cheat-chat.js';
 import globalConfig from '../../premium-app-sample/config/global-config.js';
 
 export default {
