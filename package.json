@@ -15,12 +15,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GenesysAppFoundry/partner-enablement-tools.git"
+    "url": "git+https://github.com/MyPureCloud/purecloud-premium-app.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/GenesysAppFoundry/partner-enablement-tools/issues"
+    "url": "https://github.com/MyPureCloud/partner-enablement-tools/issues"
   },
-  "homepage": "https://github.com/GenesysAppFoundry/partner-enablement-tools#readme"
+  "homepage": "https://github.com/MyPureCloud/partner-enablement-tools#readme"
 }

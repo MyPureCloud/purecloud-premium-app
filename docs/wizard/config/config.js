@@ -6,12 +6,12 @@ export default {
 
     'wizardUriBase': globalConfig.isTestEnvironment ? 
             'http://localhost:8080/wizard/' :
-            'https://genesysappfoundry.github.io/partner-enablement-tools/wizard/',
+            'https://MyPureCloud.github.io/partner-enablement-tools/wizard/',
 
     // The actual URL of the landing page of your web app.
     'premiumAppURL': globalConfig.isTestEnvironment ? 
             'http://localhost:8080/' : 
-            'https://genesysappfoundry.github.io/partner-enablement-tools/',
+            'https://MyPureCloud.github.io/partner-enablement-tools/',
 
     // PureCloud assigned name for the premium app
     // This should match the integration type name of the Premium App

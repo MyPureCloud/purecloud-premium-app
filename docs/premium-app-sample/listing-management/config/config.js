@@ -1,6 +1,6 @@
 import globalConfig from '../../config/global-config.js';
 
-let origin = 'https://genesysappfoundry.github.io';
+let origin = 'https://MyPureCloud.github.io';
 let clientIDs = globalConfig.clientIDs;
 if(globalConfig.isTestEnvironment){
     origin = 'http://localhost:8080';
@@ -9,7 +9,7 @@ if(globalConfig.isTestEnvironment){
 // Keep origin as tld as it's being used 
 // to check post messages in preview listing.
 // root would be the actual root URI of the project.
-const root = (origin == 'https://genesysappfoundry.github.io') ?
+const root = (origin == 'https://MyPureCloud.github.io') ?
                 origin + '/premium-app-sample/listing-management' :
                 origin + '/premium-app-sample/listing-management';
 
