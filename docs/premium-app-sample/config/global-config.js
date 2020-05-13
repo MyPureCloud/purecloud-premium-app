@@ -17,12 +17,12 @@ let testClientIDs = {
 
 // Client IDs for production
 let prodClientIDs = {
-    'mypurecloud.com': 'e4163c90-2168-400a-9441-cb2c8ae7ccc2',
-    'mypurecloud.ie': '377bf436-7787-4ed0-83d7-7ade528ff4ed',
-    'mypurecloud.com.au': 'ae206cd0-a70e-481d-86f4-b1bfb61498de',
-    'mypurecloud.jp': '265993a4-931a-44e5-a0b1-80519c3edb25',
-    'mypurecloud.de':  '5f25a1d0-7b42-416b-beb3-fa708e7b2e65',
-    'usw2.pure.cloud': '0d09a06e-f09a-47ed-8556-080479596414' 
+    'mypurecloud.com': '26255f2c-6a85-43bf-8d27-7761057bc72d',
+    'mypurecloud.ie': '939ab4dd-109f-4120-ba9f-051b973b9ecc',
+    'mypurecloud.de': 'aa8efb84-a77f-4c43-8b37-ac0566d9f73e',
+    'mypurecloud.com.au': 'c8a4d721-3fbb-4f50-b3e0-aa49bf86ac87',
+    'mypurecloud.jp': '28dbeebd-8128-4fe0-8f42-f2eebb767a71',
+    'usw2.pure.cloud': '2075921c-a285-4523-91df-7984f1268677'
 }
 
 // Determine URL for different environments
