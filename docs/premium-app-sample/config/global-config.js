@@ -26,7 +26,7 @@ let prodClientIDs = {
 }
 
 // Determine URL for different environments
-const root = isTestEnvironment ? 'http://localhost:8080' : 'https://github.com/MyPureCloud/purecloud-premium-app';
+const root = isTestEnvironment ? 'http://localhost:8080' : 'https://mypurecloud.github.io/purecloud-premium-app';
 
 export default {
     clientIDs: isTestEnvironment ? testClientIDs : prodClientIDs,
