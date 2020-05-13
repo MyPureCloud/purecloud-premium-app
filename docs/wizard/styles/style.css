@@ -10,7 +10,7 @@ html, body {
 
 body {
     color: #4C4C4C;
-    font-family: "HelveticaNeue", "Helvetica", "Arial", sans-serif;
+    font-family: "Roboto","HelveticaNeue", "Helvetica", "Arial", sans-serif;
     font-size: 0.9em;
     display: flex;
     flex-direction: column;
@@ -81,7 +81,7 @@ p {
 
 
 .success {
-    color: #0baf4a;
+    color: #5D3D5D;
 }
 
 .fail {
@@ -103,24 +103,27 @@ p {
 }
 
 /* Buttons */
-button {
+button,button:focus {
     border-radius: 5px 5px;
     padding: 15px 32px;
     text-align: center;
     font-weight: 600;
     font-size: 1em;
     cursor: pointer;
+    outline: 0;
 }
 
 .btn-info {
-    background-color: #34b3dd;
+    background-color: #FF4F1F;
     color: white;
-    border: 1px solid #34b3dd;
-    border-bottom: 3px solid #24a3cd;
+    border: 1px solid #FF4F1F;
+    border-bottom: 3px solid #FF4F1F;
 }
 
 .btn-info:hover {
-    background-color: #25c0df;
+    background-color:white; 
+    border-color:#FF4F1F; 
+    color: #FF4F1F; 
 }
 
 .right {
@@ -134,7 +137,7 @@ button {
 /* Modal */
 .adjust-text {
    /* margin-top: -100px; */
-    color: #4498B4;
+    color: #FF4F1F;
     font-size-adjust: unset;
 }
 
@@ -196,12 +199,12 @@ button {
 }
 
 .progress-bar li.active::before {
-    color: #34b3dd;
+    color: #FF4F1F;
     content: '✔';
 }
 
 .progress-bar li.active:before {
-    border-color: #34b3dd;
+    border-color: #FF4F1F;
 }
 
 .progress-bar li.active + li:after {
@@ -213,8 +216,8 @@ button {
     font-size: 2em;
     font-weight: bold;
     text-align: center;
-    color: #55A9C6;
-    font-family: "Lato", "HelveticaNeue", "Helvetica", "Arial", sans-serif;
+    color: #FF4F1F;
+    font-family: "Roboto","Lato", "HelveticaNeue", "Helvetica", "Arial", sans-serif;
 }
 
 /* Message-box */
@@ -231,7 +234,7 @@ button {
     font-size: 1em;
     font-weight: bold;
     text-align: left;
-    background-color: #4EB3D3; 
+    background-color: #FF4F1F; 
 }
 
 .message-content {

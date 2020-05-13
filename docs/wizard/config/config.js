@@ -1,22 +1,21 @@
+import cheatChat from '../../listing-management/partner-side/scripts/cheat-chat.js';
+import globalConfig from '../../premium-app-sample/config/global-config.js';
+
 export default {
-    clientIDs: {        
-        'mypurecloud.com': '26255f2c-6a85-43bf-8d27-7761057bc72d',
-        'mypurecloud.ie': '939ab4dd-109f-4120-ba9f-051b973b9ecc',
-        'mypurecloud.de': 'aa8efb84-a77f-4c43-8b37-ac0566d9f73e',
-        'mypurecloud.com.au': 'c8a4d721-3fbb-4f50-b3e0-aa49bf86ac87',
-        'mypurecloud.jp': '28dbeebd-8128-4fe0-8f42-f2eebb767a71',
-        'usw2.pure.cloud': '2075921c-a285-4523-91df-7984f1268677'
-    },
-    // 'wizardUriBase': 'http://localhost:8080/wizard/',
-    'wizardUriBase': 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
+    clientIDs: globalConfig.clientIDs,
+
+    'wizardUriBase': globalConfig.isTestEnvironment ? 
+            'http://localhost:8080/wizard/' :
+            'https://genesysappfoundry.github.io/partner-enablement-tools/wizard/',
 
     // The actual URL of the landing page of your web app.
-    // 'premiumAppURL': 'http://localhost:8080/premium-app-sample/supervisor.html',
-    'premiumAppURL': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/supervisor.html',
+    'premiumAppURL': globalConfig.isTestEnvironment ? 
+            'http://localhost:8080/' : 
+            'https://genesysappfoundry.github.io/partner-enablement-tools/',
 
     // PureCloud assigned name for the premium app
     // This should match the integration type name of the Premium App
-    'appName': 'premium-app-example',
+    'appName': globalConfig.appName,
 
     // Default Values for fail-safe/testing. Shouldn't have to be changed since the app
     // must be able to determine the environment from the query parameter 
@@ -34,7 +33,7 @@ export default {
     'setupPermissionsRequired': ['admin'],
 
     // To be added to names of PureCloud objects created by the wizard
-    'prefix': 'PREMIUM_EXAMPLE_',
+    'prefix': globalConfig.prefix,
 
     // These are the PureCloud items that will be added and provisioned by the wizard
     'provisioningInfo': {
@@ -48,26 +47,19 @@ export default {
                         'entityName': 'examplePremiumApp',
                         'actionSet': ['*'],
                         'allowConditions': false
+                    },
+                    {
+                        "domain": "architect",
+                        "entityName": "datatable",
+                        "actionSet": ["*"]
                     }
                 ]
             }
         ],
         'group': [
             {
-                'name': 'Agents',
-                'description': 'Agents have access to a widget that gives US state information based on caller\'s number.',
-            },
-            {
-                'name': 'Supervisors',
-                'description': 'Supervisors have the ability to watch a queue for ACD conversations.',
-            }
-        ],
-        'app-instance': [
-            {
-                'name': 'Agent Widget',
-                'url': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}',
-                'type': 'widget',
-                'groups': ['Agents']
+                "name": "Listing Manager",
+                "description": "People that will have acess to the Listing Info Workspce.",
             }
         ],
         'oauth-client': [
@@ -81,20 +73,72 @@ export default {
                  * This function is for other processing that needs
                  * to be done after creating an object.
                  * 'finally' is available for all the other
-                 * resources configured in this config file.
-                 * NOTE: Finally functions must return a Promise.
+                 * resources configured in this file.
                  * For Client Credentials, normally it means
                  * passing the details to the backend.
                  * @param {Object} installedData the PureCloud resource created
+                 * @param {Object} org orgname
+                 * @param {String} pcEnvironment eg mypurecloud.com
                  * @returns {Promise}    
                  */
-                'finally': function(installedData){
-                    return new Promise((resolve, reject) => {
-                        console.log('Fake Sending Credentials...');
-                        setTimeout(() => resolve(), 2000);
-                    });
+                'finally': function(installedData, org, pcEnvironment){
+                    cheatChat.setUp(org, pcEnvironment);
+                    return cheatChat.submitClientCredentials(installedData);
                 }
             }
-        ]
+        ],
+        'data-table': [{
+            "name": "Listings",
+            "description": "Contains the details of your app listings.",
+            "referenceKey": "id",
+            "customFields": [
+                {
+                    "name": "status",
+                    "type": "string",
+                    "default": "IN_PROGRESS"
+                },
+                {
+                    "name": "businessInformation",
+                    "type": "string",
+                    "default": "{}"
+                },
+                {
+                    "name": "listingDetails",
+                    "type": "string",
+                    "default": "{}"
+                },
+                {
+                    "name": "premiumAppDetails",
+                    "type": "string",
+                    "default": "{}"
+                },
+                {
+                    "name": "workspaceId",
+                    "type": "string"
+                },
+                {
+                    "name": "attachments",
+                    "type": "string",
+                    "default": "{}"
+                },
+                {
+                    "name": "devFoundryNotes",
+                    "type": "string",
+                    "default": "[]"
+                },
+                {
+                    "name": "placeholder1",
+                    "type": "string"
+                },
+                {
+                    "name": "placeholder2",
+                    "type": "string"
+                },
+                {
+                    "name": "placeholder3",
+                    "type": "string"
+                },
+            ]
+        }]
     }
 };

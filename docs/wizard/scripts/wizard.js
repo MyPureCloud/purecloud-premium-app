@@ -28,12 +28,13 @@ let client = null;
 
 let userMe = null;
 let installedData = {};
-
+let org = null;
+let pcEnvironment = '';
 
 /**
  * Get's all the currently installed items as defined in the
  * job order.
- * @returns {Promise} Array of the installed objects
+ * @returns {Array}
  */
 function getInstalledObjects(){
     let promiseArr = [];
@@ -48,14 +49,12 @@ function getInstalledObjects(){
 }
 
 export default {
-    /**
-     * Setup the wizard with references
-     * @param {Object} pcClient PureCloud API Client
-     * @param {Object} user PureCloud user object
-     */
-    setup(pcClient, user){
+    setup(pcClient, user, orgObject, env){
+        console.log(pcClient);
         client = pcClient;
         userMe = user;
+        org = orgObject;
+        pcEnvironment = env;
 
         // Use only modules in provisioning info
         modules = modules.filter((module) => {
@@ -66,10 +65,6 @@ export default {
 
     getInstalledObjects: getInstalledObjects,
 
-    /**
-     * Checks if any installed objects are still existing
-     * @returns {Promise<boolean>}
-     */
     isExisting(){
         let exists = false;
 
@@ -91,10 +86,6 @@ export default {
         .catch((e) => console.error(e));
     },
 
-    /**
-     * Installs all the modules
-     * @returns {Promise<Array>} array of finally function resolves
-     */
     install(){
         let creationPromises = [];
         let configurationPromises = [];
@@ -143,7 +134,8 @@ export default {
                 provisionItems.forEach((item) => {
                     if(item.finally){
                         finalFunctionPromises.push(
-                            item.finally(installedData[key][item.name])
+                            item.finally(installedData[key][item.name], 
+                                org, pcEnvironment)
                         );
                     }
                 })
@@ -154,10 +146,6 @@ export default {
         .catch((e) => console.error(e));
     },
 
-    /**
-     * Uninstall all the modules
-     * @returns {Promise<Array>} module remove promises
-     */
     uninstall(){
         let promiseArr = [];
 
