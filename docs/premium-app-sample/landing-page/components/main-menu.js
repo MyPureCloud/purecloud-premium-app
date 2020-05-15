@@ -36,6 +36,12 @@ t.innerHTML =
                     <span>Dev Org Provisioning</span>
                 </a>
             </li>
+            <li id="menu-uninstall-url">
+                <a href="${config.root}/wizard/uninstall.html">
+                    <div class="menu-provisioning-url" style="width:90px; height:80px"></div>
+                    <span>Uninstall</span>
+                </a>
+            </li>
         </ul>
     </div>
 `;
