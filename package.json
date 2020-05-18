@@ -1,26 +1,25 @@
 {
-  "name": "partner-enablement-tools",
+  "name": "purecloud-premium-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "PureCloud Premium Front-End App",
   "main": "index.js",
   "directories": {
     "doc": "docs"
   },
-  "dependencies": {
-    "express": "^4.17.1"
-  },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MyPureCloud/purecloud-premium-app.git"
+    "url": "git+https://github.com/PrinceMerluza/purecloud-premium-app.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/MyPureCloud/partner-enablement-tools/issues"
+    "url": "https://github.com/PrinceMerluza/purecloud-premium-app/issues"
   },
-  "homepage": "https://github.com/MyPureCloud/partner-enablement-tools#readme"
+  "homepage": "https://github.com/PrinceMerluza/purecloud-premium-app#readme",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
 }

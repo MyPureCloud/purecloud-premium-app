@@ -1,0 +1,271 @@
+{
+    "de": 
+        {
+            "Name": "Name",
+            "Number": "Nummer",
+            "StateInfo": "Zustandsinfo",
+            "Conversations": "Gespräche",
+            "Subscribe": "Abonnieren",
+            "ConversationID": "Gesprächs-ID",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "Zustand",
+            "WaitTime": "Wartezeit",
+            "Duration": "Dauer",
+            "IncomingCall": "Eingehender Anruf",
+            "From": "Von",
+            "Type": "Art"
+        },
+
+    "en-us":
+        {
+            "Name": "Name",
+            "Number": "Number",
+            "StateInfo": "State Info",
+            "Conversations": "Premium App /  Conversations",
+            "Subscribe": "Subscribe",
+            "ConversationID": "Conversation ID",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "State",
+            "WaitTime": "Wait Time",
+            "Duration": "Duration",
+            "IncomingCall": "Incoming Call",
+            "From": "From",
+            "Type": "Type"
+        },
+
+    "es":
+        {
+            "Name": "Nombre",
+            "Number": "Número",
+            "StateInfo": "Información Del Estado",
+            "Conversations": "Premium App /  Conversaciones",
+            "Subscribe": "Suscribir",
+            "ConversationID": "ID De Conversación",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "Estado",
+            "WaitTime": "Tiempo De Espera",
+            "Duration": "Duración",
+            "IncomingCall": "Llamada Entrante",
+            "From": "De",
+            "Type": "Tipo"
+        },
+
+    "fr":
+        {
+            "Name": "Prénom",
+            "Number": "Nombre",
+            "StateInfo": "Info d'état",
+            "Conversations": "Conversations",
+            "Subscribe": "Souscrire",
+            "ConversationID": "ID De Conversation",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "Etat",
+            "WaitTime": "Temps d'attente",
+            "Duration": "Durée",
+            "IncomingCall": "Appel entrant",
+            "From": "De",
+            "Type": "Type"
+        },
+
+    "it":
+        {
+            "Name": "Nome",
+            "Number": "Numero",
+            "StateInfo": "Informazioni Di Stato",
+            "Conversations": "Conversazioni",
+            "Subscribe": "Sottoscrivi",
+            "ConversationID": "ID Conversazione",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "Stato",
+            "WaitTime": "Tempo Di Attesa",
+            "Duration": "Durata",
+            "IncomingCall": "Chiamata in Arrivo",
+            "From": "Da",
+            "Type": "Tipo"
+        },
+
+    "ja":
+        {
+            "Name": "名",
+            "Number": "数",
+            "StateInfo": "州情報",
+            "Conversations": "会話",
+            "Subscribe": "申し込む",
+            "ConversationID": "会話ID",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "状態",
+            "WaitTime": "待ち時間",
+            "Duration": "期間",
+            "IncomingCall": "電話の着信",
+            "From": "から",
+            "Type": "タイプ"
+        },
+
+    "ko":
+        {
+            "Name": "이름",
+            "Number": "번호",
+            "StateInfo": "상태 정보",
+            "Conversations": "대화",
+            "Subscribe": "구독하기",
+            "ConversationID": "대화 ID",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "상태",
+            "WaitTime": "기다리는 시간",
+            "Duration": "지속",
+            "IncomingCall": "수신 전화",
+            "From": "에서",
+            "Type": "유형"
+        },
+
+    "nl":
+        {
+            "Name": "Naam",
+            "Number": "Aantal",
+            "StateInfo": "Staatsinformatie",
+            "Conversations": "Conversaties",
+            "Subscribe": "Abonneren",
+            "ConversationID": "Conversatie ID",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "Staat",
+            "WaitTime": "Wacht Tijd",
+            "Duration": "Looptijd",
+            "IncomingCall": "Binnenkomend Telefoongesprek",
+            "From": "Van",
+            "Type": "Type"
+        },
+
+    "no":
+        {
+            "Name": "Navn",
+            "Number": "Antall",
+            "StateInfo": "Stat Info",
+            "Conversations": "Samtaler",
+            "Subscribe": "Abonnere",
+            "ConversationID": "Samtale-ID",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "Stat",
+            "WaitTime": "Ventetid",
+            "Duration": "Varighet",
+            "IncomingCall": "Innkommende Anrop",
+            "From": "Fra",
+            "Type": "Type"
+        },
+
+    "pl":
+        {
+            "Name": "Nazwa",
+            "Number": "Numer",
+            "StateInfo": "Informacje o Stanie",
+            "Conversations": "Rozmowy",
+            "Subscribe": "Subskrybować",
+            "ConversationID": "Identyfikator Rozmowy",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "Stan",
+            "WaitTime": "Czas Ooczekiwania",
+            "Duration": "Trwanie",
+            "IncomingCall": "Połączenie Przychodzące",
+            "From": "Od",
+            "Type": "Rodzaj"
+        },
+
+    "pt-br":
+        {
+            "Name": "Nome",
+            "Number": "Número",
+            "StateInfo": "Informação do Estado",
+            "Conversations": "Conversas",
+            "Subscribe": "Se Inscrever",
+            "ConversationID": "ID da Conversa",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "Estado",
+            "WaitTime": "Tempo de Espera",
+            "Duration": "Duração",
+            "IncomingCall": "Chamada Recebida",
+            "From": "De",
+            "Type": "Tipo"
+        },
+
+    "sv":
+        {
+            "Name": "Namn",
+            "Number": "Siffra",
+            "StateInfo": "Stat Info",
+            "Conversations": "Samtal",
+            "Subscribe": "Prenumerera",
+            "ConversationID": "Konversations-ID",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "Stat",
+            "WaitTime": "Väntetid",
+            "Duration": "Varaktighet",
+            "IncomingCall": "Inkommande Samtal",
+            "From": "Från",
+            "Type": "Typ"
+        },
+
+    "th":
+        {
+            "Name": "ชื่อ",
+            "Number": "จำนวน",
+            "StateInfo": "ข้อมูลสถานะ",
+            "Conversations": "การสนทนา",
+            "Subscribe": "สมัครสมาชิก",
+            "ConversationID": "รหัสการสนทนา",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "สถานะ",
+            "WaitTime": "รอเวลา",
+            "Duration": "ระยะเวลา",
+            "IncomingCall": "สายเรียกเข้า",
+            "From": "จาก",
+            "Type": "ชนิด"
+        },
+
+    "tr":
+        {
+            "Name": "Isim",
+            "Number": "Numara",
+            "StateInfo": "Devlet Bilgisi",
+            "Conversations": "Konuşmalar",
+            "Subscribe": "Abone Ol",
+            "ConversationID": "Konuşma Kimliği",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "Devlet",
+            "WaitTime": "Bekleme Zamanı",
+            "Duration": "Süre",
+            "IncomingCall": "Gelen çağrı",
+            "From": "Itibaren",
+            "Type": "Tip"
+        },
+
+    "zh-cn":
+        {
+            "Name": "名称",
+            "Number": "数",
+            "StateInfo": "国家信息",
+            "Conversations": "对话",
+            "Subscribe": "订阅",
+            "ConversationID": "会话ID",
+            "ANI": "ANI",
+            "DNIS": "DNIS",
+            "State": "州",
+            "WaitTime": "等待时间",
+            "Duration": "持续时间",
+            "IncomingCall": "来电",
+            "From": "从",
+            "Type": "类型"
+        }
+}

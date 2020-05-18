@@ -123,7 +123,6 @@ function configure(logFunc, installedData, userId){
                     // Check if all roles for these client is already assigned
                     // to the user
                     oauthInstall.roles.forEach((r) => {
-                        console.log(installedData);
                         if(!userRoleIds.includes(installedData.role[r].id)){
                             userAssigned = false;
                         }
