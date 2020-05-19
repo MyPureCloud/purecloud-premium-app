@@ -6,12 +6,12 @@
 
 body {
     color: #0F465D;
-    font-family: “HelveticaNeue”, “Helvetica”, “Arial”, sans-serif;
+    font-family: Roboto,sans-serif !important;
     font-size: 14px;
 }
 
 div.field-title {
-    color: #1997CA;
+    color: #5D3D5D;
     font-size: 18px;
     width: 100px;
 }
@@ -26,7 +26,7 @@ div.floating{
 }
 
 .secondary-font {
-    font-family: "Lato", “HelveticaNeue”, “Helvetica”, “Arial”, sans-serif;
+    font-family: Roboto,sans-serif;
 }
 
 div.test-area{
@@ -56,7 +56,7 @@ table {
   table, th, td {
     border: 0;
     font-size: 14px;
-    font-family: Lato,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-family: Roboto,sans-serif;
     font-weight: normal;
     padding-top: 10px;
     padding-right: 6px;
@@ -81,14 +81,19 @@ table {
 }
 
 .btn-info {
-    background-color: #34b3dd;
-    color: white;
-    border: 1px solid #34b3dd;
-    border-bottom: 3px solid #24a3cd;
+    background-color:white !important; 
+    border: 1px solid #FF4F1F !important;
+    border-radius: 25px !important; 
+    color: #FF4F1F !important; 
+    border-width: 2px !important;
 }
 
-.btn-info:hover {
-    background-color: #25c0df;
+.btn-info:hover, .btn-info:focus {
+    background-color:#FF4F1F !important; 
+    border: 1px solid #FF4F1F !important;
+    border-radius: 25px !important; 
+    color: #FDFDFD !important; 
+    border-width: 2px;
 }
 
 .right {
@@ -100,6 +105,46 @@ table {
 }
 
 #txtSubscribe, #ddlQueues {
-    font-family: Lato,"Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-size: 21px;
+    font-family: Roboto,sans-serif;
+    font-size: 16px;
+}
+
+.media-type-filter>span {
+    color: #000000 !important;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    margin: 0 10px;
+    min-height: 28px;
+    padding: 8px 1px;;
+}
+
+.jumbotron {
+    background-image: linear-gradient( to right, #5D3D5D, #FF4F1F);
+    padding: 1rem !important;
+    margin-bottom: 0px !important;
+}
+
+h1{
+    color: white !important;
+}
+
+.welcome-text {
+    font-size: 3.5rem !important;
+    font-weight: 300;
+    line-height: 1.2;
+}
+
+.container {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.main-content {
+    padding: 0px 25px;
 }

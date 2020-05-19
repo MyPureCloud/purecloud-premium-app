@@ -10,7 +10,7 @@ html, body {
 
 body {
     color: #4C4C4C;
-    font-family: "HelveticaNeue", "Helvetica", "Arial", sans-serif;
+    font-family: "Roboto","HelveticaNeue", "Helvetica", "Arial", sans-serif;
     font-size: 0.9em;
     display: flex;
     flex-direction: column;
@@ -45,7 +45,7 @@ footer img {
 }
 
 footer {
-    margin-top: 50px;
+    /* margin-top: 50px; */
     padding-top: 10px;
     border-top: 2px solid #DDDDDD;
     background: #FFF;
@@ -81,7 +81,7 @@ p {
 
 
 .success {
-    color: #0baf4a;
+    color: #5D3D5D;
 }
 
 .fail {
@@ -99,7 +99,7 @@ p {
 }
 
 .sink-more {
-    margin-top:40px;
+    margin-top:25px;
 }
 
 /* Buttons */
@@ -110,17 +110,23 @@ button {
     font-weight: 600;
     font-size: 1em;
     cursor: pointer;
+    outline: 0;
 }
 
 .btn-info {
-    background-color: #34b3dd;
-    color: white;
-    border: 1px solid #34b3dd;
-    border-bottom: 3px solid #24a3cd;
+    background-color:#FF4F1F; 
+    border: 1px solid #FF4F1F;
+    border-radius:25px; 
+    color: #FDFDFD; 
+    border-width: 2px
 }
 
-.btn-info:hover {
-    background-color: #25c0df;
+.btn-info:hover, .btn-info:focus {
+    background-color:white; 
+    border: 1px solid #FF4F1F;
+    border-radius:25px; 
+    color: #FF4F1F; 
+    border-width: 2px
 }
 
 .right {
@@ -134,7 +140,7 @@ button {
 /* Modal */
 .adjust-text {
    /* margin-top: -100px; */
-    color: #4498B4;
+    color: #FF4F1F;
     font-size-adjust: unset;
 }
 
@@ -146,7 +152,7 @@ button {
     width: 950px;
     height: 60px;
     margin: auto; 
-    margin-bottom: 50px;
+    /* margin-bottom: 50px; */
 }
 
 .progress-bar li {
@@ -196,12 +202,12 @@ button {
 }
 
 .progress-bar li.active::before {
-    color: #34b3dd;
+    color: #FF4F1F;
     content: '✔';
 }
 
 .progress-bar li.active:before {
-    border-color: #34b3dd;
+    border-color: #FF4F1F;
 }
 
 .progress-bar li.active + li:after {
@@ -213,8 +219,8 @@ button {
     font-size: 2em;
     font-weight: bold;
     text-align: center;
-    color: #55A9C6;
-    font-family: "Lato", "HelveticaNeue", "Helvetica", "Arial", sans-serif;
+    color: #FF4F1F;
+    font-family: "Roboto","Lato", "HelveticaNeue", "Helvetica", "Arial", sans-serif;
 }
 
 /* Message-box */
@@ -226,23 +232,23 @@ button {
 }
 
 .message-title{
-    padding: 16px;
+    padding: 10px;
     color: white;
     font-size: 1em;
     font-weight: bold;
     text-align: left;
-    background-color: #4EB3D3; 
+    background-color: #FF4F1F; 
 }
 
 .message-content {
     background-color: #fff;
-    padding: 16px;
+    padding: 10px;
     padding-left: 32px;
     text-align: left;
 }
 
 .overlay{
-    position: absolute; 
+    position: fixed; 
     top: 0;
     left: 0;
     height: 100%;

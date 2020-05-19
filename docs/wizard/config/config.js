@@ -1,18 +1,21 @@
 export default {
+    // clientIDs: {        
+    //     'mypurecloud.com': '26255f2c-6a85-43bf-8d27-7761057bc72d',
+    //     'mypurecloud.ie': '939ab4dd-109f-4120-ba9f-051b973b9ecc',
+    //     'mypurecloud.de': 'aa8efb84-a77f-4c43-8b37-ac0566d9f73e',
+    //     'mypurecloud.com.au': 'c8a4d721-3fbb-4f50-b3e0-aa49bf86ac87',
+    //     'mypurecloud.jp': '28dbeebd-8128-4fe0-8f42-f2eebb767a71',
+    //     'usw2.pure.cloud': '2075921c-a285-4523-91df-7984f1268677'
+    // },
     clientIDs: {        
-        'mypurecloud.com': '26255f2c-6a85-43bf-8d27-7761057bc72d',
-        'mypurecloud.ie': '939ab4dd-109f-4120-ba9f-051b973b9ecc',
-        'mypurecloud.de': 'aa8efb84-a77f-4c43-8b37-ac0566d9f73e',
-        'mypurecloud.com.au': 'c8a4d721-3fbb-4f50-b3e0-aa49bf86ac87',
-        'mypurecloud.jp': '28dbeebd-8128-4fe0-8f42-f2eebb767a71',
-        'usw2.pure.cloud': '2075921c-a285-4523-91df-7984f1268677'
+        'mypurecloud.com': 'e7de8a75-62bb-43eb-9063-38509f8c21af'
     },
-    // 'wizardUriBase': 'http://localhost:8080/wizard/',
-    'wizardUriBase': 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
+    'wizardUriBase': 'http://localhost:8080/wizard/',
+    // 'wizardUriBase': 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
 
     // The actual URL of the landing page of your web app.
-    // 'premiumAppURL': 'http://localhost:8080/premium-app-sample/supervisor.html',
-    'premiumAppURL': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/supervisor.html',
+    'premiumAppURL': 'http://localhost:8080/premium-app-sample/supervisor.html',
+    // 'premiumAppURL': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/supervisor.html',
 
     // PureCloud assigned name for the premium app
     // This should match the integration type name of the Premium App
@@ -34,7 +37,7 @@ export default {
     'setupPermissionsRequired': ['admin'],
 
     // To be added to names of PureCloud objects created by the wizard
-    'prefix': 'PREMIUM_EXAMPLE_',
+    'prefix': 'AppFoundry - ',
 
     // These are the PureCloud items that will be added and provisioned by the wizard
     'provisioningInfo': {
@@ -54,20 +57,16 @@ export default {
         ],
         'group': [
             {
-                'name': 'Agents',
-                'description': 'Agents have access to a widget that gives US state information based on caller\'s number.',
-            },
-            {
                 'name': 'Supervisors',
                 'description': 'Supervisors have the ability to watch a queue for ACD conversations.',
             }
         ],
         'app-instance': [
             {
-                'name': 'Agent Widget',
-                'url': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}',
-                'type': 'widget',
-                'groups': ['Agents']
+                'name': 'Partner Enablement Tools',
+                'url': 'https://genesysappfoundry.github.io/partner-enablement-tools/',
+                'type': 'standalone',
+                'groups': ['Supervisors']
             }
         ],
         'oauth-client': [
