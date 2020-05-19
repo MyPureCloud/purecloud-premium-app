@@ -114,7 +114,7 @@ Going to the page docs/wizard/uninstall.html will run the deprovisioning of the 
 
 ![Apps Menu](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/menu-item.PNG "Apps Menu")
 
-![Partner Enablement Tool](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/partner-enablement-tool.png "Partner Enablement Tool")
+![Partner Enablement Tool](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/partner-enablement-tool.PNG "Partner Enablement Tool")
 
 
 
