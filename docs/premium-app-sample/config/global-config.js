@@ -8,7 +8,7 @@ let appName = 'premium-app-example';
 
 // PREFIX for provisioned PureCloud objects. Used by wizard and other app that
 // test the existence of these objects
-let prefix = 'DEV_ORG_PROVISIONING_TOOL_';
+let prefix = 'PREMIUM_APP_EXAMPLE_';
 
 // Client IDs when testing the app in localhost
 let testClientIDs = {
@@ -17,7 +17,7 @@ let testClientIDs = {
 
 // Client IDs for production
 let prodClientIDs = {
-    'mypurecloud.com': '26255f2c-6a85-43bf-8d27-7761057bc72d',
+    'mypurecloud.com': 'fd2ba742-446f-46c5-bbbc-1cad2f34ac3a',
     'mypurecloud.ie': '939ab4dd-109f-4120-ba9f-051b973b9ecc',
     'mypurecloud.de': 'aa8efb84-a77f-4c43-8b37-ac0566d9f73e',
     'mypurecloud.com.au': 'c8a4d721-3fbb-4f50-b3e0-aa49bf86ac87',
