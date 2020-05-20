@@ -106,13 +106,12 @@ Going to the page docs/wizard/uninstall.html will run the deprovisioning of the 
 ## Sample Premium App Features
 1.	The web page will use an implicit grant to authenticate with PureCloud. 
 
-2. The Dev Org Provisioning Tool is a tool used to provision some of the Genesys Cloud functionalites and easily access some features.
+2. Upon installing, an app instance of the Partner Enablement Tool will also be provisioned. This tool is an automated way to provision telephony to your Genesys Cloud developer org. 
 
-![Home Page](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/landing-page.PNG "Home Page")
+![Apps Menu](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/menu-item.PNG "Apps Menu")
 
-3. Provision Telephony, Download Architect Template and Assign Developer Role are the main funtionalities.
+![Partner Enablement Tool](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/partner-enablement-tool.PNG "Partner Enablement Tool")
 
-![Dev Org Provisioning](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/dev-org-provisioning.PNG "Dev Org Provisioning")
 
 
 <hr>

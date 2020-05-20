@@ -1,0 +1,20 @@
+
+{
+  "author": "Genesys App Foundry",
+  "title": "App Foundry Example Premium App",
+  "logo_url": "https://developer.mypurecloud.com/images/genesys-icon.svg",
+  "categories": [
+    "app foundry",
+    "examples"
+  ],
+  "tags": [
+    "example",
+    "javascript"
+  ],
+  "apis": [
+    "platform"
+  ],
+  "sdks": [
+    "javascript"
+  ]
+}

@@ -45,7 +45,7 @@ footer img {
 }
 
 footer {
-    margin-top: 50px;
+    /* margin-top: 50px; */
     padding-top: 10px;
     border-top: 2px solid #DDDDDD;
     background: #FFF;
@@ -79,13 +79,21 @@ p {
     margin: 12px;
 }
 
-
 .success {
     color: #5D3D5D;
 }
 
 .fail {
     color: #f54141e3;
+}
+
+.txt-available-message {
+    text-align: left;
+}
+
+.reminder-list {
+    text-align: left;
+    padding-left: 30px;
 }
 
 /* Font awesmoe modifiers */
@@ -99,11 +107,11 @@ p {
 }
 
 .sink-more {
-    margin-top:40px;
+    margin-top:25px;
 }
 
 /* Buttons */
-button,button:focus {
+button {
     border-radius: 5px 5px;
     padding: 15px 32px;
     text-align: center;
@@ -114,16 +122,19 @@ button,button:focus {
 }
 
 .btn-info {
-    background-color: #FF4F1F;
-    color: white;
+    background-color:#FF4F1F; 
     border: 1px solid #FF4F1F;
-    border-bottom: 3px solid #FF4F1F;
+    border-radius:25px; 
+    color: #FDFDFD; 
+    border-width: 2px
 }
 
-.btn-info:hover {
+.btn-info:hover, .btn-info:focus {
     background-color:white; 
-    border-color:#FF4F1F; 
+    border: 1px solid #FF4F1F;
+    border-radius:25px; 
     color: #FF4F1F; 
+    border-width: 2px
 }
 
 .right {
@@ -149,7 +160,7 @@ button,button:focus {
     width: 950px;
     height: 60px;
     margin: auto; 
-    margin-bottom: 50px;
+    /* margin-bottom: 50px; */
 }
 
 .progress-bar li {
@@ -229,7 +240,7 @@ button,button:focus {
 }
 
 .message-title{
-    padding: 16px;
+    padding: 10px;
     color: white;
     font-size: 1em;
     font-weight: bold;
@@ -239,13 +250,13 @@ button,button:focus {
 
 .message-content {
     background-color: #fff;
-    padding: 16px;
+    padding: 10px;
     padding-left: 32px;
     text-align: left;
 }
 
 .overlay{
-    position: absolute; 
+    position: fixed; 
     top: 0;
     left: 0;
     height: 100%;

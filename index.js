@@ -1,14 +1,7 @@
-const express = require('express');
-const path = require('path');
-const app = express();
+var express = require('express');
+var app = express();
 
-app.use(express.static(__dirname+ '/docs/'))
+app.use(express.static(__dirname+ '/docs'));
 
-// Routes
-app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname,'docs','index.html'));    
-});
 
-// Port Listen
-app.listen(8080);
-console.log('Running...');
+app.listen(8080, () => console.log('Listening on 8080'));

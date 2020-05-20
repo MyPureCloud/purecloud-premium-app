@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Partner Enablement Tools Wizard</title>
+    <title>Premium App Wizard</title>
 
     <link href='//fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' async type='text/css'>
     <link rel="stylesheet" href="./styles/style.css">
@@ -22,7 +22,7 @@
     </noscript>
 
     <header>
-        <p>Partner Enablement Tools /&nbsp; Home</p>
+        <p>Premium App /&nbsp; Home</p>
     </header>
 
     <div class="content">
@@ -32,7 +32,7 @@
             </span>
             <span id="username"></span>!
             <div class="txt-greeting-2">
-                welcome to the Dev Org Provisioning Tool
+                welcome to the Premium App Example
             </div>
         </div>
 
@@ -48,13 +48,17 @@
             </li>
         </ul>
 
-        <main class="">
-            <div id="available" class="">
+        <main>
+            <div id="available">
                 <p class="success">
                     <span class="txt-product-available">Product Available </span> <i class="fas fa-check-circle enlarge"></i>
                 </p>
-                <p>
-                    <span class="txt-available-message">We're ready to set you up. Please click the Start button.</span>
+                <p class="reminders">
+                    <p class="txt-available-message">Reminders:</p>
+                    <ul class="reminder-list">
+                        <li>Remove the Unistall button in your application</li>
+                        <li>You may redirect to your application by updating the premiumAppURL in the /wizard/config/config.js file</li>
+                    </ul>
                 </p>
                 <button id="next" class="btn-info right">
                     <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i></button>

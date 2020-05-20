@@ -8,7 +8,7 @@
     "txt-reset": "Reset",
     "txt-product-available": "Product Available",
     "txt-product-not-available": "Product not available",
-    "txt-available-message": "We're ready to set you up. Please click the Start button.",
+    "txt-available-message": "Reminders:",
     "txt-not-available-message": "We're sorry but your PureCloud org does not have the Premium App Sample Product enabled. Please contact PureCloud.",
     "txt-install-summary": "These are the steps that will be automatically performed for you!",
     "txt-create-role": "1. Create Role",
