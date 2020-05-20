@@ -204,6 +204,8 @@ function runPageScript(){
                 resolve();
                 break;
             case 'uninstall.html':
+                alert("The uninstall button is for development purposes only. Remove this button before demo.");
+
                 view.showContent();
                 view.showLoadingModal('Uninstalling...');
 

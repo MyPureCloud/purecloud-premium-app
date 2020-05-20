@@ -106,11 +106,7 @@ Going to the page docs/wizard/uninstall.html will run the deprovisioning of the 
 ## Sample Premium App Features
 1.	The web page will use an implicit grant to authenticate with PureCloud. 
 
-2. The supervisor view will allow supervisors to get a real-time look at a specific queue's activity.
-
-![Supervisor View](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/supervisor-view.png "Supervisor View")
-
-3. Upon installing, an app instance of the Partner Enablement Tool will also be provisioned. This tool is an automated way to provision telephony to your Genesys Cloud developer org. 
+2. Upon installing, an app instance of the Partner Enablement Tool will also be provisioned. This tool is an automated way to provision telephony to your Genesys Cloud developer org. 
 
 ![Apps Menu](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/menu-item.PNG "Apps Menu")
 

@@ -7,46 +7,238 @@
     <title>Incoming Conversation</title>
 
     <link href='//fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' async type='text/css'>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="style.css">
-
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>    
-    <script src="https://cdn.jsdelivr.net/npm/chronomouse@2.4.0/chronomouse.2.4.0.min.js"></script>
-    <script src="https://sdk-cdn.mypurecloud.com/client-apps/1.0.0/purecloud-client-app-sdk.js"></script>
-    <script src="https://sdk-cdn.mypurecloud.com/javascript/29.1.0/purecloud-platform-client-v2.min.js"></script>
 </head>
 <body>
-    <h1 id="txtIncomingCall"></h1>
-    <div>
-        <div id="txtName" class="floating field-title"></div>
-        <div id="callerName" class="floating field-value"></div>   
-    </div>
-    <div>
-        <div id="txtNumber" class="floating field-title"></div>
-        <div id="callerNumber" class="floating field-value"></div>   
-    </div>
-    <div>
-        <div id="txtStateInfo" class="floating field-title"></div>
-        <div id="callerArea" class="floating field-value"></div>   
-    </div>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="welcome-text">Welcome to Premium App Client Example!</h1>
+            <p class="uninstall-button">
+                <button class="btn-info btn btn-primary btn-lg left" onclick="window.location='../wizard/uninstall.html'" title="For development purposes only. Remove this button before demo.">
+                    Uninstall Apps
+                </button>
 
-    <script type="module">
-        import clientApp from './client_app.js';
-        
-        // Setup the client app with the redirectUri
-        clientApp.setup("index.html")
+                This button is for development purposes only.
+            </p>
+        </div>
+    </div>
+    <div class="content">
+        <h1 id="purecloud-premium-front-end-app">Your site here</h1>
+        <p>Update the premiumAppURL in the /wizard/config/config.js file to redirect to your application UI.
+            <br>
+            <br>
+            The Uninstall button is for development purposes only and should be removed before the application demo. Failure to remove the button before the demo will result in more turn around time for AppFoundry application listing approval.
+        </p>
+        <br>
+        <hr>
 
-        // Assign text to the page based on language
-        .then(() => {
-            $("#txtIncomingCall").text("\u260E " + clientApp.languageData.IncomingCall);
-            $("#txtName").text(clientApp.languageData.Name + ": ");
-            $("#txtNumber").text(clientApp.languageData.Number + ": ");
-            $("#txtStateInfo").text(clientApp.languageData.StateInfo + ": ");
-        })
+        <h1 id="purecloud-premium-front-end-app">PureCloud Premium Front-End App</h1>
+        <p>This projects contains a sample premium app and an automated on-boarding flow for setting up the app in the PureCloud organization.</p>
+        <br>
+        <h2 id="table-of-contents">Table of Contents</h2>
+        <div>
+            <ul>
+                <li><a href="#purecloud-premium-front-end-app">PureCloud Premium Front-End App</a>
+                    <ul>
+                        <li><a href="#table-of-contents">Table of Contents</a></li>
+                        <li><a href="#what-are-premium-client-applications">What are Premium Client Applications?</a></li>
+                        <li><a href="#github-pages">Github Pages</a></li>
+                        <li><a href="#requirements-to-run">Requirements to run</a></li>
+                        <li><a href="#file-structure">File Structure</a></li>
+                        <li><a href="#running-locally">Running Locally</a></li>
+                        <li><a href="#developer-tutorial">Developer Tutorial</a></li>
+                        <li><a href="#installation-wizard-features">Installation Wizard Features</a></li>
+                        <li><a href="#uninstalling--deprovisioning-the-premium-app">Uninstalling / Deprovisioning the Premium App</a></li>
+                        <li><a href="#sample-premium-app-features">Sample Premium App Features</a></li>
+                    </ul>
+                </li>
+                    <li><a href="#modifying-the-wizard-for-your-premium-app">Modifying the Wizard for your Premium App</a>
+                    <ul>
+                        <li><a href="#technologies">Technologies</a></li>
+                        <li><a href="#configuration-file">Configuration File</a></li>
+                        <li><a href="#styles-and-branding">Styles and Branding</a></li>
+                        <li><a href="#extending-the-functionality">Extending the Functionality</a><ul>
+                        <li><a href="#additional-purecloud-objects">Additional PureCloud objects</a></li>
+                        </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>        
+        <br>
+        <h2 id="what-are-premium-client-applications-">What are Premium Client Applications?</h2>
+        <div>
+            <p><a href="https://developer.mypurecloud.com/appfoundry/premium-client-applications.html">https://developer.mypurecloud.com/appfoundry/premium-client-applications.html</a></p>
+            <p> TL;DR: Premium Client Applications are a type of Custom Client Applications that streamline and automate monetization through PureCloud.</p>
+        </div>
+        <br>
+        <h2 id="github-pages">Github Pages</h2>
+        <div>
+            <p>The Premium App sample is hosted in GH-Pages:
+                <a href="https://mypurecloud.github.io/purecloud-premium-app/">https://mypurecloud.github.io/purecloud-premium-app/</a>
+            </p>
+            <p>The wizard or provisioning tool is located at:
+                <a href="https://mypurecloud.github.io/purecloud-premium-app/wizard/">https://mypurecloud.github.io/purecloud-premium-app/wizard/</a>
+            </p>
+        </div>            
+        <br>
+        <h2 id="requirements-to-run">Requirements to run</h2>
+        <div>
+            <ol>
+                <li>A working PureCloud Org with the &#39;premium-app-example&#39; integration enabled.</li>
+                <li>An admin user that will run the wizard and access the premium app. </li>
+            </ol>
+        </div>            
+        <br>
+        <h2 id="file-structure">File Structure</h2>
+        <div>
+            <p>The entire web app is hosted in Github pages with the root directory being the docs folder.</p>
+            <p>There are two folders inside /docs.</p>
+            <ol>
+                <li>premium-app-sample
+                    <ul>
+                        <li>Contains the sample Premium App.</li>
+                    </ul>
+                </li>
+                <li>wizard
+                    <ul>
+                        <li>Contains the provisioning tool for the Premium App. This is the tool that is required for all Premium Apps. </li>
+                    </ul>
+                </li>
+            </ol>
 
-        // Set-up the Client App SDK for toast interaction
-        .then(() => {
-            clientApp.purecloudClientApi = new window.purecloud.apps.ClientApp({pcEnvironment: clientApp.pcEnv});
-        })
-    </script>
-</body> 
+            <h2 id="running-locally">Running Locally</h2>
+            <p>Run</p>
+            <div class="code-block">
+                node index
+            </div>
+            <p>It should run in localhost:8080</p>
+            <p>If you&#39;re running the sample in a different host or port, then you&#39;ll also need to change the &#39;clientIds&#39; from the config file to one that you&#39;ve created(Implicit Grant Type) in your PureCloud environment. This is so you could add your testing URL in the Authorized Redirect URIs for that OAuth Client.</p>
+            <p>Read More: <a href="https://help.mypurecloud.com/articles/create-an-oauth-client/">https://help.mypurecloud.com/articles/create-an-oauth-client/</a></p>
+        </div>        
+        <br>
+        <h2 id="developer-tutorial">Developer Tutorial</h2>
+        <div>
+            <p>For a more in-depth look into the wizard sample codebase please go to:</p>
+            <p><a href="https://developer.mypurecloud.com/api/tutorials/premium-app-example-wizard/">https://developer.mypurecloud.com/api/tutorials/premium-app-example-wizard/</a></p>
+            
+            <h2 id="installation-wizard-features">Installation Wizard Features</h2>
+            <ol>
+                <li>Includes checking the organization if the Premium App is enabled.</li>
+                <li>Step-by-step procedure of informing the user what the wizard is going to create in the org.</li>
+                <li>Provides a one-step uninstallation that will undo everything the wizard has created/configured.</li>
+            </ol>
+            <p><img src="https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/step-1.png" alt="Step 1" title="Step 1"></p>
+            <p><img src="https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/step-2.png" alt="Step 2" title="Step 2"></p>
+            <p><img src="https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/step-3.png" alt="Step 3" title="Step 3"></p>
+            <p><img src="https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/finish.png" alt="Finish" title="Finish"></p>
+        </div>
+        <br>
+        <h2 id="uninstalling-deprovisioning-the-premium-app">Uninstalling / Deprovisioning the Premium App</h2>
+        <div>
+            <p>Going to the page docs/wizard/uninstall.html will run the deprovisioning of the Prremium App. This means deleting all the PureCloud objects (groups, roles, etc.) that were initially created by the tool. </p>
+        </div>
+        <br>
+        <h2 id="sample-premium-app-features">Sample Premium App Features</h2>
+        <div>
+            <ol>
+                <li>
+                    <p>The web page will use an implicit grant to authenticate with PureCloud. </p>
+                </li>
+                <li>
+                    <p>Upon installing, an app instance of the Partner Enablement Tool will also be provisioned. This tool is an automated way to provision telephony to your Genesys Cloud developer org. </p>
+                    <p><img src="https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/menu-item.PNG" alt="Apps Menu" title="Apps Menu" class="img-app-menu"></p>
+                    <p><img src="https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/partner-enablement-tool.PNG" alt="Partner Enablement Tool" title="Partner Enablement Tool"></p>
+                </li>
+            </ol>            
+        </div>
+        <br>
+        <hr>
+
+        <h1 id="modifying-the-wizard-for-your-premium-app">Modifying the Wizard for your Premium App</h1>
+        <div>
+            <p>By default the wizard app allows you to automatically provision the following PureCloud objects:</p>
+            <ul>
+                <li>Roles</li>
+                <li>Groups</li>
+                <li>Additional Integration Instances</li>
+                <li>Oauth Client</li>
+                <li>Data Tables</li>
+            </ul>
+            <p>Depending on the Premium App&#39;s needs it may need any number of those objects. The only object that is almost always required is a role. At least one role should be created that has the permission for your app. This role will grant users access to to view and use the premium app fom within PureCloud.</p>
+        </div>
+        <br>
+        <h2 id="technologies">Technologies</h2>
+        <div>
+            <p>The Wizard app is mostly built with vanilla HTML, CSS and JS. This makes it independent from any particular libraries.</p>
+        </div>
+        <br>        
+        <h2 id="configuration-file">Configuration File</h2>
+        <div>
+            <p>The configuration file is the SSOT for the entire operation and also contains the details on what items are to be provisioned by the wizard.</p>
+            <div class="code-block">
+                ./docs/wizard/config/config.js
+            </div>            
+            <p>The following values should be modified for production:</p>
+            <ul>
+                <li>Regional client ids for your app to be provided by AppFoundry.</li>
+                <li>wizardUriBase 
+                    <ul>
+                        <li>Uri for the wizard tool.</li>
+                    </ul>
+                </li>
+                <li>premiumAppURL 
+                    <ul>
+                        <li>the landing page of the actual Premium App.</li>
+                    </ul>
+                </li>
+                <li>appName 
+                    <ul>
+                        <li>This is the unique id that is generated for your integration.</li>
+                    </ul>
+                </li>
+                <li>prefix 
+                    <ul>
+                        <li>A string that will be prefixed to all the names of the provisioned PureCloud Objects. It is up to the discretion of the vendor but a good rule of thumb is just use the name of the Premium App itself.</li>
+                    </ul>
+                </li>
+                <li>provisioningInfo
+                    <ul>
+                        <li>An object containing the definition of objects to be created. Please consult the default config file and the sample-order.js for examples on how it should be formatted.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <br>
+        <h2 id="styles-and-branding">Styles and Branding</h2>
+        <div>
+            <p>While the default layout is sufficient for the provisioning process, you are free and encouraged to change elements and styling to reflect your branding.</p>
+            <p>At the very least, Premium Apps are expected to replace the default logo with a logo of their app or company.</p>
+            <p>Image assets</p>
+            <div class="code-block">
+                docs/wizard/assets/img/
+            </div>            
+            <p>CSS</p>
+            <div class="code-block">
+                docs/wizard/styles/style.css
+            </div>            
+        </div>
+        <br>
+        <h2 id="extending-the-functionality">Extending the Functionality</h2>
+        <div>
+            <p>Some apps are simple to set up while some apps may require configuration not natively supported by the wizard tool. For feature requests for the wizard, feel free to open an issue in this Github repo. It would be the discretion of the developers (DevFoundry) whether to approve or reject feature requests.</p>
+        </div>
+        <br>
+        <h3 id="additional-purecloud-objects">Additional PureCloud objects</h3>
+        <div>
+            <p>Aside from the PureCloud Objects listed <a href="#modifying-the-wizard-for-your-premium-app">here</a> you can create additional modules for other PureCloud object types. All of these modules are defined here:</p>
+            <div class="code-block">
+                ./docs/wizard/scripts/modules/
+            </div>
+            <p>Consult the folder README for creating new modules.</p>
+        </div>        
+    </div>
+</body>
 </html>

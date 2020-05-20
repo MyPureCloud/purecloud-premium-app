@@ -79,13 +79,21 @@ p {
     margin: 12px;
 }
 
-
 .success {
     color: #5D3D5D;
 }
 
 .fail {
     color: #f54141e3;
+}
+
+.txt-available-message {
+    text-align: left;
+}
+
+.reminder-list {
+    text-align: left;
+    padding-left: 30px;
 }
 
 /* Font awesmoe modifiers */

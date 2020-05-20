@@ -11,8 +11,8 @@ export default {
     'wizardUriBase': 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
 
     // The actual URL of the landing page of your web app.
-    // 'premiumAppURL': 'http://localhost:8080/premium-app-sample/supervisor.html',
-    'premiumAppURL': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/supervisor.html',
+    // 'premiumAppURL': 'http://localhost:8080/premium-app-sample/index.html',
+    'premiumAppURL': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html',
 
     // PureCloud assigned name for the premium app
     // This should match the integration type name of the Premium App

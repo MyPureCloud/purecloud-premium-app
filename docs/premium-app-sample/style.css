@@ -1,83 +1,47 @@
-/* 
-*   Custom CSS-style adhering to the current (June 2018) version 
-*   of the PureCloud App Foundry Style Guide
-*       Found at: https://developer.mypurecloud.com/partners/
-*/
+html {
+    scroll-behavior: smooth;
+}
+
+.jumbotron {
+    background-image: linear-gradient( to right, #5D3D5D, #FF4F1F);
+    padding: 1rem !important;
+    margin-bottom: 10px !important;
+  }
+
+h1 {
+    color: white !important;
+}
 
 body {
-    color: #0F465D;
+    color: #000000;
     font-family: Roboto,sans-serif !important;
     font-size: 14px;
+    margin: 0px;
 }
 
-div.field-title {
-    color: #5D3D5D;
-    font-size: 18px;
-    width: 100px;
+.welcome-text {
+    font-size: 3.5rem !important;
+    font-weight: 300;
+    line-height: 1.2;
 }
 
-div.field-value {
-    color: #4498B4;
-    text-align: right;
+.container {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
-div.floating{
-    display: inline-block;
-}
-
-.secondary-font {
-    font-family: Roboto,sans-serif;
-}
-
-div.test-area{
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #FFEAEA;
-}
-
-/* Addition to Bulma classes */
-
-h1.title{
-    color: #0F465D;
-}
-
-.subtitle{
-    color: #1997CA;
-}
-
-option{
-    left:0;
-}
-
-table {
-    border-collapse: collapse;
-  }
-  
-  table, th, td {
-    border: 0;
-    font-size: 14px;
-    font-family: Roboto,sans-serif;
-    font-weight: normal;
-    padding-top: 10px;
-    padding-right: 6px;
-    padding-bottom: 10px;
-    padding-left: 6px;
-  }
-  
-  th, td {
-    padding-top: 10px;
-    padding-right: 6px;
-    padding-bottom: 10px;
-    padding-left: 6px;
-  }
-
-  button {
-    border-radius: 5px 5px;
-    padding: 15px 32px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 1em;
-    cursor: pointer;
+.btn {
+    height: 40px;
+    padding: 10px 32px;
+    border-radius: 25px;
+    color: #fff !important;
+    background-color: #FF4F1F !important;
+    border: 2px solid #FF4F1F;
+    font-size: 16px;
+    font-family: Roboto,sans-serif !important;
 }
 
 .btn-info {
@@ -96,55 +60,49 @@ table {
     border-width: 2px;
 }
 
-.right {
-    float: right;
+.uninstall-button {
+    color: white;
 }
 
-.left {
-    float: left;
+.content {
+    margin: 0px 30px;
 }
 
-#txtSubscribe, #ddlQueues {
-    font-family: Roboto,sans-serif;
-    font-size: 16px;
-}
-
-.media-type-filter>span {
+.content h1 {
     color: #000000 !important;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 12px;
-    margin: 0 10px;
-    min-height: 28px;
-    padding: 8px 1px;;
 }
 
-.jumbotron {
-    background-image: linear-gradient( to right, #5D3D5D, #FF4F1F);
-    padding: 1rem !important;
-    margin-bottom: 0px !important;
+a {
+    color: #FF4F1F; 
+    text-decoration: none;
 }
 
-h1{
-    color: white !important;
+a:hover {
+    color: #FF4F1F;
+    text-decoration: underline;
 }
 
-.welcome-text {
-    font-size: 3.5rem !important;
-    font-weight: 300;
-    line-height: 1.2;
+a:visited {
+    color: #5D3E5D;
 }
 
-.container {
-    width: 100%;
-    padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
+img {
+    width: 750px;
+    margin-left: 45px;
+    border: 1px solid #FF4F1F;
 }
 
-.main-content {
-    padding: 0px 25px;
+.img-app-menu {
+    width: 250px;
+}
+
+.code-block {
+    background-color: #D3D3D4;
+    text-align: center;
+    width: 25%;
+    padding: 10px 0px;
+}
+
+pre {
+    margin: 0px !important;
 }
