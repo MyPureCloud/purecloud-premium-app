@@ -1,6 +1,6 @@
 export default {
     clientIDs: {        
-        'mypurecloud.com': 'a4d0372b-918f-4954-a266-f3d9bb5d0ea8',
+        'mypurecloud.com': 'fd2ba742-446f-46c5-bbbc-1cad2f34ac3a',
         'mypurecloud.ie': '939ab4dd-109f-4120-ba9f-051b973b9ecc',
         'mypurecloud.de': 'aa8efb84-a77f-4c43-8b37-ac0566d9f73e',
         'mypurecloud.com.au': 'c8a4d721-3fbb-4f50-b3e0-aa49bf86ac87',
@@ -34,7 +34,7 @@ export default {
     'setupPermissionsRequired': ['admin'],
 
     // To be added to names of PureCloud objects created by the wizard
-    'prefix': 'AppFoundry - ',
+    'prefix': 'PREMIUM_EXAMPLE_',
 
     // These are the PureCloud items that will be added and provisioned by the wizard
     'provisioningInfo': {
