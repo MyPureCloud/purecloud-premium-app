@@ -104,6 +104,8 @@ function setup(){
     .then((user) => {
         userMe = user;
 
+        view.showUserName(user);
+
         return setPageLanguage();
     })  
     .then(() => {

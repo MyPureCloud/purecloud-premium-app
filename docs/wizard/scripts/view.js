@@ -56,4 +56,14 @@ export default {
         elAvailable.style.display = 'none';
         elUnavailable.style.display = '';
     },  
+
+    /**
+     * Show the username of the current user for greeting purposes
+     */
+    showUserName(user){
+        let el = document.getElementById('username');
+        if(el){
+            el.innerText = user.name;
+        }
+    }
 }
