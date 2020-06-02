@@ -165,7 +165,7 @@ button {
 
 .progress-bar li {
     list-style-type: none;
-    width: 33%;
+    width: 25%;
     float: left;
     text-transform: uppercase;
     text-emphasis: 1;

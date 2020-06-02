@@ -159,7 +159,7 @@ function runPageScript(){
                 // Button Handler
                 let elNextBtn = document.getElementById('next');
                 elNextBtn.addEventListener('click', () => {
-                    window.location.href = './install.html';
+                    window.location.href = './custom-setup.html';
                 });
 
                 validateProductAvailability()
@@ -181,6 +181,23 @@ function runPageScript(){
                         resolve();
                     }
                 });
+                break;
+            case 'custom-setup.html':
+                // Button Handler
+                let elSetupBtn = document.getElementById('next');
+                elSetupBtn.addEventListener('click', () => {
+                    window.location.href = './install.html';
+
+                    // view.showLoadingModal('Installing..');
+                    // wizard.install()
+                    // .then(() => {
+                    //     window.location.href = './install.html';
+                    // })
+                    // .catch(e => console.error(e))
+                });
+
+                resolve();
+                view.showContent();
                 break;
             case 'install.html':
                 // Button Handler
