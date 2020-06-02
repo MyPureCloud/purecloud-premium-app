@@ -50,6 +50,7 @@ body {
     border-radius: 25px !important; 
     color: #FF4F1F !important; 
     border-width: 2px !important;
+    outline: none !important;
 }
 
 .btn-info:hover, .btn-info:focus {

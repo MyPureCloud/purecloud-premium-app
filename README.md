@@ -93,15 +93,17 @@ https://developer.mypurecloud.com/api/tutorials/premium-app-example-wizard/
 
 ![Step 3](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/step-3.png "Step 3")
 
+![Step 4](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/step-4.png "Step 4")
+
 ![Finish](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/finish.png "Finish")
 
 
 
 ## Uninstalling / Deprovisioning the Premium App
 
-Going to the page docs/wizard/uninstall.html will run the deprovisioning of the Prremium App. This means deleting all the PureCloud objects (groups, roles, etc.) that were initially created by the tool. 
+Going to the page docs/wizard/uninstall.html will run the deprovisioning of the Premium App. This means deleting all the PureCloud objects (groups, roles, etc.) that were initially created by the tool. 
 
-
+![Uninstall](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/uninstall.png "Uninstall")
 
 ## Sample Premium App Features
 1.	The web page will use an implicit grant to authenticate with PureCloud. 
