@@ -67,7 +67,7 @@ node index
 
 It should run in localhost:8080
 
-If you're running the sample in a different host or port, then you'll also need to change the 'clientIds' from the config file to one that you've created(Implicit Grant Type) in your PureCloud environment. This is so you could add your testing URL in the Authorized Redirect URIs for that OAuth Client.
+If you're running the sample in a different host or port, then you'll also need to change the 'clientID' from the config file to one that you've created(Implicit Grant Type) in your PureCloud environment. This is so you could add your testing URL in the Authorized Redirect URIs for that OAuth Client.
 
 Read More: https://help.mypurecloud.com/articles/create-an-oauth-client/
 
