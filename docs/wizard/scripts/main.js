@@ -50,7 +50,7 @@ function authenticatePureCloud(){
  client.setEnvironment(pcEnvironment);
     client.setPersistSettings(true, appName);
     return client.loginImplicitGrant(
-                config.clientID, 
+                config.clientIDs[pcEnvironment], 
                 config.wizardUriBase + 'index.html'
             );
 }
