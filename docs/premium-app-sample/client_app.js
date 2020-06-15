@@ -59,7 +59,7 @@ clientApp.setup = function(pagePath){
     }
 
 
-    let clientId = appConfig.clientIDs[pcEnv];
+    let clientID = appConfig.clientID;
     clientApp.langTag = langTag;
     clientApp.pcEnv = pcEnv;
 
@@ -67,7 +67,7 @@ clientApp.setup = function(pagePath){
     client.setPersistSettings(true, appConfig.appName);
     client.setEnvironment(pcEnv);
 
-    return client.loginImplicitGrant(clientId, config.basePath + pagePath, appConfig.appName)
+    return client.loginImplicitGrant(clientID, config.basePath + pagePath, appConfig.appName)
     .then(data => {
         console.log(data);
         
