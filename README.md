@@ -12,6 +12,7 @@ This projects contains a sample premium app and an automated on-boarding flow fo
   - [Running Locally](#running-locally)
   - [Developer Tutorial](#developer-tutorial)
   - [Installation Wizard Features](#installation-wizard-features)
+    - [Installed Data Summary](#installed-data-summary)
   - [Uninstalling / Deprovisioning the Premium App](#uninstalling--deprovisioning-the-premium-app)
   - [Sample Premium App Features](#sample-premium-app-features)
 - [Modifying the Wizard for your Premium App](#modifying-the-wizard-for-your-premium-app)
@@ -97,7 +98,11 @@ https://developer.mypurecloud.com/api/tutorials/premium-app-example-wizard/
 
 ![Finish](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/finish.png "Finish")
 
+### Installed Data Summary
 
+After the wizard installation, you can get the summary of the provisioned objects (id and name) in the Notes section of the original Intergration instance. 
+
+![Installed Data](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/installed-data.png "Installed Data")
 
 ## Uninstalling / Deprovisioning the Premium App
 
