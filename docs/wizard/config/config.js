@@ -12,7 +12,7 @@ export default {
     // This should match the integration type name of the Premium App
     // NOTE: During initial development please use ‘premium-app-example’.
     //            Once your premium app is approved an integration type will be created
-    //            by the PureCloud product team and you can update the name at that time.
+    //            by the Genesys Cloud product team and you can update the name at that time.
     'appName': 'premium-app-example',
 
     // Default Values for fail-safe/testing. Shouldn't have to be changed since the app
