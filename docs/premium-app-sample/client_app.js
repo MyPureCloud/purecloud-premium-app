@@ -6,7 +6,7 @@ import config from './config.js';
 
 let clientApp = {}; 
 
-// PureCloud OAuth information
+// Genesys Cloud OAuth information
 const platformClient = require('platformClient');
 const client = platformClient.ApiClient.instance;
 
@@ -17,7 +17,7 @@ const analyticsApi = new platformClient.AnalyticsApi();
 const routingApi = new platformClient.RoutingApi();
 
 
-// Will Authenticate through PureCloud and subscribe to User Conversation Notifications
+// Will Authenticate through Genesys Cloud and subscribe to User Conversation Notifications
 clientApp.setup = function(pagePath){
     const queryString = window.location.search.substring(1);
     const pairs = queryString.split('&');
@@ -63,7 +63,7 @@ clientApp.setup = function(pagePath){
     clientApp.langTag = langTag;
     clientApp.pcEnv = pcEnv;
 
-    // Authenticate via PureCloud
+    // Authenticate via Genesys Cloud
     client.setPersistSettings(true, appConfig.appName);
     client.setEnvironment(pcEnv);
 
@@ -145,11 +145,11 @@ clientApp.onSocketMessage = function(event){
 };
 
 clientApp.toastIncomingCall = function(callerLocation){
-    if(clientApp.hasOwnProperty('purecloudClientApi')){
+    if(clientApp.hasOwnProperty('genesysCloudClientApi')){
         if(clientApp.langTag !== null) {
-            clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language[clientApp.langTag].IncomingCall, clientApp.language[clientApp.langTag].From + ": " + callerLocation);
+            clientApp.genesysCloudClientApi.alerting.showToastPopup(clientApp.language[clientApp.langTag].IncomingCall, clientApp.language[clientApp.langTag].From + ": " + callerLocation);
         } else {
-            clientApp.purecloudClientApi.alerting.showToastPopup(clientApp.language["en-us"].IncomingCall, clientApp.language["en-us"].From + ": " + callerLocation);
+            clientApp.genesysCloudClientApi.alerting.showToastPopup(clientApp.language["en-us"].IncomingCall, clientApp.language["en-us"].From + ": " + callerLocation);
         }        
     }
 };

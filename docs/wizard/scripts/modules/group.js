@@ -4,8 +4,8 @@ const platformClient = require('platformClient');
 const groupsApi = new platformClient.GroupsApi();
 
 /**
- * Gets the existing groups on PureCloud based on Prefix
- * @return {Promise.<Array>} PureCloud Group Objects
+ * Gets the existing groups on Genesys Cloud based on Prefix
+ * @return {Promise.<Array>} Genesys Cloud Group Objects
  */
 function getExisting(){
     // Query bodies
@@ -24,7 +24,7 @@ function getExisting(){
 }
 
 /**
- * Delete existing groups from PureCloud org
+ * Delete existing groups from Genesys Cloud org
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
@@ -46,11 +46,11 @@ function remove(logFunc){
 }
 
 /**
- * Add PureCloud groups based on installation data
+ * Add Genesys Cloud groups based on installation data
  * @param {Function} logFunc logger for messages
  * @param {Object} data the installation data for this type
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
- *                          is the PureCloud object details of that type.
+ *                          is the Genesys Cloud object details of that type.
  */
 function create(logFunc, data){
     let groupPromises = [];

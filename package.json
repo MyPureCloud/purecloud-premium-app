@@ -1,7 +1,7 @@
 {
   "name": "purecloud-premium-app",
   "version": "1.0.0",
-  "description": "PureCloud Premium Front-End App",
+  "description": "Genesys Cloud Premium Front-End App",
   "main": "index.js",
   "directories": {
     "doc": "docs"

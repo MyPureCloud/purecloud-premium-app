@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>PureCloud Supervisor view</title>
+    <title>Genesys Cloud Supervisor view</title>
 
     <link href='//fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' async type='text/css'>
     <link rel="stylesheet" href="style.css">
@@ -132,7 +132,7 @@
         .then(() => {
             clientApp.loadSupervisorView();
         }).then(() => {
-            clientApp.purecloudClientApi = new window.purecloud.apps.ClientApp({
+            clientApp.genesysCloudClientApi = new window.purecloud.apps.ClientApp({
                                             pcEnvironment: clientApp.pcEnv});
         });        
 

@@ -1,14 +1,14 @@
 export default {
-    clientID: 'fd2ba742-446f-46c5-bbbc-1cad2f34ac3a',
+    clientID: 'e7de8a75-62bb-43eb-9063-38509f8c21af',
 
-    // 'wizardUriBase': 'http://localhost:8080/wizard/',
-    'wizardUriBase': 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
+    'wizardUriBase': 'http://localhost:8080/wizard/',
+    // 'wizardUriBase': 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
 
     // The actual URL of the landing page of your web app.
-    // 'premiumAppURL': 'http://localhost:8080/premium-app-sample/index.html',
-    'premiumAppURL': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html',
+    'premiumAppURL': 'http://localhost:8080/premium-app-sample/index.html',
+    // 'premiumAppURL': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html',
 
-    // PureCloud assigned name for the premium app
+    // Genesys Cloud assigned name for the premium app
     // This should match the integration type name of the Premium App
     'appName': 'premium-app-example',
 
@@ -22,15 +22,15 @@ export default {
     // determining language and environment
     // Ex: www.electric-sheep-app.com?language=en-us&environment=mypurecloud.com
     'languageQueryParam': 'language',
-    'pureCloudEnvironmentQueryParam': 'environment',
+    'genesysCloudEnvironmentQueryParam': 'environment',
 
     // Permissions required for running the Wizard App
     'setupPermissionsRequired': ['admin'],
 
-    // To be added to names of PureCloud objects created by the wizard
+    // To be added to names of Genesys Cloud objects created by the wizard
     'prefix': 'PREMIUM_EXAMPLE_',
 
-    // These are the PureCloud items that will be added and provisioned by the wizard
+    // These are the Genesys Cloud items that will be added and provisioned by the wizard
     'provisioningInfo': {
         'role': [
             {
@@ -75,7 +75,7 @@ export default {
                  * NOTE: Finally functions must return a Promise.
                  * For Client Credentials, normally it means
                  * passing the details to the backend.
-                 * @param {Object} installedData the PureCloud resource created
+                 * @param {Object} installedData the Genesys Cloud resource created
                  * @returns {Promise}    
                  */
                 'finally': function(installedData){

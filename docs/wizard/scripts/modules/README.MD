@@ -1,4 +1,4 @@
-A module represents a type of PureCloud resource like a Role, a Group, etc.
+A module represents a type of Genesys Cloud resource like a Role, a Group, etc.
 
 Each module should have one file with the the following functions: getExisting(), remove(), create(), and configure().
 

@@ -5,8 +5,8 @@ const authorizationApi = new platformClient.AuthorizationApi();
 
 
 /**
- * Get existing roles in purecloud based on prefix
- * @returns {Promise.<Array>} PureCloud Roles
+ * Get existing roles in Genesys Cloud based on prefix
+ * @returns {Promise.<Array>} Genesys Cloud Roles
  */
 function getExisting(){
     let authOpts = { 
@@ -18,7 +18,7 @@ function getExisting(){
 }
 
 /**
- * Delete existing roles from PureCloud
+ * Delete existing roles from Genesys Cloud
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
@@ -40,11 +40,11 @@ function remove(logFunc){
 }
 
 /**
- * Add PureCLoud roles based on installation data
+ * Add Genesys Cloud roles based on installation data
  * @param {Function} logFunc logger for messages
  * @param {Object} data the installation data for this type
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
- *                          is the PureCloud object details of that type.
+ *                          is the Genesys Cloud object details of that type.
  */
 function create(logFunc, data){
     let rolePromises = [];

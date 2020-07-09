@@ -3,10 +3,10 @@ let isTestEnvironment = false;
 
 console.log(`Running in ${isTestEnvironment ? 'TEST' : 'PROD'} environment`);
 
-// PureCloud Integration type name for this app 
+// Genesys Cloud Integration type name for this app 
 let appName = 'premium-app-example';
 
-// PREFIX for provisioned PureCloud objects. Used by wizard and other app that
+// PREFIX for provisioned Genesys Cloud objects. Used by wizard and other app that
 // test the existence of these objects
 let prefix = 'PREMIUM_APP_EXAMPLE_';
 

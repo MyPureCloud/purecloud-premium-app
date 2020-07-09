@@ -9,7 +9,7 @@
     "txt-product-available": "Producto disponible",
     "txt-product-not-available": "Producto no disponible",
     "txt-available-message": "Estamos listos para configurarlo. Haga clic en el botón Inicio",
-    "txt-not-available-message": "Lo lamentamos, pero su organización de PureCloud no tiene habilitado el producto de muestra de la aplicación premium. Póngase en contacto con PureCloud.",
+    "txt-not-available-message": "Lo lamentamos, pero su organización de Genesys Cloud no tiene habilitado el producto de muestra de la aplicación premium. Póngase en contacto con Genesys Cloud.",
     "txt-install-summary": "¡Estos son los pasos que se realizarán automáticamente para usted!",
     "txt-create-role": "1. Crear rol",
     "txt-create-role-msg": "crea un rol específicamente para proporcionar acceso a la aplicación",

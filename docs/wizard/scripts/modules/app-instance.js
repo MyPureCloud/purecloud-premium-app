@@ -6,7 +6,7 @@ const integrationsApi = new platformClient.IntegrationsApi();
 
 /**
  * Get existing apps based on the prefix
- * @returns {Promise.<Array>} PureCloud Integrations
+ * @returns {Promise.<Array>} Genesys Cloud Integrations
  */
 function getExisting(){
     let integrationsOpts = {
@@ -46,11 +46,11 @@ function remove(logFunc){
 }
 
 /**
- * Add PureCLoud instances based on installation data
+ * Add Genesys Cloud instances based on installation data
  * @param {Function} logFunc logger for messages
  * @param {Object} data the installation data for this type
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
- *                          is the PureCloud object details of that type.
+ *                          is the Genesys Cloud object details of that type.
  */
 function create(logFunc, data){
     let integrationPromises = [];

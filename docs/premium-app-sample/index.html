@@ -25,7 +25,7 @@
         </div>
     </div>
     <div class="content">
-        <h1 id="purecloud-premium-front-end-app">Your site here</h1>
+        <h1 id="genesys-cloud-premium-front-end-app">Your site here</h1>
         <p>Update the premiumAppURL in the /wizard/config/config.js file to redirect to your application UI.
             <br>
             <br>
@@ -34,13 +34,13 @@
         <br>
         <hr>
 
-        <h1 id="purecloud-premium-front-end-app">PureCloud Premium Front-End App</h1>
-        <p>This projects contains a sample premium app and an automated on-boarding flow for setting up the app in the PureCloud organization.</p>
+        <h1 id="genesys-cloud-premium-front-end-app">Genesys Cloud Premium Front-End App</h1>
+        <p>This projects contains a sample premium app and an automated on-boarding flow for setting up the app in the Genesys Cloud organization.</p>
         <br>
         <h2 id="table-of-contents">Table of Contents</h2>
         <div>
             <ul>
-                <li><a href="#purecloud-premium-front-end-app">PureCloud Premium Front-End App</a>
+                <li><a href="#genesys-cloud-premium-front-end-app">Genesys Cloud Premium Front-End App</a>
                     <ul>
                         <li><a href="#table-of-contents">Table of Contents</a></li>
                         <li><a href="#what-are-premium-client-applications">What are Premium Client Applications?</a></li>
@@ -60,7 +60,7 @@
                         <li><a href="#configuration-file">Configuration File</a></li>
                         <li><a href="#styles-and-branding">Styles and Branding</a></li>
                         <li><a href="#extending-the-functionality">Extending the Functionality</a><ul>
-                        <li><a href="#additional-purecloud-objects">Additional PureCloud objects</a></li>
+                        <li><a href="#additional-genesys-cloud-objects">Additional Genesys Cloud objects</a></li>
                         </ul>
                         </li>
                     </ul>
@@ -71,7 +71,7 @@
         <h2 id="what-are-premium-client-applications-">What are Premium Client Applications?</h2>
         <div>
             <p><a href="https://developer.mypurecloud.com/appfoundry/premium-client-applications.html">https://developer.mypurecloud.com/appfoundry/premium-client-applications.html</a></p>
-            <p> TL;DR: Premium Client Applications are a type of Custom Client Applications that streamline and automate monetization through PureCloud.</p>
+            <p> TL;DR: Premium Client Applications are a type of Custom Client Applications that streamline and automate monetization through Genesys Cloud.</p>
         </div>
         <br>
         <h2 id="github-pages">Github Pages</h2>
@@ -87,7 +87,7 @@
         <h2 id="requirements-to-run">Requirements to run</h2>
         <div>
             <ol>
-                <li>A working PureCloud Org with the &#39;premium-app-example&#39; integration enabled.</li>
+                <li>A working Genesys Cloud Org with the &#39;premium-app-example&#39; integration enabled.</li>
                 <li>An admin user that will run the wizard and access the premium app. </li>
             </ol>
         </div>            
@@ -115,7 +115,7 @@
                 node index
             </div>
             <p>It should run in localhost:8080</p>
-            <p>If you&#39;re running the sample in a different host or port, then you&#39;ll also need to change the &#39;clientID&#39; from the config file to one that you&#39;ve created(Implicit Grant Type) in your PureCloud environment. This is so you could add your testing URL in the Authorized Redirect URIs for that OAuth Client.</p>
+            <p>If you&#39;re running the sample in a different host or port, then you&#39;ll also need to change the &#39;clientID&#39; from the config file to one that you&#39;ve created(Implicit Grant Type) in your Genesys Cloud environment. This is so you could add your testing URL in the Authorized Redirect URIs for that OAuth Client.</p>
             <p>Read More: <a href="https://help.mypurecloud.com/articles/create-an-oauth-client/">https://help.mypurecloud.com/articles/create-an-oauth-client/</a></p>
         </div>        
         <br>
@@ -139,7 +139,7 @@
         <br>
         <h2 id="uninstalling-deprovisioning-the-premium-app">Uninstalling / Deprovisioning the Premium App</h2>
         <div>
-            <p>Going to the page docs/wizard/uninstall.html will run the deprovisioning of the Premium App. This means deleting all the PureCloud objects (groups, roles, etc.) that were initially created by the tool. </p>
+            <p>Going to the page docs/wizard/uninstall.html will run the deprovisioning of the Premium App. This means deleting all the Genesys Cloud objects (groups, roles, etc.) that were initially created by the tool. </p>
             <p><img src="https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/uninstall.png" alt="Uninstall" title="Uninstall"></p>
         </div>
         <br>
@@ -147,7 +147,7 @@
         <div>
             <ol>
                 <li>
-                    <p>The web page will use an implicit grant to authenticate with PureCloud. </p>
+                    <p>The web page will use an implicit grant to authenticate with Genesys Cloud. </p>
                 </li>
                 <li>
                     <p>Upon installing, an app instance of the Partner Enablement Tool will also be provisioned. This tool is an automated way to provision telephony to your Genesys Cloud developer org. </p>
@@ -161,7 +161,7 @@
 
         <h1 id="modifying-the-wizard-for-your-premium-app">Modifying the Wizard for your Premium App</h1>
         <div>
-            <p>By default the wizard app allows you to automatically provision the following PureCloud objects:</p>
+            <p>By default the wizard app allows you to automatically provision the following Genesys Cloud objects:</p>
             <ul>
                 <li>Roles</li>
                 <li>Groups</li>
@@ -169,7 +169,7 @@
                 <li>Oauth Client</li>
                 <li>Data Tables</li>
             </ul>
-            <p>Depending on the Premium App&#39;s needs it may need any number of those objects. The only object that is almost always required is a role. At least one role should be created that has the permission for your app. This role will grant users access to to view and use the premium app fom within PureCloud.</p>
+            <p>Depending on the Premium App&#39;s needs it may need any number of those objects. The only object that is almost always required is a role. At least one role should be created that has the permission for your app. This role will grant users access to to view and use the premium app fom within Genesys Cloud.</p>
         </div>
         <br>
         <h2 id="technologies">Technologies</h2>
@@ -203,7 +203,7 @@
                 </li>
                 <li>prefix 
                     <ul>
-                        <li>A string that will be prefixed to all the names of the provisioned PureCloud Objects. It is up to the discretion of the vendor but a good rule of thumb is just use the name of the Premium App itself.</li>
+                        <li>A string that will be prefixed to all the names of the provisioned Genesys Cloud Objects. It is up to the discretion of the vendor but a good rule of thumb is just use the name of the Premium App itself.</li>
                     </ul>
                 </li>
                 <li>provisioningInfo
@@ -233,9 +233,9 @@
             <p>Some apps are simple to set up while some apps may require configuration not natively supported by the wizard tool. For feature requests for the wizard, feel free to open an issue in this Github repo. It would be the discretion of the developers (DevFoundry) whether to approve or reject feature requests.</p>
         </div>
         <br>
-        <h3 id="additional-purecloud-objects">Additional PureCloud objects</h3>
+        <h3 id="additional-genesys-cloud-objects">Additional Genesys Cloud objects</h3>
         <div>
-            <p>Aside from the PureCloud Objects listed <a href="#modifying-the-wizard-for-your-premium-app">here</a> you can create additional modules for other PureCloud object types. All of these modules are defined here:</p>
+            <p>Aside from the Genesys Cloud Objects listed <a href="#modifying-the-wizard-for-your-premium-app">here</a> you can create additional modules for other Genesys Cloud object types. All of these modules are defined here:</p>
             <div class="code-block">
                 ./docs/wizard/scripts/modules/
             </div>

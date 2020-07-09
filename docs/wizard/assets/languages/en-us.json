@@ -10,7 +10,7 @@
     "txt-product-available": "Product Available",
     "txt-product-not-available": "Product not available",
     "txt-available-message": "Reminders:",
-    "txt-not-available-message": "We're sorry but your PureCloud org does not have the Premium App Sample Product enabled. Please contact PureCloud.",
+    "txt-not-available-message": "We're sorry but your Genesys Cloud org does not have the Premium App Sample Product enabled. Please contact Genesys Cloud.",
     "txt-install-summary": "These are the steps that will be automatically performed for you!",
     "txt-create-role": "1. Create Role",
     "txt-create-role-msg": "Create a role specifically to provide access to the app.",
