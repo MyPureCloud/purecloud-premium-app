@@ -58,19 +58,9 @@ export default {
         'app-instance': [
             {
                 'name': 'Partner Enablement Tools',
-                'url': 'https://genesysappfoundry.github.io/partner-enablement-tools/index.html',
+                'url': 'https://genesysappfoundry.github.io/partner-enablement-tools/index.html?language={{pcLangTag}}&environment={{pcEnvironment}}',
                 'type': 'standalone',
-                'groups': ['Supervisors'],
-                /* 
-                For the properties below, if set to true, will add the query 
-                parameter with the same value as the one set on the wizard.
-                Ex: 
-                Final URL: https://someapp?environment=mypurecloud.com&language=en-us
-                */
-                'addEnvironmentQueryParam': true,
-                'environmentParamName': 'environment',
-                'addLanguageQueryParam': true,
-                'languageParamName': 'language',
+                'groups': ['Supervisors']
             }
         ],
         'oauth-client': [
