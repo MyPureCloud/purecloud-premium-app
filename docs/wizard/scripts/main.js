@@ -15,10 +15,8 @@ const integrationsApi = new platformClient.IntegrationsApi();
 const appName = config.appName;
         
 // Variables
-let pcLanguage = localStorage.getItem(appName + ':language') ||
-                    config.defaultLanguage;
-let pcEnvironment = localStorage.getItem(appName + ':environment') ||
-                    config.defaultPcEnvironment;
+let pcLanguage;
+let pcEnvironment;
 let clientApp = null;
 let userMe = null;
 let integrationId = '';
@@ -45,23 +43,26 @@ function getIntegrationId(){
 }   
 
 /**
- * Get query parameters for language and Genesys Cloud region
+ * Set values for environment and language, prioritizng values on the query
+ * parameters
  */
-function queryParamsConfig(){
+function setDynamicParameters(){
     // Get Query Parameters
     const urlParams = new URLSearchParams(window.location.search);
     let tempLanguage = urlParams.get(config.languageQueryParam);
     let tempPcEnv = urlParams.get(config.genesysCloudEnvironmentQueryParam); 
 
-    // Override default and storage items with what's on search query
-    if(tempLanguage){
-        pcLanguage = tempLanguage;
-        localStorage.setItem(appName + ':language', pcLanguage);
-    }
-    if(tempPcEnv){
-        pcEnvironment = tempPcEnv;
-        localStorage.setItem(appName + ':environment', pcEnvironment);
-    }
+    // Language
+    pcLanguage = tempLanguage || 
+                localStorage.getItem(appName + ':language') ||
+                config.defaultLanguage;
+    localStorage.setItem(appName + ':language', pcLanguage);
+
+    // Environment
+    pcEnvironment = tempPcEnv ||
+                    localStorage.getItem(appName + ':environment') ||
+                    config.defaultPcEnvironment;
+    localStorage.setItem(appName + ':environment', pcEnvironment);
 }
 
 /**
@@ -112,8 +113,8 @@ function setup(){
     view.showLoadingModal('Loading...');
     view.hideContent();
 
-    queryParamsConfig();
-    
+    setDynamicParameters();
+
     // Setup Client App
     clientApp = new ClientApp({
         pcEnvironment: pcEnvironment

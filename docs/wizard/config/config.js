@@ -2,39 +2,39 @@ export default {
     clientID: 'e7de8a75-62bb-43eb-9063-38509f8c21af',
 
     // 'wizardUriBase': 'http://localhost:8080/wizard/',
-    'wizardUriBase': 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
+    wizardUriBase: 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
 
     // The actual URL of the landing page of your web app.
     // 'premiumAppURL': 'http://localhost:8080/premium-app-sample/index.html',
-    'premiumAppURL': 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html',
+    premiumAppURL: 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html',
 
     // Genesys Cloud assigned name for the premium app
     // This should match the integration type name of the Premium App
     // NOTE: During initial development please use ‘premium-app-example’.
     //            Once your premium app is approved an integration type will be created
     //            by the Genesys Cloud product team and you can update the name at that time.
-    'appName': 'premium-app-example',
+    appName: 'premium-app-example',
 
     // Default Values for fail-safe/testing. Shouldn't have to be changed since the app
     // must be able to determine the environment from the query parameter 
     // of the integration's URL
-    'defaultPcEnvironment': 'mypurecloud.com',
-    'defaultLanguage': 'en-us',
+    defaultPcEnvironment: 'mypurecloud.com',
+    defaultLanguage: 'en-us',
 
     // The names of the query parameters to check in 
     // determining language and environment
     // Ex: www.electric-sheep-app.com?language=en-us&environment=mypurecloud.com
-    'languageQueryParam': 'language',
-    'genesysCloudEnvironmentQueryParam': 'environment',
+    languageQueryParam: 'language',
+    genesysCloudEnvironmentQueryParam: 'environment',
 
     // Permissions required for running the Wizard App
-    'setupPermissionsRequired': ['admin'],
+    setupPermissionsRequired: ['admin'],
 
     // To be added to names of Genesys Cloud objects created by the wizard
-    'prefix': 'PREMIUM_EXAMPLE_',
+    prefix: 'PREMIUM_EXAMPLE_',
 
     // These are the Genesys Cloud items that will be added and provisioned by the wizard
-    'provisioningInfo': {
+    provisioningInfo: {
         'role': [
             {
                 'name': 'Role',
@@ -58,9 +58,19 @@ export default {
         'app-instance': [
             {
                 'name': 'Partner Enablement Tools',
-                'url': 'https://genesysappfoundry.github.io/partner-enablement-tools/',
+                'url': 'https://genesysappfoundry.github.io/partner-enablement-tools/index.html',
                 'type': 'standalone',
-                'groups': ['Supervisors']
+                'groups': ['Supervisors'],
+                /* 
+                For the properties below, if set to true, will add the query 
+                parameter with the same value as the one set on the wizard.
+                Ex: 
+                Final URL: https://someapp?environment=mypurecloud.com&language=en-us
+                */
+                'addEnvironmentQueryParam': true,
+                'environmentParamName': 'environment',
+                'addLanguageQueryParam': true,
+                'languageParamName': 'language',
             }
         ],
         'oauth-client': [

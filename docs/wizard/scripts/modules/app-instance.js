@@ -98,12 +98,30 @@ function configure(logFunc, installedData, userId){
         let appInstanceInstall =  instanceInstallationData
                                             .find((a) => a.name == instanceKey);
 
+        // Build final url of the integration
+        let url = new URL(appInstanceInstall.url);
+        let tempParams = '';
+        if(appInstanceInstall.addEnvironmentQueryParam){
+            let val = localStorage.getItem(appName + ':environment');
+            tempParams += appInstanceInstall.environmentParamName + '=' + val;
+        }
+        if(appInstanceInstall.addLanguageQueryParam){
+            let val = localStorage.getItem(appName + ':language');
+            tempParams += '&' + appInstanceInstall.languageParamName + '=' + val;
+        }
+        
+        if(url.search.length > 0){
+            url.search += '&' + tempParams;
+        } else {
+            url.search = '?' + tempParams;
+        }
+
         let integrationConfig = {
             body: {
                 name: config.prefix + instanceKey,
                 version: 1, 
                 properties: {
-                    url: appInstanceInstall.url,
+                    url: url.toString(),
                     sandbox: 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts',
                     displayType: appInstanceInstall.type,
                     featureCategory: '', 
