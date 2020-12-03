@@ -36,9 +36,10 @@ function getIntegrationId(){
             if(pa_instance){
                 resolve(pa_instance.id);
             }else{
-                reject('Integration ID not found.')
+                resolve(null);
             }
         })
+        .catch(err => reject(err))
     });
 }   
 
@@ -93,16 +94,36 @@ function getUserDetails(){
  * @returns {Promise}
  */
 function validateProductAvailability(){      
-    return integrationsApi.getIntegrationsTypes({})
-    .then((data) => {
-        if (data.entities.filter((integType) => integType.id === appName)[0]){
-            console.log("PRODUCT AVAILABLE");
-            return(true);
+    let integrationTypes = []
+
+    // Internal recursive function for calling 
+    // next pages (if any) of the integration types
+    let _getIntegrationTypes = (pageNum) => {
+        return integrationsApi.getIntegrationsTypes({
+            pageSize: 100,
+            pageNumber: pageNum
+        })
+        .then((data) => {
+            data.entities.forEach(integrationType => 
+                integrationTypes.push(integrationType));
+            
+            if(data.nextUri){
+                return _getIntegrationTypes(pageNum + 1);
+            }
+        });
+    }
+
+    return _getIntegrationTypes(1)
+    .then(() => {
+        if (integrationTypes.filter((integType) => integType.id === appName)[0]){
+            console.log('PRODUCT AVAILABLE');
+            return true;
         } else {
-            console.log("PRODUCT NOT AVAILABLE");
-            return(false);
+            console.log('PRODUCT NOT AVAILABLE');
+            return false;
         }
-    });
+    })
+    .catch(e => console.error(e)); 
 }
 
 /**
