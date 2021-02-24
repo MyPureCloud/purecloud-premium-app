@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\docs",
+    "\\docs\\wizard",
+    "\\docs\\wizard\\assets",
+    "\\docs\\wizard\\config",
+    "\\docs\\wizard\\scripts",
+    "\\docs\\wizard\\scripts\\modules",
+    "\\docs\\wizard\\styles",
+    "\\https-requirements",
+    "\\screenshots"
+  ],
+  "SelectedNode": "\\docs\\wizard\\scripts\\main.js",
+  "PreviewInSolutionExplorer": false
+}
