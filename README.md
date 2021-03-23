@@ -149,7 +149,7 @@ The following values should be modified for production:
 - prefix
   - A string that will be prefixed to all the names of the provisioned Genesys Cloud Objects. It is up to the discretion of the vendor but a good rule of thumb is just use the name of the Premium App itself.
 - provisioningInfo
-  - An object containing the definition of objects to be created. Please consult the default config file and the sample-order.js for examples on how it should be formatted.
+  - An object containing the definition of objects to be created. Please consult the default config file and the sample-provisioning-info.js for examples on how it should be formatted.
 
 ## Styles and Branding
 
