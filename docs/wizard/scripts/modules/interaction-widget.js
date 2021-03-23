@@ -4,9 +4,9 @@ const platformClient = require('platformClient');
 const integrationsApi = new platformClient.IntegrationsApi();
 
 
-/**
- * Get existing apps based on the prefix
- * @returns {Promise.<Array>} Genesys Cloud Integrations
+ /**
+ * Get existing authetication clients based on the prefix
+ * @returns {Promise.<Array>} Array of Genesys Cloud OAuth Clients
  */
 function getExisting(){
     let integrationsOpts = {
@@ -16,11 +16,11 @@ function getExisting(){
     return integrationsApi.getIntegrations(integrationsOpts)
     .then((data) => {
         return(data.entities
-                .filter(entity => {
-                    return entity.integrationType.id == config.appName && 
-                            entity.name.startsWith(config.prefix);
-                }));
-    });  
+            .filter(entity => {
+                return entity.integrationType.id == 'embedded-client-app-interaction-widget' && 
+                        entity.name.startsWith(config.prefix);
+            }));
+    }); 
 }
 
 /**
@@ -29,7 +29,7 @@ function getExisting(){
  * @returns {Promise}
  */
 function remove(logFunc){
-    logFunc('Uninstalling Other App Instances...');
+    logFunc('Uninstalling Interaction Widgets...');
 
     return getExisting()
     .then(apps => {
@@ -47,6 +47,7 @@ function remove(logFunc){
     });
 }
 
+
 /**
  * Add Genesys Cloud instances based on installation data
  * @param {Function} logFunc logger for messages
@@ -54,7 +55,7 @@ function remove(logFunc){
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
  *                          is the Genesys Cloud object details of that type.
  */
-function create(logFunc, data){
+ function create(logFunc, data){
     let integrationPromises = [];
     let enableIntegrationPromises = [];
     let integrationsData = {};
@@ -63,7 +64,7 @@ function create(logFunc, data){
         let integrationBody = {
             body: {
                 integrationType: {
-                    id: config.appName
+                    id: 'embedded-client-app-interaction-widget'
                 }
             }
         };
@@ -72,7 +73,7 @@ function create(logFunc, data){
         integrationPromises.push(
             integrationsApi.postIntegrations(integrationBody)
             .then((data) => {
-                logFunc("Created instance: " + instance.name);
+                logFunc('Created instance: ' + instance.name);
                 integrationsData[instance.name] = data;
             })
         );
@@ -90,8 +91,8 @@ function create(logFunc, data){
  * @param {String} userId User id if needed
  */
 function configure(logFunc, installedData, userId){
-    let instanceInstallationData = config.provisioningInfo['app-instance'];
-    let appInstancesData = installedData['app-instance'];
+    let instanceInstallationData = config.provisioningInfo['interaction-widget'];
+    let appInstancesData = installedData['interaction-widget'];
 
     let promisesArr = [];
 
@@ -106,10 +107,13 @@ function configure(logFunc, installedData, userId){
                 version: 1, 
                 properties: {
                     url: appInstanceInstall.url,
-                    sandbox: appInstanceInstall.sandbox || 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts', 
-                    displayType: appInstanceInstall.type || 'standalone',
-                    featureCategory: '', 
-                    groupFilter: appInstanceInstall
+                    sandbox: appInstanceInstall.sandbox || 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts',
+                    queueIdFilterList: [],
+                    communicationTypeFilter: appInstanceInstall
+                            .communicationTypeFilter ? 
+                                    appInstanceInstall.communicationTypeFilter :
+                                    '',
+                    groups: appInstanceInstall
                                     .groups.map((groupName) => 
                                         installedData.group[groupName].id)
                                     .filter(g => g != undefined)
@@ -145,7 +149,7 @@ function configure(logFunc, installedData, userId){
 }
 
 export default {
-    provisioningInfoKey: 'app-instance',
+    provisioningInfoKey: 'interaction-widget',
 
     getExisting: getExisting,
     remove: remove,

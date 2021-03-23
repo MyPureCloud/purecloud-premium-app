@@ -7,6 +7,7 @@ import groupModule from './modules/group.js';
 import appInstanceModule from './modules/app-instance.js';
 import OAuthClientModule from './modules/oauth-client.js';
 import dataTableModule from './modules/data-table.js';
+import interactionWidget from './modules/interaction-widget.js';
 
 // Add new modules here
 // This will later be filtered in setup() to only use
@@ -16,7 +17,8 @@ let modules = [
     groupModule, 
     appInstanceModule, 
     OAuthClientModule,
-    dataTableModule
+    dataTableModule,
+    interactionWidget
 ];
 
 const jobOrder = config.provisioningInfo;
