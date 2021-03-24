@@ -1,3 +1,5 @@
+import config from '../config/config.js';
+
 const elLoadingModal = document.getElementById('loading-modal');
 
 export default {
@@ -64,6 +66,14 @@ export default {
         let el = document.getElementById('username');
         if(el){
             el.innerText = user.name;
+        }
+    },
+
+
+    setupPage(){
+        if(!config.enableCustomSetup){
+            document.getElementById('progress-custom-setup')
+                .style.display = 'none';
         }
     }
 }

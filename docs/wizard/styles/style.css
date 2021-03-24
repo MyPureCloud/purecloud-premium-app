@@ -155,17 +155,18 @@ button {
 
 /* Progress */
 .progress-bar {
+    display: flex;
+    justify-content: center;
+
     color: #4C4C4C;
     counter-reset: step;
-    width: 950px;
     height: 60px;
     margin: auto; 
-    /* margin-bottom: 50px; */
 }
 
 .progress-bar li {
     list-style-type: none;
-    width: 25%;
+    width: 15%;
     float: left;
     text-transform: uppercase;
     text-emphasis: 1;
