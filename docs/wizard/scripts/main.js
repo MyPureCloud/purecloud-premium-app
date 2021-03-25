@@ -29,7 +29,7 @@ let integrationId = '';
  */
 function getIntegrationId(){
     return new Promise((resolve, reject) => {
-        integrationsApi.getIntegrationsClientapps({pageSize: 100})
+        integrationsApi.getIntegrationsClientapps({pageSize: 1000})
         .then((data) => {
             let instances = data.entities;
             let pa_instance = instances.find(instance => instance.integrationType.id == config.appName);
@@ -71,7 +71,7 @@ function setDynamicParameters(){
  * @returns {Promise} login info
  */
 function authenticateGenesysCloud(){
- client.setEnvironment(pcEnvironment);
+    client.setEnvironment(pcEnvironment);
     client.setPersistSettings(true, appName);
     return client.loginImplicitGrant(
                 config.clientID, 
@@ -132,6 +132,7 @@ function validateProductAvailability(){
  */
 function setup(){
     view.showLoadingModal('Loading...');
+    view.setupPage();
     view.hideContent();
 
     setDynamicParameters();
@@ -208,7 +209,11 @@ function runPageScript(){
                 // Button Handler
                 let elNextBtn = document.getElementById('next');
                 elNextBtn.addEventListener('click', () => {
-                    window.location.href = './custom-setup.html';
+                    if(config.enableCustomSetup){
+                        window.location.href = './custom-setup.html';
+                    } else {
+                        window.location.href = './install.html';
+                    }
                 });
 
                 validateProductAvailability()

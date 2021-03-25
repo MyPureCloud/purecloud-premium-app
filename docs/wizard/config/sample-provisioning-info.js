@@ -45,6 +45,14 @@ let sample = {
             'groups': ['Supervisors']
         }
     ],
+    'interaction-widget': [
+        {
+            'name': 'Interaction Widget',
+            'url': 'https://app-website.com/?conversationid={{pcConversationId}}&lang={{pcLangTag}}&environment={{pcEnvironment}}',
+            'groups': ['Agents'],
+            'communicationTypeFilter': 'chat, call, email'
+        }
+    ],
     'data-table': [
         {
             'name': 'Data Table',
