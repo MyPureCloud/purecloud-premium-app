@@ -30,6 +30,10 @@ export default {
     // Permissions required for running the Wizard App
     setupPermissionsRequired: ['admin'],
 
+    // Enable the optional 'Step 2' in the porivisoning process
+    // If false, it will not show the page or the step in the wizard
+    enableCustomSetup: true,
+
     // To be added to names of Genesys Cloud objects created by the wizard
     prefix: 'PREMIUM_EXAMPLE_',
 
