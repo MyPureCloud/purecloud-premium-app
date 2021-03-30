@@ -71,9 +71,9 @@ export default {
 
 
     setupPage(){
-        if(!config.enableCustomSetup){
-            document.getElementById('progress-custom-setup')
-                .style.display = 'none';
+        if(!config.enableCustomSetup && document.getElementById('progress-custom-setup')){
+                document.getElementById('progress-custom-setup')
+                    .style.display = 'none';
         }
     }
 }
