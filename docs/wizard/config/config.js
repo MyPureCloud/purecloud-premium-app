@@ -29,8 +29,8 @@ export default {
 
     // The names of the query parameters to check in 
     // determining language and environment
-    // Ex: www.electric-sheep-app.com?language=en-us&environment=mypurecloud.com
-    languageQueryParam: 'language',
+    // Ex: www.electric-sheep-app.com?langTag=en-us&environment=mypurecloud.com
+    languageQueryParam: 'langTag',
     genesysCloudEnvironmentQueryParam: 'environment',
 
     // Permissions required for running the Wizard App
