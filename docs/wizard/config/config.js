@@ -15,6 +15,12 @@ export default {
     //            by the Genesys Cloud product team and you can update the name at that time.
     appName: 'premium-app-example',
 
+    // The minimum permission required for a user to access the Premium App.
+    // NOTE: During initial development please use the default permission 
+    //      'integration:examplePremiumApp:view'. Once your premium app is approved,
+    //      the unique integration domain will be generated and this must be updated.
+    viewPermission: 'integration:examplePremiumApp:view',
+
     // Default Values for fail-safe/testing. Shouldn't have to be changed since the app
     // must be able to determine the environment from the query parameter 
     // of the integration's URL

@@ -229,7 +229,11 @@ function runPageScript(){
                 // Check if has an existing installation
                 .then((exists) => {
                     if(exists) {
-                       window.location.href = config.premiumAppURL;
+                        if(!userMe.authorization.permissions.includes(config.viewPermission)){
+                            window.location.href = './unlicensed.html';
+                        } else {
+                            window.location.href = config.premiumAppURL;
+                        }
                     } else {
                         view.showContent();
                         resolve();
