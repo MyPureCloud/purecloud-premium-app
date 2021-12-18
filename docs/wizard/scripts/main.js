@@ -12,80 +12,58 @@ const usersApi = new platformClient.UsersApi();
 const integrationsApi = new platformClient.IntegrationsApi();
 
 // Constants
-const appName = config.appName;
-        
+const premiumAppIntegrationTypeId = config.premiumAppIntegrationTypeId;
+
 // Variables
 let pcLanguage;
 let pcEnvironment;
 let clientApp = null;
 let userMe = null;
-let integrationId = '';
 
-/**
- * Get ID of the integration so the description can be edited containing
- * the installed data. Currently gets the first one from the result.
- * Does not support multiple integration instances yet.
- * @returns {Promise} id of the premium app integration instance
- */
-function getIntegrationId(){
-    return new Promise((resolve, reject) => {
-        integrationsApi.getIntegrationsClientapps({pageSize: 1000})
-        .then((data) => {
-            let instances = data.entities;
-            let pa_instance = instances.find(instance => instance.integrationType.id == config.appName);
-            if(pa_instance){
-                resolve(pa_instance.id);
-            }else{
-                resolve(null);
-            }
-        })
-        .catch(err => reject(err))
-    });
-}   
 
 /**
  * Set values for environment and language, prioritizng values on the query
  * parameters
  */
-function setDynamicParameters(){
+function setDynamicParameters() {
     // Get Query Parameters
     const urlParams = new URLSearchParams(window.location.search);
     let tempLanguage = urlParams.get(config.languageQueryParam);
-    let tempPcEnv = urlParams.get(config.genesysCloudEnvironmentQueryParam); 
+    let tempPcEnv = urlParams.get(config.genesysCloudEnvironmentQueryParam);
 
     // Language
-    pcLanguage = tempLanguage || 
-                localStorage.getItem(appName + ':language') ||
-                config.defaultLanguage;
-    localStorage.setItem(appName + ':language', pcLanguage);
+    pcLanguage = tempLanguage ||
+        localStorage.getItem(premiumAppIntegrationTypeId + ':language') ||
+        config.defaultLanguage;
+    localStorage.setItem(premiumAppIntegrationTypeId + ':language', pcLanguage);
 
     // Environment
     pcEnvironment = tempPcEnv ||
-                    localStorage.getItem(appName + ':environment') ||
-                    config.defaultPcEnvironment;
-    localStorage.setItem(appName + ':environment', pcEnvironment);
+        localStorage.getItem(premiumAppIntegrationTypeId + ':environment') ||
+        config.defaultPcEnvironment;
+    localStorage.setItem(premiumAppIntegrationTypeId + ':environment', pcEnvironment);
 }
 
 /**
  * Authenticate with Genesys Cloud
  * @returns {Promise} login info
  */
-function authenticateGenesysCloud(){
+function authenticateGenesysCloud() {
     client.setEnvironment(pcEnvironment);
-    client.setPersistSettings(true, appName);
+    client.setPersistSettings(true, premiumAppIntegrationTypeId);
     return client.loginImplicitGrant(
-                config.clientID, 
-                config.wizardUriBase + 'index.html'
-            );
+        config.clientID,
+        config.wizardUriBase + 'index.html'
+    );
 }
 
 /**
  * Get user details with its roles
  * @returns {Promise} usersApi result
  */
-function getUserDetails(){
-    let opts = {'expand': ['authorization']};
-    
+function getUserDetails() {
+    let opts = { 'expand': ['organization', 'authorization'] };
+
     return usersApi.getUsersMe(opts);
 }
 
@@ -93,44 +71,75 @@ function getUserDetails(){
  * Checks if the Genesys Cloud org has the premium app product enabled
  * @returns {Promise}
  */
-function validateProductAvailability(){      
-    let integrationTypes = []
-
-    // Internal recursive function for calling 
-    // next pages (if any) of the integration types
-    let _getIntegrationTypes = (pageNum) => {
-        return integrationsApi.getIntegrationsTypes({
-            pageSize: 100,
-            pageNumber: pageNum
-        })
+function validateProductAvailability() {
+    return integrationsApi.getIntegrationsType(premiumAppIntegrationTypeId)
         .then((data) => {
-            data.entities.forEach(integrationType => 
-                integrationTypes.push(integrationType));
-            
-            if(data.nextUri){
-                return _getIntegrationTypes(pageNum + 1);
-            }
-        });
-    }
-
-    return _getIntegrationTypes(1)
-    .then(() => {
-        if (integrationTypes.filter((integType) => integType.id === appName)[0]){
             console.log('PRODUCT AVAILABLE');
             return true;
-        } else {
+        })
+        .catch((err) => {
             console.log('PRODUCT NOT AVAILABLE');
             return false;
+        });
+}
+
+/**
+ * Checks if the user has the necessary permissions
+ */
+function checkUserPermissions(checkType, userPermissions) {
+    let missingPermissions = [];
+    if (checkType === 'premium') {
+        if (!userPermissions.includes(config.premiumAppViewPermission)) {
+            missingPermissions.push(config.premiumAppViewPermission);
         }
-    })
-    .catch(e => console.error(e)); 
+    } else if (checkType === 'wizard' || checkType === 'all') {
+        let permissionsToCheck = [];
+
+        if (checkType === 'all') {
+            permissionsToCheck.push(config.premiumAppViewPermission);
+        }
+
+        let modulesToCheck = Object.keys(config.provisioningInfo);
+        modulesToCheck.push('custom');
+        modulesToCheck.push('wizard');
+        if (config.enableCustomSetupStepAfterInstall === true) {
+            modulesToCheck.push('postCustomSetup');
+        }
+
+        modulesToCheck.forEach(modKey => {
+            config.installPermissions[modKey].forEach(item => {
+                if (!permissionsToCheck.includes(item)) {
+                    permissionsToCheck.push(item);
+                }
+            });
+        });
+
+        // check permissions
+        // first filter on exact match
+        let filteredPermissionsToCheck = permissionsToCheck.filter((perm) => !userPermissions.includes(perm));
+        // second filter using startsWith match criteria - to manage division based permissions
+        for (const checkPerm of filteredPermissionsToCheck) {
+            let permissionFound = false;
+            for (const userPerm of userPermissions) {
+                if (userPerm.startsWith(checkPerm)) {
+                    permissionFound = true;
+                    break;
+                }
+            }
+            if (permissionFound == false) {
+                missingPermissions.push(checkPerm);
+            }
+        }
+    }
+
+    return missingPermissions;
 }
 
 /**
  * Setup function
  * @returns {Promise}
  */
-function setup(){
+function setup() {
     view.showLoadingModal('Loading...');
     view.setupPage();
     view.hideContent();
@@ -143,73 +152,44 @@ function setup(){
     });
 
     return authenticateGenesysCloud()
-    .then(() => {
-        return getUserDetails();
-    })
-    .then((user) => {
-        userMe = user;
-
-        view.showUserName(user);
-
-        return getIntegrationId();
-    })
-    .then((id) => {
-        integrationId = id;
-
-        return setPageLanguage();
-    })  
-    .then(() => {
-        wizard.setup(client, userMe, integrationId);
-
-        return runPageScript();
-    })  
-    .then(() => {
-        view.hideLoadingModal();
-    })
-    .catch((e) => console.error(e));    
-}
-
-/**
- * Sets and loads the language file based on the pcLanguage global var
- * @returns {Promise}
- */
-function setPageLanguage(){
-    return new Promise((resolve, reject) => {
-        let fileUri = 
-            `${config.wizardUriBase}assets/languages/${pcLanguage}.json`;
-        $.getJSON(fileUri)
-        .done(data => {
-            Object.keys(data).forEach((key) => {
-                let els = document.querySelectorAll(`.${key}`);
-                for(let i = 0; i < els.length; i++){
-                    els.item(i).innerText = data[key];
-                }
-            })
-            resolve();
+        .then(() => {
+            return getUserDetails();
         })
-        .fail(xhr => {
-            console.log('Language file not found.');
-            resolve();
-        }); 
-    });
+        .then((user) => {
+            userMe = user;
+
+            view.showUserName(user);
+
+            return config.setPageLanguage(pcLanguage);
+        })
+        .then(() => {
+            wizard.setup(client, userMe);
+
+            return runPageScript();
+        })
+        .then(() => {
+            view.hideLoadingModal();
+        })
+        .catch((e) => console.error(e));
 }
 
 /**
  * Runs page specific script.
  * @returns {Promise}
  */
-function runPageScript(){
+function runPageScript() {
     return new Promise((resolve, reject) => {
         let pathParts = window.location.pathname.split('/');
         let page = pathParts[pathParts.length - 1];
+        let productAvailable = false;
 
         // Run Page Specific Scripts
-        switch(page){
+        switch (page) {
             case 'index.html':
                 // Button Handler
                 let elNextBtn = document.getElementById('next');
                 elNextBtn.addEventListener('click', () => {
-                    if(config.enableCustomSetup){
+                    if (config.enableCustomSetupPageBeforeInstall) {
                         window.location.href = './custom-setup.html';
                     } else {
                         window.location.href = './install.html';
@@ -217,28 +197,45 @@ function runPageScript(){
                 });
 
                 validateProductAvailability()
-                .then((isAvailable) => {
-                    if(isAvailable){
-                        view.showProductAvailable();
-                    }else{
-                        view.showProductUnavailable();
-                    }
-
-                    return wizard.isExisting();
-                })
-                // Check if has an existing installation
-                .then((exists) => {
-                    if(exists) {
-                        if(!userMe.authorization.permissions.includes(config.viewPermission)){
-                            window.location.href = './unlicensed.html';
+                    .then((isAvailable) => {
+                        productAvailable = isAvailable;
+                        if (isAvailable) {
+                            view.showProductAvailable();
                         } else {
-                            window.location.href = config.premiumAppURL;
+                            view.showProductUnavailable();
                         }
-                    } else {
-                        view.showContent();
-                        resolve();
-                    }
-                });
+
+                        return wizard.isExisting();
+                    })
+                    // Check if has an existing installation
+                    .then((exists) => {
+                        if (exists) {
+                            // If the wizard install process was already performed, only check the Premium App View permission
+                            if (!userMe.authorization.permissions.includes(config.premiumAppViewPermission)) {
+                                localStorage.setItem(premiumAppIntegrationTypeId + ':missingPermissions', config.premiumAppViewPermission);
+                                window.location.href = './unlicensed.html';
+                            } else {
+                                window.location.href = config.redirectURLOnWizardCompleted;
+                            }
+                        } else {
+                            // JSM TODO - rest-ce que ca ne va pas masquer le cas ou product is not available???
+                            if (config.checkInstallPermissions && productAvailable == true) {
+                                let missingPermissions = checkUserPermissions(config.checkInstallPermissions, userMe.authorization.permissions);
+                                if (missingPermissions && missingPermissions.length > 0) {
+                                    localStorage.setItem(premiumAppIntegrationTypeId + ':missingPermissions', missingPermissions.toString());
+                                    window.location.href = './unlicensed.html';
+                                } else {
+                                    // No missing permission or no required permission - granted access to install
+                                    view.showContent();
+                                    resolve();
+                                }
+                            } else {
+                                // No check of permissions on install or product not available warning should take priority
+                                view.showContent();
+                                resolve();
+                            }
+                        }
+                    });
                 break;
             case 'custom-setup.html':
                 // Button Handler
@@ -256,10 +253,15 @@ function runPageScript(){
                 elStartBtn.addEventListener('click', () => {
                     view.showLoadingModal('Installing..');
                     wizard.install()
-                    .then(() => {
-                        window.location.href = './finish.html';
-                    })
-                    .catch(e => console.error(e))
+                        .then((customSetupStatus) => {
+                            if (customSetupStatus.status) {
+                                window.location.href = './finish.html';
+                            } else {
+                                localStorage.setItem(premiumAppIntegrationTypeId + ':failureCause', customSetupStatus.cause);
+                                window.location.href = './post-custom-setup-failure.html';
+                            }
+                        })
+                        .catch(e => console.error(e))
                 });
 
                 resolve();
@@ -268,7 +270,7 @@ function runPageScript(){
             case 'finish.html':
                 view.showContent();
                 setTimeout(() => {
-                    window.location.href = config.premiumAppURL;
+                    window.location.href = config.redirectURLOnWizardCompleted;
                 }, 2000);
 
                 resolve();
@@ -280,12 +282,12 @@ function runPageScript(){
                 view.showLoadingModal('Uninstalling...');
 
                 wizard.uninstall()
-                .then(() => {
-                    setTimeout(() => {
-                        window.location.href = config.wizardUriBase 
-                                        + 'index.html';
-                    }, 2000);
-                });
+                    .then(() => {
+                        setTimeout(() => {
+                            window.location.href = config.wizardUriBase
+                                + 'index.html';
+                        }, 2000);
+                    });
                 resolve();
                 break;
             default:

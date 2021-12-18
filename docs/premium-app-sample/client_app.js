@@ -42,18 +42,18 @@ clientApp.setup = function(pagePath){
     // If query parameters are not provided, try to get values from localstorage
     // Default values if it does not exist.
     if(pcEnv){
-        localStorage.setItem(appConfig.appName + ":environment", pcEnv);
-    }else if(localStorage.getItem(appConfig.appName + ":environment")){
-        pcEnv = localStorage.getItem(appConfig.appName + ":environment");
+        localStorage.setItem(appConfig.premiumAppIntegrationTypeId + ":environment", pcEnv);
+    }else if(localStorage.getItem(appConfig.premiumAppIntegrationTypeId + ":environment")){
+        pcEnv = localStorage.getItem(appConfig.premiumAppIntegrationTypeId + ":environment");
     } else {
         pcEnv = appConfig.defaultPcEnvironment;
 
     }
 
     if(langTag){
-        localStorage.setItem(appConfig.appName + ":langTag", langTag);
-    }else if(localStorage.getItem(appConfig.appName + ":langTag")){
-        langTag = localStorage.getItem(appConfig.appName + ":langTag");
+        localStorage.setItem(appConfig.premiumAppIntegrationTypeId + ":langTag", langTag);
+    }else if(localStorage.getItem(appConfig.premiumAppIntegrationTypeId + ":langTag")){
+        langTag = localStorage.getItem(appConfig.premiumAppIntegrationTypeId + ":langTag");
     } else {
         langTag =  appConfig.defaultLanguage;
     }
@@ -64,10 +64,10 @@ clientApp.setup = function(pagePath){
     clientApp.pcEnv = pcEnv;
 
     // Authenticate via Genesys Cloud
-    client.setPersistSettings(true, appConfig.appName);
+    client.setPersistSettings(true, appConfig.premiumAppIntegrationTypeId);
     client.setEnvironment(pcEnv);
 
-    return client.loginImplicitGrant(clientID, config.basePath + pagePath, appConfig.appName)
+    return client.loginImplicitGrant(clientID, config.basePath + pagePath, appConfig.premiumAppIntegrationTypeId)
     .then(data => {
         console.log(data);
         

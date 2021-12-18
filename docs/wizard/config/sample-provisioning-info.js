@@ -36,12 +36,16 @@ let sample = {
             'name': 'Agent Widget',
             'url': 'https://mypurecloud.github.io/purecloud-premium-app/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}',
             'type': 'widget',
+            'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts',
+            'permissions': 'camera,microphone,geolocation',
             'groups': ['Agents', 'Supervisors']
         },
         {
             'name': 'Supervisor Widget',
             'url': 'https://mypurecloud.github.io/purecloud-premium-app/supervisor.html?lang={{pcLangTag}}&environment={{pcEnvironment}}',
             'type': 'standalone',
+            'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts',
+            'permissions': 'camera,microphone,geolocation',
             'groups': ['Supervisors']
         }
     ],
@@ -49,8 +53,86 @@ let sample = {
         {
             'name': 'Interaction Widget',
             'url': 'https://app-website.com/?conversationid={{pcConversationId}}&lang={{pcLangTag}}&environment={{pcEnvironment}}',
+            'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts',
+            'permissions': 'camera,microphone,geolocation',
             'groups': ['Agents'],
             'communicationTypeFilter': 'chat, call, email'
+        }
+    ],
+    'widget-deployment': [
+        {
+            'name': 'Widget Deployment',
+            'description': '',
+            'type': 'third-party',
+            'allowedDomains': [],
+            'authentication': false,
+            'autoEnable': true
+        }
+    ],
+    'ws-data-actions': [
+        {
+            'name': 'My Web Services',
+            'autoEnable': true,
+            /**
+             * credential type: userDefinedOAuth, userDefined, basicAuth, none or empty string or no credentialType attribute (if no crdentials required)
+             */
+            'credentialType': 'userDefinedOAuth',
+            'credentials': {
+                'loginUrl': 'https://test.test.com/login',
+                'clientId': '1234',
+                'clientSecret': '5678'
+            },
+            'data-actions': [
+                {
+                    'name': 'My Data Action',
+                    'secure': false,
+                    'autoPublish': true,
+                    "config": {
+                        "request": {
+                            "requestUrlTemplate": "https://test.test.com/test",
+                            "requestType": "POST",
+                            "headers": {
+                                "Authorization": "${authResponse.token_type} ${authResponse.access_token}",
+                                "Content-Type": "application/json"
+                            },
+                            "requestTemplate": "${input.rawRequest}"
+                        },
+                        "response": {
+                            "translationMap": {
+                                "mymsg": "$.msg"
+                            },
+                            "translationMapDefaults": {
+                                "mymsg": "\"\""
+                            },
+                            "successTemplate": "{ \"myoutput\": ${mymsg} }"
+                        }
+                    },
+                    "contract": {
+                        "input": {
+                            "inputSchema": {
+                                "type": "object",
+                                "properties": {
+                                    "access_token": {
+                                        "type": "string"
+                                    }
+                                },
+                                "additionalProperties": true
+                            }
+                        },
+                        "output": {
+                            "successSchema": {
+                                "type": "object",
+                                "properties": {
+                                    "myoutput": {
+                                        "type": "string"
+                                    }
+                                },
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                }
+            ]
         }
     ],
     'data-table': [
@@ -78,7 +160,7 @@ let sample = {
             'description': 'Generated Client that\'s passed to the App Backend',
             'roles': ['Role'],
             'authorizedGrantType': 'CLIENT_CREDENTIALS',
-            'finally': function(installedData){
+            'finally': function (installedData) {
                 return new Promise((resolve, reject) => {
                     console.log('Fake Sending Credentials...');
                     setTimeout(() => resolve(), 2000);

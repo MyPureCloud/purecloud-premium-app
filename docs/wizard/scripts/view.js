@@ -7,18 +7,18 @@ export default {
      * Show the loading modal 
      * @param {String} message 
      */
-    showLoadingModal(message){
+    showLoadingModal(message) {
         console.info(`modal: ${message}`);
 
         elLoadingModal.style.display = '';
         let elMessage = elLoadingModal.querySelectorAll('.modal-message')[0]
-                            .innerText = message;
+            .innerText = message;
     },
 
     /**
      * Hide the loading modal
      */
-    hideLoadingModal(){
+    hideLoadingModal() {
         console.info('hide-modal');
         elLoadingModal.style.display = 'none';
     },
@@ -26,7 +26,7 @@ export default {
     /**
      * Show the content div of the page
      */
-    showContent(){
+    showContent() {
         let elContent = document.querySelectorAll('.content')[0];
         elContent.style.visibility = '';
     },
@@ -34,7 +34,7 @@ export default {
     /**
      * Hide the content div of the page
      */
-    hideContent(){
+    hideContent() {
         let elContent = document.querySelectorAll('.content')[0];
         elContent.style.visibility = 'hidden';
     },
@@ -42,7 +42,7 @@ export default {
     /**
      * Show the message that the product is available
      */
-    showProductAvailable(){
+    showProductAvailable() {
         let elAvailable = document.getElementById('available');
         let elUnavailable = document.getElementById('unavailable');
         elAvailable.style.display = '';
@@ -52,28 +52,28 @@ export default {
     /**
      * Show the message that the product is unavailable.
      */
-    showProductUnavailable(){
+    showProductUnavailable() {
         let elAvailable = document.getElementById('available');
         let elUnavailable = document.getElementById('unavailable');
         elAvailable.style.display = 'none';
         elUnavailable.style.display = '';
-    },  
+    },
 
     /**
      * Show the username of the current user for greeting purposes
      */
-    showUserName(user){
+    showUserName(user) {
         let el = document.getElementById('username');
-        if(el){
+        if (el) {
             el.innerText = user.name;
         }
     },
 
 
-    setupPage(){
-        if(!config.enableCustomSetup && document.getElementById('progress-custom-setup')){
-                document.getElementById('progress-custom-setup')
-                    .style.display = 'none';
+    setupPage() {
+        if (!config.enableCustomSetupPageBeforeInstall && document.getElementById('progress-custom-setup')) {
+            document.getElementById('progress-custom-setup')
+                .style.display = 'none';
         }
     }
 }

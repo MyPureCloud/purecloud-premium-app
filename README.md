@@ -97,7 +97,7 @@ After the wizard installation, you can get the summary of the provisioned object
 
 ## Uninstalling / Deprovisioning the Premium App
 
-Going to the page docs/wizard/uninstall.html will run the deprovisioning of the Premium App. This means deleting all the Genesys Cloud objects (groups, roles, etc.) that were initially created by the tool.
+Going to the page docs/wizard/uninstall.html will run the deprovisioning of the Premium App. This means deleting all the Genesys Cloud objects (groups, roles, etc.) that were initially created by the tool with the specified prefix.
 
 ![Uninstall](https://raw.githubusercontent.com/MyPureCloud/purecloud-premium-app/master/screenshots/uninstall.png "Uninstall")
 
@@ -122,6 +122,9 @@ By default the wizard app allows you to automatically provision the following Ge
 - Additional Integration Instances
 - Oauth Client
 - Data Tables
+- Interaction Widgets
+- Widget Deployments
+- Web Services Data Actions Integrations
 
 Depending on the Premium App's needs it may need any number of those objects. The only object that is almost always required is a role. At least one role should be created that has the permission for your app. This role will grant users access to to view and use the premium app fom within Genesys Cloud.
 
@@ -142,14 +145,20 @@ The following values should be modified for production:
 - Regional client ids for your app to be provided by AppFoundry.
 - wizardUriBase
   - Uri for the wizard tool.
-- premiumAppURL
-  - the landing page of the actual Premium App.
-- appName
-  - This is the unique id that is generated for your integration.
+- redirectURLOnWizardCompleted
+  - the landing page of the actual Premium App or a page on your website (displayed when the wizard setup has been completed).
+- premiumAppIntegrationTypeId
+  - This is the unique id that is generated for your integration (it will correspond to the IntegrationType id of your Premium App)
 - prefix
   - A string that will be prefixed to all the names of the provisioned Genesys Cloud Objects. It is up to the discretion of the vendor but a good rule of thumb is just use the name of the Premium App itself.
 - provisioningInfo
   - An object containing the definition of objects to be created. Please consult the default config file and the sample-provisioning-info.js for examples on how it should be formatted.
+- enableCustomSetupPageBeforeInstall
+  - Enables the optional 'Step 2' page (Custom Setup) in the provisoning process
+  - If false, it will not show the page or the step in the wizard
+- enableCustomSetupStepAfterInstall
+  - Enables the optional Post Custom Setup module in the install process (in ./wizard/scripts/modules/post-custom-setup.js)
+  - If true, it will invoke the configure method in the postCustomSetup module after the other Genesys Cloud modules have been processed (for roles, groups, interactions widgets, ...).
 
 ## Styles and Branding
 
