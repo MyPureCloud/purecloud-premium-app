@@ -1,4 +1,5 @@
 {
+    "txt-premium-app-name": "Premium App",
     "txt-greeting": "Hi",
     "txt-greeting-2": "Welcome to the Premium App Example Application",
     "txt-start": "Start",
@@ -35,8 +36,8 @@
     "txt-create-widget-deployment-msg": "Create a Widget Deployment for WebChat v2.",
     "txt-create-ws-data-actions": "Create Web Services integration and Data Actions",
     "txt-create-ws-data-actions-msg": "Create Web Services Data Actions integration with its credentials, and associated Data Actions.",
-    "txt-create-data-table": "AAAAAAAA",
-    "txt-create-data-table-msg": "AAAAAAAA",
+    "txt-create-data-table": "Create Architect Data Table",
+    "txt-create-data-table-msg": "Architect Data Table will be created.",
     "txt-create-post-custom-setup": "Post Custom Setup",
     "txt-create-post-custom-setup-msg": "Invoke Backend for Post Custom Setup.",
     "txt-please-click": "Please click the button to start the installation.",
