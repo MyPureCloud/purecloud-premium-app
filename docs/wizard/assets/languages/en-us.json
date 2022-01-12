@@ -1,5 +1,8 @@
 {
     "txt-premium-app-name": "Premium App",
+    "txt-premium-home": "Home",
+    "txt-premium-install": "Install",
+    "txt-premium-summary": "Summary",
     "txt-greeting": "Hi",
     "txt-greeting-2": "Welcome to the Premium App Example Application",
     "txt-start": "Start",
