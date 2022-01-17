@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,18 +12,20 @@
 
     <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.3.0/purecloud-client-app-sdk.js"></script>
-    
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
 </head>
+
 <body>
     <div id="background"></div>
     <noscript>
-        For full functionality of this site it is necessary to enable JavaScript. Here are the <a href="http://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web browser</a>.
+        For full functionality of this site it is necessary to enable JavaScript. Here are the <a
+            href="http://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web
+            browser</a>.
     </noscript>
 
     <header>
-        <p>Premium App /&nbsp; Install</p>
+        <p id="content-header-text"><span class="txt-premium-app-name">Premium App</span> /&nbsp; <span class="txt-premium-install">Install</span></p>
     </header>
 
     <div class="content">
@@ -47,62 +50,64 @@
 
         <main>
             <p>
-                <span class="txt-install-summary">These are the steps that will be automatically performed for you!</span> 
+                <span class="txt-install-summary">These are the steps that will be automatically performed for
+                    you!</span>
             </p>
 
-            <div class="message">
-                <div class="message-title">
-                    <span class="txt-create-role">1. Create Role</span>
+            <div id="messages" class="messages">
+                <div class="message">
+                    <div class="message-title">
+                        <span>1. </span><span class="txt-create-role">Create Role</span>
+                    </div>
+                    <div class="message-content">
+                        <div>
+                            <span class="txt-create-role-msg">
+                                Create a role specifically to provide access to the app.
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div class="message-content">
-                    <div>
-                        <span class="txt-create-role-msg">
-                            Create a role specifically to provide access to the app.
-                        </span>
-                    </div> 
-                </div>
-            </div>
 
-            <div class="message">
-                <div class="message-title">
-                        <span class="txt-create-group">2. Create Groups</span>
+                <div class="message">
+                    <div class="message-title">
+                        <span>2. </span><span class="txt-create-group">Create Groups</span>
+                    </div>
+                    <div class="message-content">
+                        <div>
+                            <span class="txt-create-group-msg">
+                                Groups will provide filtering to users' access to the app instances.
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div class="message-content">
-                    <div>
-                        <span class="txt-create-group-msg">
-                            Groups will provide filtering to users' access to the app instances.
-                        </span> 
-                    </div> 
-                </div>
-            </div>
 
-            <div class="message">
-                <div class="message-title">
-                    <span class="txt-create-instance">
-                    3. Create instances
-                    </span>
+                <div class="message">
+                    <div class="message-title">
+                        <span>3. </span><span class="txt-create-app-instance">Create instances</span>
+                    </div>
+                    <div class="message-content">
+                        <div>
+                            <span class="txt-create-app-instance-msg">
+                                More instances of the app will be created with different URI endpoints to provide
+                                different features of the app.
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div class="message-content">
-                    <div>
-                        <span class="txt-create-instance-msg">
-                            More instances of the app will be created with different URI endpoints to provide different features of the app.
-                        </span>
-                    </div> 
-                </div>
-            </div>
 
-            <div class="message">
-                <div class="message-title">
-                    <span class="txt-create-oauthclient">
-                    4. Create OAuth Client
-                    </span>
-                </div>
-                <div class="message-content">
-                    <div>
-                        <span class="txt-create-oauthclient-msg">
-                            An optional OAuth Client could be created for  server-to-server communication. After creation, it should be followed by a method that will pass the OAuth Client information to the app's server.
-                        </span>
-                    </div> 
+                <div class="message">
+                    <div class="message-title">
+                        <span>4. </span><span class="txt-create-oauth-client">Create OAuth Client</span>
+                    </div>
+                    <div class="message-content">
+                        <div>
+                            <span class="txt-create-oauth-client-msg">
+                                An optional OAuth Client could be created for server-to-server communication. After
+                                creation, it should be followed by a method that will pass the OAuth Client information
+                                to the app's server.
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -129,7 +134,58 @@
             <div class="modal-message"></div>
         </div>
     </div>
-    
+
+    <script type="module">
+        import config from './config/config.js';
+
+        if (config.enableDynamicInstallSummary == true) {
+            let messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = '';
+
+            let modulesToInstall = Object.keys(config.provisioningInfo);
+            if (config.enableCustomSetupStepAfterInstall === true) {
+                modulesToInstall.push('post-custom-setup');
+            }
+            let moduleIndex = 0;
+            modulesToInstall.forEach(modKey => {
+                moduleIndex++;
+                let messageDiv = document.createElement("div");
+                messageDiv.className = "message";
+
+                let messageTitle = document.createElement("div");
+                messageTitle.className = "message-title";
+                messageTitle.innerHTML = "<span>" + moduleIndex.toString() + ". </span><span class='txt-create-" + modKey + "'></span>";
+                messageDiv.appendChild(messageTitle);
+
+                let messageContent = document.createElement("div");
+                messageContent.className = "message-content";
+                messageContent.innerHTML = "<div><span class='txt-create-" + modKey + "-msg'></span></div>";
+                messageDiv.appendChild(messageContent);
+
+                messagesDiv.appendChild(messageDiv);
+
+                //  document.body.insertBefore(newDiv, currentDiv);
+
+
+            });
+
+            // Language
+            // TODO - may not be necessary as it is invoked from main.js (after) as well
+            let pcLanguage = localStorage.getItem(config.premiumAppIntegrationTypeId + ':language') || config.defaultLanguage;
+
+            config.setPageLanguage(pcLanguage)
+                .then(() => {
+                    console.log('Localization applied: ', pcLanguage);
+                })
+                .catch((e) => {
+                    console.error(e);
+                });
+
+        }
+
+    </script>
+
     <script src="./scripts/main.js" type="module"></script>
 </body>
+
 </html>

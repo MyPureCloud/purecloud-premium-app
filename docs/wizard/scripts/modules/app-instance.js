@@ -8,19 +8,35 @@ const integrationsApi = new platformClient.IntegrationsApi();
  * Get existing apps based on the prefix
  * @returns {Promise.<Array>} Genesys Cloud Integrations
  */
-function getExisting(){
-    let integrationsOpts = {
-        'pageSize': 100
-    };
-    
-    return integrationsApi.getIntegrations(integrationsOpts)
-    .then((data) => {
-        return(data.entities
-                .filter(entity => {
-                    return entity.integrationType.id == config.appName && 
+function getExisting() {
+    let integrations = []
+
+    // Internal recursive function for calling 
+    // next pages (if any) of the integrations
+    let _getIntegrations = (pageNum) => {
+        return integrationsApi.getIntegrations({
+            pageSize: 100,
+            pageNumber: pageNum
+        })
+            .then((data) => {
+                data.entities
+                    .filter(entity => {
+                        return entity.integrationType.id == config.premiumAppIntegrationTypeId &&
                             entity.name.startsWith(config.prefix);
-                }));
-    });  
+                    }).forEach(integration =>
+                        integrations.push(integration));
+
+                if (data.nextUri) {
+                    return _getIntegrations(pageNum + 1);
+                }
+            });
+    }
+
+    return _getIntegrations(1)
+        .then(() => {
+            return integrations;
+        })
+        .catch(e => console.error(e));
 }
 
 /**
@@ -28,23 +44,21 @@ function getExisting(){
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(logFunc){
+function remove(logFunc) {
     logFunc('Uninstalling Other App Instances...');
 
     return getExisting()
-    .then(apps => {
-        let del_app = [];
+        .then((instances) => {
+            let del_apps = [];
 
-        if (apps.length > 0){
-            // Filter results before deleting
-            apps.map(entity => entity.id)
-                .forEach(iid => {
-                    del_app.push(integrationsApi.deleteIntegration(iid));
-            });
-        }
+            if (instances.length > 0) {
+                instances.forEach(entity => {
+                    del_apps.push(integrationsApi.deleteIntegration(entity.id));
+                });
+            }
 
-        return Promise.all(del_app);
-    });
+            return Promise.all(del_apps);
+        });
 }
 
 /**
@@ -54,7 +68,7 @@ function remove(logFunc){
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
  *                          is the Genesys Cloud object details of that type.
  */
-function create(logFunc, data){
+function create(logFunc, data) {
     let integrationPromises = [];
     let enableIntegrationPromises = [];
     let integrationsData = {};
@@ -63,7 +77,7 @@ function create(logFunc, data){
         let integrationBody = {
             body: {
                 integrationType: {
-                    id: config.appName
+                    id: config.premiumAppIntegrationTypeId
                 }
             }
         };
@@ -71,15 +85,15 @@ function create(logFunc, data){
         // Rename and add Group Filtering
         integrationPromises.push(
             integrationsApi.postIntegrations(integrationBody)
-            .then((data) => {
-                logFunc("Created instance: " + instance.name);
-                integrationsData[instance.name] = data;
-            })
+                .then((data) => {
+                    logFunc("Created instance: " + instance.name);
+                    integrationsData[instance.name] = data;
+                })
         );
     });
 
     return Promise.all(integrationPromises)
-    .then(() => integrationsData);
+        .then(() => integrationsData);
 }
 
 /**
@@ -89,7 +103,7 @@ function create(logFunc, data){
  * @param {Object} installedData contains everything that was installed by the wizard
  * @param {String} userId User id if needed
  */
-function configure(logFunc, installedData, userId){
+function configure(logFunc, installedData, userId) {
     let instanceInstallationData = config.provisioningInfo['app-instance'];
     let appInstancesData = installedData['app-instance'];
 
@@ -97,47 +111,53 @@ function configure(logFunc, installedData, userId){
 
     Object.keys(appInstancesData).forEach((instanceKey) => {
         let appInstance = appInstancesData[instanceKey];
-        let appInstanceInstall =  instanceInstallationData
-                                            .find((a) => a.name == instanceKey);
+        let appInstanceInstall = instanceInstallationData
+            .find((a) => a.name == instanceKey);
 
         let integrationConfig = {
             body: {
                 name: config.prefix + instanceKey,
-                version: 1, 
+                version: 1,
                 properties: {
                     url: appInstanceInstall.url,
-                    sandbox: appInstanceInstall.sandbox || 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts', 
                     displayType: appInstanceInstall.type || 'standalone',
-                    featureCategory: '', 
+                    featureCategory: '',
                     groupFilter: appInstanceInstall
-                                    .groups.map((groupName) => 
-                                        installedData.group[groupName].id)
-                                    .filter(g => g != undefined)
+                        .groups.map((groupName) =>
+                            installedData.group[groupName].id)
+                        .filter(g => g != undefined)
                 },
                 advanced: appInstanceInstall.advanced || {},
-                notes: appInstanceInstall.notes || `Provisioned by ${config.appName} integration`,
+                notes: appInstanceInstall.notes || `Provisioned by ${config.premiumAppIntegrationTypeId} integration`,
                 credentials: {}
             }
         };
-       
+
+        // Manage Wizard during development, before approval, using premiumAppIntegrationTypeId='premium-app-example' (sandbox and permissions in request schema)
+        // and in production, after approval, using premiumAppIntegrationTypeId='premium-app-vendorABC' (sandbox and permissions not allowed in request schema)
+        if (config.premiumAppIntegrationTypeId === 'premium-app-example') {
+            integrationConfig.body.properties.sandbox = appInstanceInstall.sandbox || 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts';
+            integrationConfig.body.properties.permissions = appInstanceInstall.permissions || 'camera,microphone,geolocation';
+        }
+
         promisesArr.push(
             integrationsApi.putIntegrationConfigCurrent(
-                appInstance.id, 
+                appInstance.id,
                 integrationConfig
             )
-            .then((data) => {
-                logFunc('Configured instance: ' + appInstance.name);   
+                .then((data) => {
+                    logFunc('Configured instance: ' + appInstance.name);
 
-                let opts = {
-                    body: {
-                        intendedState: 'ENABLED'
-                    }
-                };
+                    let opts = {
+                        body: {
+                            intendedState: 'ENABLED'
+                        }
+                    };
 
-                return integrationsApi.patchIntegration(appInstance.id, opts)
-            })
-            .then((data) => logFunc('Enabled instance: ' + data.name))
-            .catch((err) => console.error(err))
+                    return integrationsApi.patchIntegration(appInstance.id, opts)
+                })
+                .then((data) => logFunc('Enabled instance: ' + data.name))
+                .catch((err) => console.error(err))
         );
     });
 

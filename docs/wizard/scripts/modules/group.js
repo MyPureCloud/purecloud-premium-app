@@ -7,20 +7,41 @@ const groupsApi = new platformClient.GroupsApi();
  * Gets the existing groups on Genesys Cloud based on Prefix
  * @return {Promise.<Array>} Genesys Cloud Group Objects
  */
-function getExisting(){
-    // Query bodies
-    let groupSearchBody = {
-        query: [
-            {
-                fields: ['name'],
-                value: config.prefix,
-                operator: 'OR',
-                type: 'STARTS_WITH'
-            }
-        ]
-    };
+function getExisting() {
+    let groups = []
 
-    return groupsApi.postGroupsSearch(groupSearchBody);
+    // Internal recursive function for calling 
+    // next pages (if any) of the groups
+    let _getGroups = (pageNum) => {
+        return groupsApi.postGroupsSearch({
+            pageSize: 100,
+            pageNumber: pageNum,
+            query: [
+                {
+                    fields: ['name'],
+                    value: config.prefix,
+                    type: 'STARTS_WITH'
+                }
+            ]
+        })
+            .then((data) => {
+                if (data.pageCount > 0) {
+                    data.results
+                        .forEach(group =>
+                            groups.push(group));
+
+                    if (pageNum < data.pageCount) {
+                        return _getGroups(pageNum + 1);
+                    }
+                }
+            });
+    }
+
+    return _getGroups(1)
+        .then(() => {
+            return groups;
+        })
+        .catch(e => console.error(e));
 }
 
 /**
@@ -28,21 +49,21 @@ function getExisting(){
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(logFunc){
+function remove(logFunc) {
     logFunc('Uninstalling Groups...');
 
     return getExisting()
-    .then(groups => {
-        let del_group = [];
+        .then((instances) => {
+            let del_groups = [];
 
-        if(groups.total > 0){
-            groups.results.map(grp => grp.id).forEach(gid => {
-                del_group.push(groupsApi.deleteGroup(gid));
-            });
-        }
+            if (instances.length > 0) {
+                instances.forEach(entity => {
+                    del_groups.push(groupsApi.deleteGroup(entity.id));
+                });
+            }
 
-        return Promise.all(del_group);
-    });
+            return Promise.all(del_groups);
+        });
 }
 
 /**
@@ -52,7 +73,7 @@ function remove(logFunc){
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
  *                          is the Genesys Cloud object details of that type.
  */
-function create(logFunc, data){
+function create(logFunc, data) {
     let groupPromises = [];
     let groupData = {};
 
@@ -68,16 +89,16 @@ function create(logFunc, data){
 
         groupPromises.push(
             groupsApi.postGroups(groupBody)
-            .then((data) => {
-                logFunc('Created group: ' + group.name);
-                groupData[group.name] = data;
-            })
-            .catch((err) => console.log(err))
+                .then((data) => {
+                    logFunc('Created group: ' + group.name);
+                    groupData[group.name] = data;
+                })
+                .catch((err) => console.log(err))
         );
     });
 
     return Promise.all(groupPromises)
-    .then(() => groupData);
+        .then(() => groupData);
 }
 
 /**
@@ -87,7 +108,7 @@ function create(logFunc, data){
  * @param {Object} installedData contains everything that was installed by the wizard
  * @param {String} userId User id if needed
  */
-function configure(logFunc, installedData, userId){
+function configure(logFunc, installedData, userId) {
     let promiseArr = [];
     let groupData = installedData.group;
 
@@ -106,7 +127,7 @@ function configure(logFunc, installedData, userId){
     return Promise.all(promiseArr);
 }
 
-export default{
+export default {
     provisioningInfoKey: 'group',
 
     getExisting: getExisting,

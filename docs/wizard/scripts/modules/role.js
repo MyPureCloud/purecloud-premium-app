@@ -8,13 +8,34 @@ const authorizationApi = new platformClient.AuthorizationApi();
  * Get existing roles in Genesys Cloud based on prefix
  * @returns {Promise.<Array>} Genesys Cloud Roles
  */
-function getExisting(){
-    let authOpts = { 
-        'name': config.prefix + "*", // Wildcard to work like STARTS_WITH 
-        'userCount': false
-    };
+function getExisting() {
+    let roles = []
 
-    return authorizationApi.getAuthorizationRoles(authOpts);
+    // Internal recursive function for calling 
+    // next pages (if any) of the integrations
+    let _getRoles = (pageNum) => {
+        return authorizationApi.getAuthorizationRoles({
+            pageSize: 100,
+            pageNumber: pageNum,
+            name: config.prefix + "*",
+            userCount: 'false'
+        })
+            .then((data) => {
+                data.entities
+                    .forEach(role =>
+                        roles.push(role));
+
+                if (data.nextUri) {
+                    return _getRoles(pageNum + 1);
+                }
+            });
+    }
+
+    return _getRoles(1)
+        .then(() => {
+            return roles;
+        })
+        .catch(e => console.error(e));
 }
 
 /**
@@ -22,21 +43,21 @@ function getExisting(){
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(logFunc){
+function remove(logFunc) {
     logFunc('Uninstalling Roles...');
 
     return getExisting()
-    .then(roles => {
-        let del_role = [];
+        .then((instances) => {
+            let del_roles = [];
 
-        if(roles.total > 0){
-            roles.entities.map(r => r.id).forEach(rid => {
-                del_role.push(authorizationApi.deleteAuthorizationRole(rid));
-            });
-        }
-        
-        return Promise.all(del_role);
-    });
+            if (instances.length > 0) {
+                instances.forEach(entity => {
+                    del_roles.push(authorizationApi.deleteAuthorizationRole(entity.id));
+                });
+            }
+
+            return Promise.all(del_roles);
+        });
 }
 
 /**
@@ -46,7 +67,7 @@ function remove(logFunc){
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
  *                          is the Genesys Cloud object details of that type.
  */
-function create(logFunc, data){
+function create(logFunc, data) {
     let rolePromises = [];
     let roleData = {}; // Object of "rolename": (Role Object)
 
@@ -62,17 +83,17 @@ function create(logFunc, data){
         let roleId = null;
         rolePromises.push(
             authorizationApi.postAuthorizationRoles(roleBody)
-            .then((data) => {
-                logFunc('Created role: ' + role.name);
+                .then((data) => {
+                    logFunc('Created role: ' + role.name);
 
-                roleData[role.name] = data;
-            })
-            .catch((err) => console.log(err))
+                    roleData[role.name] = data;
+                })
+                .catch((err) => console.log(err))
         );
     });
 
     return Promise.all(rolePromises)
-    .then(() => roleData);
+        .then(() => roleData);
 }
 
 /**
@@ -82,7 +103,7 @@ function create(logFunc, data){
  * @param {Object} installedData contains everything that was installed by the wizard
  * @param {String} userId User id if needed
  */
-function configure(logFunc, installedData, userId){
+function configure(logFunc, installedData, userId) {
     // Assign the role to the user
     // Required before you can assign the role to an Auth Client.
     let promiseArr = [];
@@ -91,15 +112,15 @@ function configure(logFunc, installedData, userId){
     Object.keys(roleData).forEach((roleKey) => {
         promiseArr.push(
             authorizationApi.putAuthorizationRoleUsersAdd(
-                roleData[roleKey].id, 
+                roleData[roleKey].id,
                 [userId]
             )
-            .then((data) => {
-                logFunc('Assigned ' + roleData[roleKey].name + ' to user');
-            })
+                .then((data) => {
+                    logFunc('Assigned ' + roleData[roleKey].name + ' to user');
+                })
         );
     });
-    
+
     return Promise.all(promiseArr);
 }
 

@@ -5,23 +5,16 @@ const oAuthApi = new platformClient.OAuthApi();
 const authorizationApi = new platformClient.AuthorizationApi();
 const usersApi = new platformClient.UsersApi();
 
- /**
- * Get existing authetication clients based on the prefix
- * @returns {Promise.<Array>} Array of Genesys Cloud OAuth Clients
- */
-function getExisting(){
+/**
+* Get existing authetication clients based on the prefix
+* @returns {Promise.<Array>} Array of Genesys Cloud OAuth Clients
+*/
+function getExisting() {
     return oAuthApi.getOauthClients()
-    .then((data) => {
-        console.log('==================================');
-        console.log(data);
-        return(data.entities
-            .filter(entity => {
-                if(entity.name)
-                    return entity.name.startsWith(config.prefix);
-                else
-                    return false;
-            }));
-    });
+        .then((data) => {
+            return data.entities.filter((entity) =>
+                entity.name.startsWith(config.prefix));
+        });
 }
 
 /**
@@ -29,23 +22,21 @@ function getExisting(){
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(logFunc){
+function remove(logFunc) {
     logFunc('Uninstalling OAuth Clients...');
 
     return getExisting()
-    .then((instances) => {
-        let del_clients = [];
+        .then((instances) => {
+            let del_clients = [];
 
-        if (instances.length > 0){
-            // Filter results before deleting
-            instances.map(entity => entity.id)
-                .forEach(cid => {
-                    del_clients.push(oAuthApi.deleteOauthClient(cid));
-            });
-        }
+            if (instances.length > 0) {
+                instances.forEach(entity => {
+                    del_clients.push(oAuthApi.deleteOauthClient(entity.id));
+                });
+            }
 
-        return Promise.all(del_clients);
-    });
+            return Promise.all(del_clients);
+        });
 }
 
 /**
@@ -55,7 +46,7 @@ function remove(logFunc){
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
  *                          is the Genesys Cloud object details of that type.
  */
-function create(logFunc, data){
+function create(logFunc, data) {
     let authData = {};
 
     // Assign employee role to the oauth client because required
@@ -63,35 +54,35 @@ function create(logFunc, data){
     return authorizationApi.getAuthorizationRoles({
         name: 'employee'
     })
-    .then((result) => {
-        let employeeRole = result.entities[0];
+        .then((result) => {
+            let employeeRole = result.entities[0];
 
-        let authPromises = [];
-        
-        data.forEach((oauth) => {
-            let oauthClient = {
-                name: config.prefix + oauth.name,
-                description: oauth.description,
-                authorizedGrantType: oauth.authorizedGrantType,
-                roleIds: [employeeRole.id]
-            };
+            let authPromises = [];
 
-            authPromises.push(
-                oAuthApi.postOauthClients(oauthClient)
-                .then((data) => {
-                    authData[oauth.name] = data;
+            data.forEach((oauth) => {
+                let oauthClient = {
+                    name: config.prefix + oauth.name,
+                    description: oauth.description,
+                    authorizedGrantType: oauth.authorizedGrantType,
+                    roleIds: [employeeRole.id]
+                };
 
-                    logFunc('Created ' + data.name + ' auth client');
-                })
-                .catch((err) => console.log(err))
-            );
+                authPromises.push(
+                    oAuthApi.postOauthClients(oauthClient)
+                        .then((data) => {
+                            authData[oauth.name] = data;
 
-            
+                            logFunc('Created ' + data.name + ' auth client');
+                        })
+                        .catch((err) => console.log(err))
+                );
+
+
+            })
+
+            return Promise.all(authPromises);
         })
-
-        return Promise.all(authPromises);
-    })
-    .then(() => authData);
+        .then(() => authData);
 }
 
 /**
@@ -101,7 +92,7 @@ function create(logFunc, data){
  * @param {Object} installedData contains everything that was installed by the wizard
  * @param {String} userId User id if needed
  */
-function configure(logFunc, installedData, userId){
+function configure(logFunc, installedData, userId) {
     let promiseArr = [];
     let oauthData = installedData['oauth-client'];
 
@@ -109,49 +100,49 @@ function configure(logFunc, installedData, userId){
         let promise = new Promise((resolve, reject) => {
             let oauth = oauthData[oauthKey];
             let oauthInstall = config.provisioningInfo['oauth-client']
-                                .find((info) => info.name == oauthKey);
+                .find((info) => info.name == oauthKey);
 
             let timer = setInterval(() => {
                 usersApi.getUsersMe({
                     expand: ['authorization']
                 })
-                .then((result) => {
-                    console.log(result);
-                    let userRoleIds = result.authorization.roles.map(u => u.id);
-                    let userAssigned = true;
+                    .then((result) => {
+                        console.log(result);
+                        let userRoleIds = result.authorization.roles.map(u => u.id);
+                        let userAssigned = true;
 
-                    // Check if all roles for these client is already assigned
-                    // to the user
-                    oauthInstall.roles.forEach((r) => {
-                        if(!userRoleIds.includes(installedData.role[r].id)){
-                            userAssigned = false;
+                        // Check if all roles for these client is already assigned
+                        // to the user
+                        oauthInstall.roles.forEach((r) => {
+                            if (!userRoleIds.includes(installedData.role[r].id)) {
+                                userAssigned = false;
+                            }
+                        });
+
+                        if (userAssigned) {
+                            clearInterval(timer);
+
+                            oAuthApi.putOauthClient(
+                                oauthData[oauthKey].id,
+                                {
+                                    name: oauth.name,
+                                    authorizedGrantType: oauth.authorizedGrantType,
+                                    roleIds: oauthInstall.roles.map(
+                                        (roleName) => installedData.role[roleName].id)
+                                        .filter(g => g != undefined)
+                                }
+                            )
+                                .then(() => {
+                                    resolve();
+                                })
+                                .catch((e) => reject(e));
                         }
-                    });
-
-                    if(userAssigned){
+                    })
+                    .catch(e => {
                         clearInterval(timer);
 
-                        oAuthApi.putOauthClient(
-                            oauthData[oauthKey].id,
-                            {
-                                name: oauth.name,
-                                authorizedGrantType: oauth.authorizedGrantType,
-                                roleIds: oauthInstall.roles.map(
-                                        (roleName) => installedData.role[roleName].id)
-                                    .filter(g => g != undefined)
-                            }
-                        )
-                        .then(() => {
-                            resolve();
-                        })
-                        .catch((e) => reject(e));
-                    }
-                })
-                .catch(e => {
-                    clearInterval(timer);
-
-                    console.error(e);
-                });
+                        console.error(e);
+                    });
             }, 3000);
         });
 

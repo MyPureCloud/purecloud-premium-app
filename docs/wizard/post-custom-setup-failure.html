@@ -8,7 +8,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unlicensed</title>
+  <title>Backend Failure</title>
 
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
@@ -33,19 +33,18 @@
   <div class="content">
     <div class="title">
       <div>
-        <span class="txt-unlicensed">Access Denied</span>
+        <span class="txt-post-custom-setup-failure">Backend failure</span>
       </div>
     </div>
-
     <main>
       <p>
-        <span class="txt-missing-permissions">You don't have the proper permissions to access the integration.</span>
+        <span class="txt-failure-backend">The setup on our backend failed.</span>
       </p>
       <p>
-        <b><span class="txt-details-missing-permissions">Missing:</span></b><i><span class="details-missing-permissions"></span></i>
+        <b><span class="txt-details-failure-backend">Cause:</span></b><i><span class="details-failure-backend"></span></i>
       </p>
       <p>
-        <span class="txt-resolve-permissions">Please contact your administrator for further assistance.</span>
+        <span class="txt-resolve-backend">Please contact us, or we will contact you shortly by email.</span>
       </p>
     </main>
   </div>
@@ -55,12 +54,12 @@
   <script type="module">
     import config from './config/config.js';
 
-    // Display Missing Permissions if provided
-    let missingPermissions = localStorage.getItem(config.premiumAppIntegrationTypeId + ':missingPermissions') || '';
-    if (missingPermissions && missingPermissions != '') {
-      let els = document.querySelectorAll(`.details-missing-permissions`);
+    // Display Failure Cause if provided
+    let failureCause = localStorage.getItem(config.premiumAppIntegrationTypeId + ':failureCause') || '';
+    if (failureCause && failureCause != '') {
+      let els = document.querySelectorAll(`.details-failure-backend`);
       for (let i = 0; i < els.length; i++) {
-        els.item(i).innerText = missingPermissions;
+        els.item(i).innerText = failureCause;
       }
     }
 
