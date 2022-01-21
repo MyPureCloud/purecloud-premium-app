@@ -8,12 +8,9 @@ const widgetsApi = new platformClient.WidgetsApi();
 * Get existing Widget Deployments based on the prefix
 * @returns {Promise.<Array>} Array of Genesys Cloud OAuth Clients
 */
-function getExisting() {
-    return widgetsApi.getWidgetsDeployments()
-        .then((data) => {
-            return data.entities.filter((entity) =>
-                entity.name.startsWith(config.prefix));
-        });
+async function getExisting() {
+    let data = await widgetsApi.getWidgetsDeployments();
+    return data.entities.filter((entity) => entity.name.startsWith(config.prefix));
 }
 
 /**
@@ -21,21 +18,20 @@ function getExisting() {
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(logFunc) {
+async function remove(logFunc) {
     logFunc('Uninstalling Widget Deployments...');
 
-    return getExisting()
-        .then((instances) => {
-            let del_deployments = [];
+    let instances = await getExisting();
 
-            if (instances.length > 0) {
-                instances.forEach(entity => {
-                    del_deployments.push(widgetsApi.deleteWidgetsDeployment(entity.id));
-                });
-            }
+    let del_deployments = [];
 
-            return Promise.all(del_deployments);
+    if (instances.length > 0) {
+        instances.forEach(entity => {
+            del_deployments.push(widgetsApi.deleteWidgetsDeployment(entity.id));
         });
+    }
+
+    return Promise.all(del_deployments);
 }
 
 /**
@@ -45,7 +41,7 @@ function remove(logFunc) {
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
  *                          is the Genesys Cloud object details of that type.
  */
-function create(logFunc, data) {
+async function create(logFunc, data) {
     let deploymentPromises = [];
     let deploymentsData = {};
 
@@ -59,17 +55,15 @@ function create(logFunc, data) {
             clientType: instance.clientType || 'third-party'
         };
 
-        deploymentPromises.push(
-            widgetsApi.postWidgetsDeployments(deploymentBody)
-                .then((data) => {
-                    logFunc('Created Widget Deployment: ' + instance.name);
-                    deploymentsData[instance.name] = data;
-                })
-        );
+        deploymentPromises.push((async () => {
+            let result = await widgetsApi.postWidgetsDeployments(deploymentBody);
+            logFunc('Created Widget Deployment: ' + instance.name);
+            deploymentsData[instance.name] = result;
+        })());
     });
 
-    return Promise.all(deploymentPromises)
-        .then(() => deploymentsData);
+    await Promise.all(deploymentPromises);
+    return deploymentsData;
 }
 
 /**
@@ -79,7 +73,7 @@ function create(logFunc, data) {
  * @param {Object} installedData contains everything that was installed by the wizard
  * @param {String} userId User id if needed
  */
-function configure(logFunc, installedData, userId) {
+async function configure(logFunc, installedData, userId) {
     let instanceInstallationData = config.provisioningInfo['widget-deployment'];
     let deploymentInstancesData = installedData['widget-deployment'];
 
@@ -94,15 +88,10 @@ function configure(logFunc, installedData, userId) {
         if (deploymentInstanceInstall.autoEnable && deploymentInstanceInstall.autoEnable === true) {
             deploymentConfig.disabled = false;
 
-            promisesArr.push(
-                widgetsApi.putWidgetsDeployment(
-                    deploymentInstance.id,
-                    deploymentConfig
-                )
-                    .then((data) => {
-                        logFunc('Configured Widget Deployment: ' + deploymentInstance.name);
-                    })
-            );
+            promisesArr.push((async () => {
+                await widgetsApi.putWidgetsDeployment(deploymentInstance.id, deploymentConfig);
+                logFunc('Configured Widget Deployment: ' + deploymentInstance.name);
+            })());
         }
     });
 

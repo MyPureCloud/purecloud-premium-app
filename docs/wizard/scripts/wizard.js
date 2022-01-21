@@ -81,6 +81,7 @@ function getInstalledObjects() {
  * @returns {Object} SImplified object data of installed items
  */
 function simplifyInstalledData() {
+    console.log(installedData);
     let result = {};
     Object.keys(installedData).forEach(modKey => {
         let modItems = installedData[modKey];
@@ -148,6 +149,7 @@ export default {
         let creationPromises = [];
         let configurationPromises = [];
         let finalFunctionPromises = [];
+        let creationResult = null; 
 
         // Create all the items
         try {
@@ -163,10 +165,10 @@ export default {
                     )
                 );
             });
-            const creationResult = await Promise.all(creationPromises);
+            creationResult = await Promise.all(creationPromises);
         } catch(e) {
             console.error('Error on creating objects');
-            console.error(e);
+            throw e;
         } 
 
         // Configure all objects
@@ -187,7 +189,7 @@ export default {
             await Promise.all(configurationPromises);
         } catch(e) {
             console.error('Error on configuring objects');
-            console.error(e);
+            throw e;
         }
 
         // Run 'finally' methods
@@ -207,7 +209,7 @@ export default {
             await Promise.all(finalFunctionPromises);
         } catch(e) {
             console.error('Error running finally on objects');
-            console.error(e);
+            throw e;
         }
 
         // Store the installedData in the integration's description
@@ -218,7 +220,8 @@ export default {
             let integrationInstance = await integrationsApi.getIntegrationConfigCurrent(integrationId);
             let simplifiedData = simplifyInstalledData();
 
-            integrationInstance.notes = JSON.stringify(simplifiedData);
+            // NOTE: Cuts off at 500 because of limit to integration notes.
+            integrationInstance.notes = JSON.stringify(simplifiedData).substring(0,500);
 
             await integrationsApi.putIntegrationConfigCurrent(integrationId, { body: integrationInstance });
 
@@ -234,8 +237,8 @@ export default {
                 return { status: true, cause: 'no post custom setup' };
             }
         } catch(e) {
-            console.error('Error finalizing installeData');
-            console.error(e);
+            console.error('Error finalizing installedData');
+            throw e;
         }
     },
 
