@@ -11,10 +11,13 @@ const fs = require('fs').promises;
 const fsConstants = require('fs').constants;
 const path = require('path');
 const colors = require('colors');
+const HTMLParser = require('node-html-parser');
+const md5 = require('md5');
 
 // File paths
 const configFilePath = path.join(__dirname, 'docs/wizard/config/config.js')
 const languageDirPath = path.join(__dirname, 'docs/wizard/assets/languages')
+const wizardPath = path.join(__dirname, 'docs/wizard')
 
 // Default config constants to check
 const defaultClientId = 'e7de8a75-62bb-43eb-9063-38509f8c21af';
@@ -26,6 +29,11 @@ const defaultLanguage = {
   'txt-premium-app-name': 'Premium App',
   'txt-greeting-2': 'Welcome to the Premium App Example Application',
   'txt-not-available-message': 'We\'re sorry but your Genesys Cloud org does not have the Premium App Sample Product enabled. Please contact Genesys Cloud.',
+}
+
+// Default image md5 checksum hashes
+const defaulImgHash = {
+  footerImg: '3b3fc68be4e84a23b52ef2b9fcd359a8'
 }
 
 // Message arrays
@@ -298,7 +306,7 @@ async function evaluateLanguageFiles(){
 
 /**
  * Checks the properties of the language JSON file (en-us language only for now)
- * and evaluates if they were updates and no longer the default values.
+ * and evaluates if they were updated and no longer the default values.
  * If en-us does not exist or is not the default language, skip this entire section.
  * In that case, we'll assume that because they're using a different default language, that the text would 
  * already be their own.
@@ -328,12 +336,47 @@ async function evaluateWizardText(){
   await Evaluator.evaluateArr(Evaluator.CRITICAL, forEvaluation)
 }
 
+/**
+ * Evaluate images if they've been changed
+ * Uses md5 checksum to check if the same as default image
+ */
+async function evaluateImages(){
+  let htmlString = null;
+  let htmlValue = null; // Parsed HTML
+  let forEvaluation = [];
+
+  // Footer Image
+  // NOTE: Only checks in index.html. Pretty safe assumption that if partner updated the image, they'll
+  // update it on all pages as it would be OBVIOUS if some pages have different logos.
+  try {
+    const htmlData = await fs.readFile(path.join(wizardPath, 'index.html'));
+    htmlString = htmlData.toString();
+    htmlValue = HTMLParser.parse(htmlString);
+  } catch(e) {
+    console.error(`Error in parsing index.html`)
+    throw e;
+  }
+
+  const footerImgSrc = htmlValue.querySelector('#footer-logo').getAttribute('src');
+  const footerImgData = await fs.readFile(path.join(wizardPath, footerImgSrc));
+  forEvaluation.push(Evaluator.customEvaluation(() => {
+      return md5(footerImgData) !== defaulImgHash.footerImg;
+    },
+    `Footer image has been replaced`,
+    `Footer image is the default footer image`,
+    `Personalize UI`
+  ));
+
+  await Evaluator.evaluateArr(Evaluator.CRITICAL, forEvaluation);
+}
+
 async function evaluateAll(){
   config = await getConfigObject();
   await evaluateConfig();
   await evaluateLanguageFiles();
   await evaluateWizardText();
-
+  await evaluateImages();
+  // await evaluateStyles();
 
   printMessages();
 }

@@ -23,6 +23,8 @@
   "homepage": "https://github.com/PrinceMerluza/purecloud-premium-app#readme",
   "dependencies": {
     "colors": "^1.4.0",
-    "express": "^4.16.3"
+    "express": "^4.16.3",
+    "md5": "^2.3.0",
+    "node-html-parser": "^5.2.0"
   }
 }
