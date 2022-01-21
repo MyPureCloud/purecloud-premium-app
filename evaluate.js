@@ -12,6 +12,8 @@ const configFilePath = path.join(__dirname, 'docs/wizard/config/config.js')
 
 // Constants to check
 const defaultClientId = 'e7de8a75-62bb-43eb-9063-38509f8c21af';
+const defaultIntegrationTypeId = 'premium-app-example';
+const defaultViewPermission = 'integration:examplePremiumApp:view';
 
 // Message arrays
 const passedMessages = [];
@@ -25,7 +27,7 @@ const Evaluator = {
   'CRITICAL': 1,
 
   /**
-   * Check object if property exists
+   * Check object if property exists. If it's a string, then make sure that it's not blank.
    * @param {Object} obj the object
    * @param {String} propertyName property name to check
    * @param {String} objectName for message, the name of the object
@@ -34,10 +36,15 @@ const Evaluator = {
    */
   propertyExists(obj, propertyName, objectName, additionalComment) {
     if (propertyName in obj) {
+      // If string, make sure it's not a blank string
+      if(typeof obj[propertyName] == 'string' && obj[propertyName].trim().length <= 0){
+        return [false, `${propertyName} does not exist in ${objectName}. -- ${additionalComment}`]
+      }
+
       return [true, `${propertyName} exists in ${objectName}. -- ${additionalComment}`]
-    } else {
-      return [false, `${propertyName} does not exist in ${objectName}. -- ${additionalComment}`]
     }
+
+    return [false, `${propertyName} does not exist in ${objectName}. -- ${additionalComment}`]
   },
 
   /**
@@ -50,10 +57,34 @@ const Evaluator = {
    * @returns {Array} [bool, message]
    */
   notEqual(value1, value2, value1Name, additionalComment) {
+    // value1 should not be null or undefined
+    if(!value1){
+      return [false, `${value1Name} does not exist`]
+    }
+
     if(value1 !== value2){
       return [true, `${value1Name} is not equal to ${value2} -- ${additionalComment}`]
     } else {
       return [false, `${value1Name} is equal to ${value2} -- ${additionalComment}`]
+    }
+  },
+
+  /**
+   * Custom evaluation that returns true or false.
+   * @param {Function} func fucntion that returns boolean
+   * @param {String} passMessage 
+   * @param {String} failMessage
+   * @param {String} additionalComment (optional)
+   * @returns {Array} [bool, message]
+   */
+  customEvaluation(func, passMessage, failMessage, additionalComment) {
+    let result = func();
+    if(typeof result != 'boolean') throw new Error('Func does not return boolean');
+    
+    if(result){
+      return [true, `${passMessage} -- ${additionalComment}`]
+    } else {
+      return [false, `${failMessage} -- ${additionalComment}`]
     }
   },
 
@@ -86,6 +117,9 @@ const Evaluator = {
   }
 }
 
+/**
+ * Print the result messages
+ */
 function printMessages(){
   console.log(' --------- PASSED ----------'.blue);  
   if(passedMessages.length <= 0) console.log('none'.grey);
@@ -103,6 +137,7 @@ function printMessages(){
   console.log();
 
   console.log('NOTE: Some warnings may be acceptable especially if the evaluation is done prior to a Premium App demo.');
+  console.log('For production-ready wizards, every test should pass.');
   console.log('If there are any questions, please contact your Genesys Developer Evangelist POC.');
   console.log();
 }
@@ -135,12 +170,51 @@ async function evaluateConfig(){
   let config = await getConfigObject();
   if(!config) throw new Error('Error on getting the config file.');
 
+  // =================== WARNING LEVEL ===============
   Evaluator.evaluateArr(Evaluator.WARNING, [
-    Evaluator.notEqual(config.clientID, defaultClientId, 'defaultClientId', 'clientID should be replaced with your own client ID.')
+    // Client ID
+    Evaluator.notEqual(config.clientID, defaultClientId, 'clientID', 'clientID should be replaced with your own client ID.'),
+
+    // URLs
+    Evaluator.customEvaluation(() => {
+      let url = new URL(config.wizardUriBase);
+      return url.hostname == 'localhost' ? false : true;
+    }, 'wizardUriBase is not localhost', 'wizardUriBase is localhost', 'wizardUriBase should be a publically available URL'),
+    Evaluator.customEvaluation(() => {
+      let url = new URL(config.redirectURLOnWizardCompleted);
+      return url.hostname == 'localhost' ? false : true;
+    }, 'redirectURLOnWizardCompleted is not localhost', 'redirectURLOnWizardCompleted is localhost', 'redirectURLOnWizardCompleted should be a publically available URL'),
+
+    // Integration Type ID
+    Evaluator.notEqual(config.premiumAppIntegrationTypeId, defaultIntegrationTypeId, 'premiumAppIntegrationTypeId', 'Once integration is approved in AppFoundry, premiumAppIntegrationTypeId should match the provided unique ID.'),
+
+    // Premium App View Permission
+    Evaluator.notEqual(config.premiumAppViewPermission, defaultViewPermission, 'premiumAppViewPermission', 'Once integration is approved in AppFoundry, premiumAppViewPermission should match the new unique permission.'),
   ])
 
+  // =================== CRITICAL LEVEL ===============
   Evaluator.evaluateArr(Evaluator.CRITICAL, [
-    Evaluator.propertyExists(config, 'clientID', 'config', 'ClientID should exist')
+    Evaluator.propertyExists(config, 'clientID', 'config', 'ClientID should exist'),
+    Evaluator.propertyExists(config, 'wizardUriBase', 'config', 'wizardUriBase should exist'),
+    Evaluator.propertyExists(config, 'redirectURLOnWizardCompleted', 'config', 'redirectURLOnWizardCompleted should exist'),
+    Evaluator.propertyExists(config, 'premiumAppIntegrationTypeId', 'config', 'premiumAppIntegrationTypeId should exist'),
+    Evaluator.propertyExists(config, 'premiumAppViewPermission', 'config', 'premiumAppViewPermission should exist'),
+    // checkInstallPermissions
+    Evaluator.customEvaluation(() => {
+        let installPermisison = config.checkInstallPermissions;
+        if(!installPermisison) return false;
+
+        if(['all', 'premium', 'wizard', 'none'].includes(installPermisison)) return true;
+
+        return false;
+      }, `${config.checkInstallPermissions} is valid value for checkInstallPermissions`,
+      `${config.checkInstallPermissions} is not valid value for checkInstallPermissions`,
+      `Valid values: all, premium, wizard, none`
+    ),
+    Evaluator.propertyExists(config, 'defaultPcEnvironment', 'config', 'defaultPcEnvironment should exist'),
+    // TODO: Maybe test if pcEnvironment is valid
+    Evaluator.propertyExists(config, 'prefix', 'config', 'prefix should exist'),
+    Evaluator.propertyExists(config, 'provisioningInfo', 'config', 'provisioningInfo should exist'),
   ])
 }
 
@@ -152,4 +226,4 @@ async function evaluateAll(){
 }
 
 
-evaluateAll()
+evaluateAll();
