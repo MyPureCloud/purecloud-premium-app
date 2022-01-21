@@ -258,7 +258,6 @@ async function runPageScript() {
                 window.location.href = config.redirectURLOnWizardCompleted;
             }, 2000);
 
-            resolve();
             break;
         case 'uninstall.html':
             alert('The uninstall button is for development purposes only. Remove this button before demo.');
