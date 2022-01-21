@@ -1,14 +1,20 @@
 /**
+ * QUIDDITCH
+ * 3.0.0
+ * 
  * This script is for analyzing the wizard's readiness on being a Premium App
  * It will check if default values/images have already been replaced with a different one.
  * It will also do checks on configuration values to make sure they are valid.
  */
+
 const fs = require('fs').promises;
+const fsConstants = require('fs').constants;
 const path = require('path');
 const colors = require('colors');
 
 // File paths
 const configFilePath = path.join(__dirname, 'docs/wizard/config/config.js')
+const languageDirPath = path.join(__dirname, 'docs/wizard/assets/languages')
 
 // Constants to check
 const defaultClientId = 'e7de8a75-62bb-43eb-9063-38509f8c21af';
@@ -38,13 +44,13 @@ const Evaluator = {
     if (propertyName in obj) {
       // If string, make sure it's not a blank string
       if(typeof obj[propertyName] == 'string' && obj[propertyName].trim().length <= 0){
-        return [false, `${propertyName} does not exist in ${objectName}. -- ${additionalComment}`]
+        return Promise.resolve([false, `${propertyName} does not exist in ${objectName}. -- ${additionalComment}`])
       }
 
-      return [true, `${propertyName} exists in ${objectName}. -- ${additionalComment}`]
+      return Promise.resolve([true, `${propertyName} exists in ${objectName}. -- ${additionalComment}`])
     }
 
-    return [false, `${propertyName} does not exist in ${objectName}. -- ${additionalComment}`]
+    return Promise.resolve([false, `${propertyName} does not exist in ${objectName}. -- ${additionalComment}`])
   },
 
   /**
@@ -63,9 +69,9 @@ const Evaluator = {
     }
 
     if(value1 !== value2){
-      return [true, `${value1Name} is not equal to ${value2} -- ${additionalComment}`]
+      return Promise.resolve([true, `${value1Name} is not equal to ${value2} -- ${additionalComment}`])
     } else {
-      return [false, `${value1Name} is equal to ${value2} -- ${additionalComment}`]
+      return Promise.resolve([false, `${value1Name} is equal to ${value2} -- ${additionalComment}`])
     }
   },
 
@@ -82,9 +88,28 @@ const Evaluator = {
     if(typeof result != 'boolean') throw new Error('Func does not return boolean');
     
     if(result){
-      return [true, `${passMessage} -- ${additionalComment}`]
+      return Promise.resolve([true, `${passMessage} -- ${additionalComment}`])
     } else {
-      return [false, `${failMessage} -- ${additionalComment}`]
+      return Promise.resolve([false, `${failMessage} -- ${additionalComment}`])
+    }
+  },
+
+  /**
+   * Custom evaluation that returns true or false.
+   * @param {Function} func async fucntion that returns Promise<boolean>
+   * @param {String} passMessage 
+   * @param {String} failMessage
+   * @param {String} additionalComment (optional)
+   * @returns {Array} [bool, message]
+   */
+  async customEvaluationAsync(func, passMessage, failMessage, additionalComment) {
+    let result = await func();
+    if(typeof result != 'boolean') throw new Error('Func resolution does not return boolean');
+    
+    if(result){
+      return Promise.resolve([true, `${passMessage} -- ${additionalComment}`])
+    } else {
+      return Promise.resolve([false, `${failMessage} -- ${additionalComment}`])
     }
   },
 
@@ -93,8 +118,10 @@ const Evaluator = {
    * @param {*} importanceLevel Evaluator.WARNING or Evaluator.CRITICAL
    * @param {Array} evaluationArr array of tests 
    */
-  evaluateArr(importanceLevel, evaluationArr) {
-    evaluationArr.forEach(evaluation => {
+  async evaluateArr(importanceLevel, evaluationArr) {
+    const evaluationResults = await Promise.all(evaluationArr);
+
+    evaluationResults.forEach(evaluation => {
       const result = evaluation[0];
       const message = evaluation[1];
 
@@ -117,6 +144,9 @@ const Evaluator = {
   }
 }
 
+// Globals
+let config = null; // Config object of the config file
+
 /**
  * Print the result messages
  */
@@ -136,9 +166,9 @@ function printMessages(){
   criticalMessages.forEach((m, i) => console.log(`${i + 1}. ${m}`.brightRed));
   console.log();
 
-  console.log('NOTE: Some warnings may be acceptable especially if the evaluation is done prior to a Premium App demo.');
-  console.log('For production-ready wizards, every test should pass.');
-  console.log('If there are any questions, please contact your Genesys Developer Evangelist POC.');
+  console.log('NOTE: Some warnings are acceptable especially if the evaluation is done prior to a demo.'.black.bgWhite.underline);
+  console.log('For production-ready wizards, every test should pass.'.black.bgWhite.underline);
+  console.log('If there are any questions, please contact your Genesys Developer Evangelist POC.'.black.bgWhite.underline);
   console.log();
 }
 
@@ -167,11 +197,10 @@ async function getConfigObject(){
  * Evaluate the config.json
  */
 async function evaluateConfig(){
-  let config = await getConfigObject();
   if(!config) throw new Error('Error on getting the config file.');
 
   // =================== WARNING LEVEL ===============
-  Evaluator.evaluateArr(Evaluator.WARNING, [
+  await Evaluator.evaluateArr(Evaluator.WARNING, [
     // Client ID
     Evaluator.notEqual(config.clientID, defaultClientId, 'clientID', 'clientID should be replaced with your own client ID.'),
 
@@ -193,7 +222,7 @@ async function evaluateConfig(){
   ])
 
   // =================== CRITICAL LEVEL ===============
-  Evaluator.evaluateArr(Evaluator.CRITICAL, [
+  await Evaluator.evaluateArr(Evaluator.CRITICAL, [
     Evaluator.propertyExists(config, 'clientID', 'config', 'ClientID should exist'),
     Evaluator.propertyExists(config, 'wizardUriBase', 'config', 'wizardUriBase should exist'),
     Evaluator.propertyExists(config, 'redirectURLOnWizardCompleted', 'config', 'redirectURLOnWizardCompleted should exist'),
@@ -212,18 +241,66 @@ async function evaluateConfig(){
       `Valid values: all, premium, wizard, none`
     ),
     Evaluator.propertyExists(config, 'defaultPcEnvironment', 'config', 'defaultPcEnvironment should exist'),
-    // TODO: Maybe test if pcEnvironment is valid
+    // TODO: Maybe test if pcEnvironment is valid value
     Evaluator.propertyExists(config, 'prefix', 'config', 'prefix should exist'),
     Evaluator.propertyExists(config, 'provisioningInfo', 'config', 'provisioningInfo should exist'),
+    Evaluator.propertyExists(config, 'defaultLanguage', 'config', 'defaultLanguage should exist'),
+    Evaluator.propertyExists(config, 'availableLanguageAssets', 'config', 'availableLanguageAssets should exist'),
+    // Check if defaultLanguage value is valid
+    Evaluator.customEvaluation(() => {
+        if(!config.defaultLanguage) return false;
+
+        return Object.keys(config.availableLanguageAssets).includes(config.defaultLanguage)
+      },
+      `${config.defaultLanguage} is a valid language value`,
+      `${config.defaultLanguage} is not available in the availableLanguageAssets`,
+      `defaultLanguage should be valid`
+    ),
+    Evaluator.propertyExists(config, 'installPermissions', 'config', 'installPermissions should exist'),
+    Evaluator.propertyExists(config, 'uninstallPermissions', 'config', 'uninstallPermissions should exist'),
+    Evaluator.propertyExists(config, 'installScopes', 'config', 'installScopes should exist'),
+    Evaluator.propertyExists(config, 'uninstallScopes', 'config', 'uninstallScopes should exist'),
+
   ])
 }
 
+/**
+ * Check if language files exist for the available languages in config
+ */
+async function evaluateLanguageFiles(){
+  const toBeEvaluated = [];
+
+  Object.keys(config.availableLanguageAssets).forEach(langKey => {
+    toBeEvaluated.push(Evaluator.customEvaluationAsync(async () => {
+        const langFilePath = path.join(languageDirPath, `${langKey}.json`);
+        try {
+          await fs.access(langFilePath, fsConstants.F_OK);
+          return true;
+        } catch(e) {
+          return false
+        }
+      },
+      `${langKey}.json exists`,
+      `${langKey} is declared in config languages but ${langKey}.json does not exist.`,
+      'Language file should exist'
+    ))
+  });
+
+  await Evaluator.evaluateArr(Evaluator.CRITICAL, toBeEvaluated);
+}
 
 async function evaluateAll(){
+  config = await getConfigObject();
   await evaluateConfig();
+  await evaluateLanguageFiles();
 
   printMessages();
 }
 
-
+console.log('====================================================================='.bgBrightCyan.black);
+console.log(`-----------------          QUIDDITCH                -----------------`.bgBrightCyan.black);
+console.log(`-----------------      PREMIUM WIZARD EVALUATOR     -----------------`.bgBrightCyan.black);
+console.log(`-----------------          (v3.0.0)                 -----------------`.bgBrightCyan.black);
+console.log('====================================================================='.bgBrightCyan.black);
+console.log();
 evaluateAll();
