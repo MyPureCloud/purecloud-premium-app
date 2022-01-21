@@ -38,7 +38,7 @@ export default {
         'en-us': 'English',
         'es': 'Español'
     },
-    enableLanguageSelection: false,
+    enableLanguageSelection: true,
 
     // The names of the query parameters to check in 
     // determining language and environment
@@ -244,4 +244,4 @@ export default {
         });
     }
 
-};
+}
