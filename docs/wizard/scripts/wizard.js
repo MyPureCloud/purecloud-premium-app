@@ -28,7 +28,6 @@ let modules = [
 ];
 
 const jobOrder = config.provisioningInfo;
-const prefix = config.prefix;
 
 // Genesys Cloud
 const platformClient = require('platformClient');
@@ -45,28 +44,24 @@ let installedData = {}; // Everything that's installed after
  * Get ID of the integration so the description can be edited containing
  * the installed data. Currently gets the first one from the result.
  * Does not support multiple integration instances yet.
- * @returns {Promise} id of the premium app integration instance
+ * @returns {Promise<string|null>} id of the premium app integration instance
  */
-function getIntegrationId() {
-    return new Promise((resolve, reject) => {
-        integrationsApi.getIntegrationsClientapps({ pageSize: 1000 })
-            .then((data) => {
-                let instances = data.entities;
-                let pa_instance = instances.find(instance => instance.integrationType.id == config.premiumAppIntegrationTypeId);
-                if (pa_instance) {
-                    resolve(pa_instance.id);
-                } else {
-                    resolve(null);
-                }
-            })
-            .catch(err => reject(err))
-    });
+async function getIntegrationId() {
+    try {
+        const clientApps = await integrationsApi.getIntegrationsClientapps({ pageSize: 1000 });
+        let instances = clientApps.entities;
+        let pa_instance = instances.find(instance => instance.integrationType.id == config.premiumAppIntegrationTypeId);
+
+        return pa_instance ? pa_instance.id : null;
+    } catch(e) {
+        throw e;
+    }
 }
 
 /**
  * Get's all the currently installed items as defined in the
  * job order.
- * @returns {Promise} Array of the installed objects
+ * @returns {Promise<Array>} Array of the installed objects
  */
 function getInstalledObjects() {
     let promiseArr = [];
@@ -86,6 +81,7 @@ function getInstalledObjects() {
  * @returns {Object} SImplified object data of installed items
  */
 function simplifyInstalledData() {
+    console.log(installedData);
     let result = {};
     Object.keys(installedData).forEach(modKey => {
         let modItems = installedData[modKey];
@@ -127,114 +123,123 @@ export default {
      * Checks if any installed objects are still existing
      * @returns {Promise<boolean>}
      */
-    isExisting() {
+    async isExisting() {
         let exists = false;
 
-        return getInstalledObjects()
-            .then((installed) => {
-                console.log(installed);
-                installed.forEach(item => {
-                    // if it's just an array
-                    exists = item.length > 0 ? true : exists;
-                });
+        try {
+            const installedObjects = await getInstalledObjects();
+            console.log(installedObjects);
 
-                return exists;
-            })
-            .catch((e) => console.error(e));
+            installedObjects.forEach(item => {
+                // if it's just an array
+                exists = item.length > 0 ? true : exists;
+            });
+            
+            return exists;
+        } catch(e) {
+            console.error(e);
+        }
     },
 
     /**
      * Installs all the modules
      * @returns {Promise<Array>} array of finally function resolves
      */
-    install() {
+    async install() {
         let creationPromises = [];
         let configurationPromises = [];
         let finalFunctionPromises = [];
+        let creationResult = null; 
 
         // Create all the items
-        modules.forEach((module) => {
-            let moduleProvisioningData = config.provisioningInfo[module.provisioningInfoKey];
+        try {
+            modules.forEach((module) => {
+                let moduleProvisioningData = config.provisioningInfo[module.provisioningInfoKey];
 
-            if (!moduleProvisioningData) return;
+                if (!moduleProvisioningData) return;
 
-            creationPromises.push(
-                module.create(
-                    view.showLoadingModal,
-                    moduleProvisioningData
-                )
-            );
-        });
+                creationPromises.push(
+                    module.create(
+                        view.showLoadingModal,
+                        moduleProvisioningData
+                    )
+                );
+            });
+            creationResult = await Promise.all(creationPromises);
+        } catch(e) {
+            console.error('Error on creating objects');
+            throw e;
+        } 
 
+        // Configure all objects
+        try {
+            modules.forEach((module, i) => {
+                installedData[module.provisioningInfoKey] = creationResult[i];
+            });
 
-        return Promise.all(creationPromises)
-            .then((result) => {
-                // Configure all items
-                modules.forEach((module, i) => {
-                    installedData[module.provisioningInfoKey] = result[i];
-                });
-
-                modules.forEach((module) => {
-                    configurationPromises.push(
-                        module.configure(
-                            view.showLoadingModal,
-                            installedData,
-                            userMe.id
-                        )
-                    );
-                });
-
-                return Promise.all(configurationPromises);
-            })
-            .then(() => {
-                view.showLoadingModal('Executing Final Steps...');
-
-                // Loop through all items with finally 
-                Object.keys(config.provisioningInfo).forEach(key => {
-                    let provisionItems = config.provisioningInfo[key];
-                    provisionItems.forEach((item) => {
-                        if (item.finally) {
-                            finalFunctionPromises.push(
-                                item.finally(installedData[key][item.name])
-                            );
-                        }
-                    })
-                });
-
-                return Promise.all(finalFunctionPromises);
-            })
-            // Store the installedData in the integration's description
-            .then(() => {
-                return getIntegrationId();
-            })
-            .then((id) => {
-                integrationId = id;
-                console.log(installedData)
-                return integrationsApi.getIntegrationConfigCurrent(integrationId)
-                    .then((instance) => {
-                        let body = instance;
-                        let simplifiedData = simplifyInstalledData();
-
-                        body.notes = JSON.stringify(simplifiedData);
-
-                        return integrationsApi.putIntegrationConfigCurrent(
-                            integrationId, { body: body });
-                    })
-            })
-            // Execute Post Custom Setup (if requested)
-            .then(() => {
-                if (config.enableCustomSetupStepAfterInstall) {
-                    return postCustomSetup.configure(
+            modules.forEach((module) => {
+                configurationPromises.push(
+                    module.configure(
                         view.showLoadingModal,
                         installedData,
-                        userMe,
-                        client
-                    );
-                } else {
-                    return { status: true, cause: 'no post custom setup' };
-                }
-            })
-            .catch((e) => console.error(e));
+                        userMe.id
+                    )
+                );
+            });
+            await Promise.all(configurationPromises);
+        } catch(e) {
+            console.error('Error on configuring objects');
+            throw e;
+        }
+
+        // Run 'finally' methods
+        view.showLoadingModal('Executing Final Steps...');
+        try {
+            // Loop through all items with finally 
+            Object.keys(config.provisioningInfo).forEach(key => {
+                let provisionItems = config.provisioningInfo[key];
+                provisionItems.forEach((item) => {
+                    if (item.finally) {
+                        finalFunctionPromises.push(
+                            item.finally(installedData[key][item.name])
+                        );
+                    }
+                })
+            });
+            await Promise.all(finalFunctionPromises);
+        } catch(e) {
+            console.error('Error running finally on objects');
+            throw e;
+        }
+
+        // Store the installedData in the integration's description
+        try {
+            const integrationId = await getIntegrationId();
+
+            console.log(installedData);
+            let integrationInstance = await integrationsApi.getIntegrationConfigCurrent(integrationId);
+            let simplifiedData = simplifyInstalledData();
+
+            // NOTE: Cuts off at 500 because of limit to integration notes.
+            integrationInstance.notes = JSON.stringify(simplifiedData).substring(0,500);
+
+            await integrationsApi.putIntegrationConfigCurrent(integrationId, { body: integrationInstance });
+
+            // Execute Post Custom Setup (if requested)
+            if (config.enableCustomSetupStepAfterInstall) {
+                return postCustomSetup.configure(
+                    view.showLoadingModal,
+                    installedData,
+                    userMe,
+                    client
+                );
+            } else {
+                return { status: true, cause: 'no post custom setup' };
+            }
+        } catch(e) {
+            console.error('Error finalizing installedData');
+            throw e;
+        }
     },
 
     /**

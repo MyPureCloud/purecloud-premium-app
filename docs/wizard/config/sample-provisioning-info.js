@@ -158,7 +158,7 @@ let sample = {
         {
             'name': 'OAuth Client',
             'description': 'Generated Client that\'s passed to the App Backend',
-            'roles': ['Role'],
+            'roles': ['Admin'],
             'authorizedGrantType': 'CLIENT_CREDENTIALS',
             'finally': function (installedData) {
                 return new Promise((resolve, reject) => {

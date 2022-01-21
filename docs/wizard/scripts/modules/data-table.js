@@ -8,37 +8,39 @@ const architectApi = new platformClient.ArchitectApi();
  * Get existing data tables based on the prefix
  * @returns {Promise.<Array>} Genesys Cloud Integrations
  */
-function getExisting() {
+async function getExisting() {
     let dataTables = []
 
     // Internal recursive function for calling 
     // next pages (if any) of the data tables
-    let _getDataTables = (pageNum) => {
-        return architectApi.getFlowsDatatables({
-            pageSize: 100,
-            pageNumber: pageNum,
-            name: config.prefix + "*"
-        })
-            .then((data) => {
-                if (data.pageCount > 0) {
-                    data.entities
-                        .filter((dt) =>
-                            dt.name.startsWith(config.prefix))
-                        .forEach(table =>
-                            dataTables.push(table));
+    let _getDataTables = async (pageNum) => {
+        let data = await architectApi.getFlowsDatatables({
+                            pageSize: 100,
+                            pageNumber: pageNum,
+                            name: config.prefix + "*"
+                        });
+        
+        if (data.pageCount > 0) {
+            data.entities
+                .filter((dt) =>
+                    dt.name.startsWith(config.prefix))
+                .forEach(table =>
+                    dataTables.push(table));
 
-                    if (pageNum < data.pageCount) {
-                        return _getDataTables(pageNum + 1);
-                    }
-                }
-            });
+            if (pageNum < data.pageCount) {
+                return _getDataTables(pageNum + 1);
+            }
+        }
     }
 
-    return _getDataTables(1)
-        .then(() => {
-            return dataTables;
-        })
-        .catch(e => console.error(e));
+    try {
+        await _getDataTables(1)
+    } catch(e) {
+        console.error(e)
+    }
+
+    return dataTables;
+
 }
 
 /**
@@ -46,24 +48,22 @@ function getExisting() {
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(logFunc) {
+async function remove(logFunc) {
     logFunc('Uninstalling Data Tables...');
 
-    return getExisting()
-        .then((instances) => {
-            let del_tables = [];
+    let instances = await getExisting();
+    let del_tables = [];
 
-            if (instances.length > 0) {
-                instances.forEach(entity => {
-                    del_tables.push(
-                        architectApi.deleteFlowsDatatable(entity.id, {
-                            'force': true
-                        }));
-                });
-            }
-
-            return Promise.all(del_tables);
+    if (instances.length > 0) {
+        instances.forEach(entity => {
+            del_tables.push(
+                architectApi.deleteFlowsDatatable(entity.id, {
+                    'force': true
+                }));
         });
+    }
+
+    return Promise.all(del_tables);
 }
 
 /**
@@ -73,7 +73,7 @@ function remove(logFunc) {
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
  *                          is the Genesys Cloud object details of that type.
  */
-function create(logFunc, data) {
+async function create(logFunc, data) {
     let dataTablePromises = [];
     let dataTableData = {};
 
@@ -118,17 +118,16 @@ function create(logFunc, data) {
         })
         dataTableBody.schema['properties'] = properties;
 
-        dataTablePromises.push(
-            architectApi.postFlowsDatatables(dataTableBody)
-                .then((resdtult) => {
-                    logFunc('Created Data Table: ' + dt.name);
-                    dataTableData[dt.name] = dt.id;
-                })
-        );
+        dataTablePromises.push((async () => {
+            let result = await architectApi.postFlowsDatatables(dataTableBody);
+
+            logFunc('Created Data Table: ' + dt.name);
+            dataTableData[dt.name] = result.id;
+        })());
     });
 
-    return Promise.all(dataTablePromises)
-        .then(() => dataTableData);
+    await Promise.all(dataTablePromises)
+    return dataTableData;
 }
 
 /**
@@ -138,7 +137,7 @@ function create(logFunc, data) {
  * @param {Object} installedData contains everything that was installed by the wizard
  * @param {String} userId User id if needed
  */
-function configure(logFunc, installedData, userId) {
+async function configure(logFunc, installedData, userId) {
     return Promise.resolve();
 }
 

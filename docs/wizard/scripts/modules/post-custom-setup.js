@@ -10,7 +10,7 @@ const platformClient = require('platformClient');
  * @param {Object} current user
  * @returns {Promise.<Object>}
  */
-function configure(logFunc, installedData, user, gcClient) {
+async function configure(logFunc, installedData, user, gcClient) {
     return new Promise((resolve, reject) => {
         logFunc('Post Custom Setup...');
 

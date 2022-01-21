@@ -8,36 +8,37 @@ const integrationsApi = new platformClient.IntegrationsApi();
 * Get existing Web Services Data Actions based on the prefix
 * @returns {Promise.<Array>} Array of Genesys Cloud OAuth Clients
 */
-function getExisting() {
+async function getExisting() {
     let integrations = []
 
     // Internal recursive function for calling 
     // next pages (if any) of the integrations
-    let _getIntegrations = (pageNum) => {
-        return integrationsApi.getIntegrations({
-            pageSize: 100,
-            pageNumber: pageNum,
-            expand: ['config.current']
-        })
-            .then((data) => {
-                data.entities
-                    .filter(entity => {
-                        return entity.integrationType.id == 'custom-rest-actions' &&
-                            entity.name.startsWith(config.prefix);
-                    }).forEach(integration =>
-                        integrations.push(integration));
+    let _getIntegrations = async (pageNum) => {
+        let data = await integrationsApi.getIntegrations({
+                        pageSize: 100,
+                        pageNumber: pageNum,
+                        expand: ['config.current']
+                    });
+        data.entities
+            .filter(entity => {
+                return entity.integrationType.id == 'custom-rest-actions' &&
+                    entity.name.startsWith(config.prefix);
+            }).forEach(integration =>
+                integrations.push(integration));
 
-                if (data.nextUri) {
-                    return _getIntegrations(pageNum + 1);
-                }
-            });
+        if (data.nextUri) {
+            return _getIntegrations(pageNum + 1);
+        }
     }
 
-    return _getIntegrations(1)
-        .then(() => {
-            return integrations;
-        })
-        .catch(e => console.error(e));
+    try {
+        await _getIntegrations(1);
+    } catch(e) {
+        console.error(e)
+    }
+
+    return integrations;
+
 }
 
 /**
@@ -45,40 +46,38 @@ function getExisting() {
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(logFunc) {
+async function remove(logFunc) {
     logFunc('Uninstalling Web Services Data Actions...');
 
-    return getExisting()
-        .then((instances) => {
-            let del_ws = [];
+    let instances = await getExisting();
 
-            if (instances.length > 0) {
-                instances.forEach(entity => {
-                    del_ws.push(
-                        integrationsApi.deleteIntegration(entity.id)
-                            .then(() => {
-                                return new Promise((resolve, reject) => {
-                                    console.log('Wait for Web Services Integration delete...');
-                                    setTimeout(() => resolve(), 3000);
-                                });
-                            })
-                            .then(() => {
-                                if (entity.config.current.credentials && entity.config.current.credentials.basicAuth && entity.config.current.credentials.basicAuth.id) {
-                                    return integrationsApi.deleteIntegrationsCredential(entity.config.current.credentials.basicAuth.id);
-                                }
-                            })
-                    );
+    let del_ws = [];
 
-                    /*
-                    del_ws.push(
-                        integrationsApi.deleteIntegration(entity.id)
-                    );
-                    */
+    if (instances.length > 0) {
+        instances.forEach(entity => {
+            del_ws.push((async () => {
+                await integrationsApi.deleteIntegration(entity.id);
+
+                console.log('Wait for Web Services Integration delete...');
+                await new Promise((resolve, reject) => {   
+                    setTimeout(() => resolve(), 3000);
                 });
-            }
 
-            return Promise.all(del_ws);
+
+                if (entity.config.current.credentials && entity.config.current.credentials.basicAuth && entity.config.current.credentials.basicAuth.id) {
+                    return integrationsApi.deleteIntegrationsCredential(entity.config.current.credentials.basicAuth.id);
+                }
+            })());
+
+            /*
+            del_ws.push(
+                integrationsApi.deleteIntegration(entity.id)
+            );
+            */
         });
+    }
+
+    return Promise.all(del_ws);
 }
 
 /**
@@ -88,7 +87,7 @@ function remove(logFunc) {
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
  *                          is the Genesys Cloud object details of that type.
  */
-function create(logFunc, data) {
+async function create(logFunc, data) {
     let integrationPromises = [];
     let integrationsData = {};
 
@@ -102,17 +101,15 @@ function create(logFunc, data) {
         };
 
         // Rename and add Group Filtering
-        integrationPromises.push(
-            integrationsApi.postIntegrations(integrationBody)
-                .then((data) => {
-                    logFunc('Created Web Services Data Actions: ' + instance.name);
-                    integrationsData[instance.name] = data;
-                })
-        );
+        integrationPromises.push((async () => {
+            let data = await integrationsApi.postIntegrations(integrationBody);
+            logFunc('Created Web Services Data Actions: ' + instance.name);
+            integrationsData[instance.name] = data;
+        })());
     });
 
-    return Promise.all(integrationPromises)
-        .then(() => integrationsData);
+    await Promise.all(integrationPromises);
+    return integrationsData;
 }
 
 /**
@@ -122,7 +119,7 @@ function create(logFunc, data) {
  * @param {Object} installedData contains everything that was installed by the wizard
  * @param {String} userId User id if needed
  */
-function configure(logFunc, installedData, userId) {
+async function configure(logFunc, installedData, userId) {
     let instanceInstallationData = config.provisioningInfo['ws-data-actions'];
     let wsInstancesData = installedData['ws-data-actions'];
 
@@ -152,111 +149,103 @@ function configure(logFunc, installedData, userId) {
             }
         };
 
-        let wsCredentialsPromise = new Promise((resolve, reject) => {
+        let wsCredentialsPromise = new Promise(async(resolve, reject) => {
             if (wsInstanceInstall.credentialType && (wsInstanceInstall.credentialType === 'userDefinedOAuth' || wsInstanceInstall.credentialType === 'userDefined' || wsInstanceInstall.credentialType === 'basicAuth')) {
-                integrationsApi.postIntegrationsCredentials(credentialsConfig)
-                    .then((data) => {
-                        resolve(data.id);
-                    })
-                    .catch(err => reject(err));
+                try {
+                    let data = await integrationsApi.postIntegrationsCredentials(credentialsConfig);
+                    resolve(data.id);
+                } catch(e) {
+                    reject(e);
+                }
             } else {
                 resolve('');
             }
         });
 
-        promisesArr.push(
-            wsCredentialsPromise
-                .then((credId) => {
-                    if (credId && credId != '') {
-                        // Save Credential Id and Credential Type in installed data
-                        wsInstance.credentialId = credId;
-                        wsInstance.credentialType = wsInstanceInstall.credentialType;
-                        integrationConfig.body.credentials = {
-                            basicAuth: {
-                                id: credId
-                            }
-                        };
+        promisesArr.push((async () => {
+            let credId = await wsCredentialsPromise;
+
+            if (credId && credId != '') {
+                // Save Credential Id and Credential Type in installed data
+                wsInstance.credentialId = credId;
+                wsInstance.credentialType = wsInstanceInstall.credentialType;
+                integrationConfig.body.credentials = {
+                    basicAuth: {
+                        id: credId
                     }
-                    return integrationsApi.putIntegrationConfigCurrent(
-                        wsInstance.id,
-                        integrationConfig
-                    );
-                })
-                .then((data) => {
-                    logFunc('Configured Web Services Data Actions: ' + wsInstance.name);
+                };
+            }
+            await integrationsApi.putIntegrationConfigCurrent(
+                wsInstance.id,
+                integrationConfig
+            );
 
-                    if (wsInstanceInstall.autoEnable && wsInstanceInstall.autoEnable === true) {
-                        let opts = {
-                            body: {
-                                intendedState: 'ENABLED'
-                            }
-                        };
+            logFunc('Configured Web Services Data Actions: ' + wsInstance.name);
+            if (wsInstanceInstall.autoEnable && wsInstanceInstall.autoEnable === true) {
+                let opts = {
+                    body: {
+                        intendedState: 'ENABLED'
+                    }
+                };
 
-                        return integrationsApi.patchIntegration(wsInstance.id, opts);
+                await integrationsApi.patchIntegration(wsInstance.id, opts);
+            }
+
+            // Wait 3 seconds
+            await new Promise((resolve, reject) => {
+                console.log('Wait for Web Services Integration enablement...');
+                setTimeout(() => resolve(), 3000);
+            });
+
+            console.log('Proceed with Web Services Integration configuration...');
+
+            // Return if Configure Data Actions not necessary
+            if (wsInstanceInstall['data-actions'] && wsInstanceInstall['data-actions'].length <= 0){
+                return;
+            }
+
+            // Configure data actions
+            let promiseDataActions = [];
+
+            wsInstanceInstall['data-actions'].forEach((dataAction) => {
+                let dataActionBody = {
+                    name: config.prefix + dataAction.name,
+                    integrationId: wsInstance.id
+                };
+
+                // Rename and add Group Filtering
+                promiseDataActions.push((async () => {
+                    let createDataActionsResult =  await integrationsApi.postIntegrationsActionsDrafts(dataActionBody);
+                    logFunc('Created Web Services Data Action: ' + createDataActionsResult.name);
+                    let dataActionUpdateBody = { ...createDataActionsResult };
+                    dataActionUpdateBody.secure = dataAction.secure || false;
+                    dataActionUpdateBody.config = dataAction.config;
+                    dataActionUpdateBody.contract = dataAction.contract;
+
+                    let patchDataActionsResult = await integrationsApi.patchIntegrationsActionDraft(dataActionUpdateBody.id, dataActionUpdateBody);
+                    if (dataAction.autoPublish && dataAction.autoPublish === true) {
+                        return integrationsApi.postIntegrationsActionDraftPublish(patchDataActionsResult.id, patchDataActionsResult);
                     } else {
                         return;
                     }
-                })
-                .then(() => {
-                    return new Promise((resolve, reject) => {
-                        console.log('Wait for Web Services Integration enablement...');
-                        setTimeout(() => resolve(), 3000);
-                    });
-                })
-                .then(() => {
-                    console.log('Proceed with Web Services Integration configuration...');
-                    // Configure Data Actions if necessary
-                    if (wsInstanceInstall['data-actions'] && wsInstanceInstall['data-actions'].length > 0) {
-                        let promiseDataActions = [];
+                })());
+            });
 
-                        wsInstanceInstall['data-actions'].forEach((dataAction) => {
-                            let dataActionBody = {
-                                name: config.prefix + dataAction.name,
-                                integrationId: wsInstance.id
-                            };
+            await Promise.all(promiseDataActions);
 
-                            // Rename and add Group Filtering
-                            promiseDataActions.push(
-                                integrationsApi.postIntegrationsActionsDrafts(dataActionBody)
-                                    .then((data) => {
-                                        logFunc('Created Web Services Data Action: ' + data.name);
-                                        let dataActionUpdateBody = { ...data };
-                                        dataActionUpdateBody.secure = dataAction.secure || false;
-                                        dataActionUpdateBody.config = dataAction.config;
-                                        dataActionUpdateBody.contract = dataAction.contract;
-                                        return integrationsApi.patchIntegrationsActionDraft(dataActionUpdateBody.id, dataActionUpdateBody);
-                                    })
-                                    .then((data) => {
-                                        if (dataAction.autoPublish && dataAction.autoPublish === true) {
-                                            return integrationsApi.postIntegrationsActionDraftPublish(data.id, data);
-                                        } else {
-                                            return;
-                                        }
-                                    })
-                            );
-                        });
+            if (wsInstanceInstall.credentialType && wsInstanceInstall.credentialType == 'userDefinedOAuth' && wsInstanceInstall.customAuthAction && wsInstanceInstall.customAuthAction.update && wsInstanceInstall.customAuthAction.update === true) {
+                // Set back to draft
+                let createDraftResult = await integrationsApi.postIntegrationsActionDraft('customAuth_-_' + wsInstance.id);
+                let dataActionUpdateBody = { ...createDraftResult };
+                dataActionUpdateBody.config = wsInstanceInstall.customAuthAction.config;
+                delete dataActionUpdateBody.contract;
+                delete dataActionUpdateBody.secure;
+                
+                let patchResults = await integrationsApi.patchIntegrationsActionDraft(dataActionUpdateBody.id, dataActionUpdateBody);
 
-                        return Promise.all(promiseDataActions)
-                            .then(() => {
-                                if (wsInstanceInstall.credentialType && wsInstanceInstall.credentialType == 'userDefinedOAuth' && wsInstanceInstall.customAuthAction && wsInstanceInstall.customAuthAction.update && wsInstanceInstall.customAuthAction.update === true) {
-                                    // Set back to draft
-                                    return integrationsApi.postIntegrationsActionDraft('customAuth_-_' + wsInstance.id)
-                                        .then((data) => {
-                                            let dataActionUpdateBody = { ...data };
-                                            dataActionUpdateBody.config = wsInstanceInstall.customAuthAction.config;
-                                            delete dataActionUpdateBody.contract;
-                                            delete dataActionUpdateBody.secure;
-                                            return integrationsApi.patchIntegrationsActionDraft(dataActionUpdateBody.id, dataActionUpdateBody);
-                                        })
-                                        .then((data) => {
-                                            return integrationsApi.postIntegrationsActionDraftPublish(data.id, data);
-                                        })
-                                }
-                            });
-                    }
-                })
-                .catch((err) => console.error(err))
-        );
+                return integrationsApi.postIntegrationsActionDraftPublish(patchResults.id, patchResults);
+            }
+        })());
     });
 
     return Promise.all(promisesArr);

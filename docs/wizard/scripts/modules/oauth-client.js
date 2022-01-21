@@ -9,12 +9,9 @@ const usersApi = new platformClient.UsersApi();
 * Get existing authetication clients based on the prefix
 * @returns {Promise.<Array>} Array of Genesys Cloud OAuth Clients
 */
-function getExisting() {
-    return oAuthApi.getOauthClients()
-        .then((data) => {
-            return data.entities.filter((entity) =>
-                entity.name.startsWith(config.prefix));
-        });
+async function getExisting() {
+    let data = await oAuthApi.getOauthClients();
+    return data.entities.filter((entity) => entity.name.startsWith(config.prefix));
 }
 
 /**
@@ -22,21 +19,19 @@ function getExisting() {
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(logFunc) {
+async function remove(logFunc) {
     logFunc('Uninstalling OAuth Clients...');
 
-    return getExisting()
-        .then((instances) => {
-            let del_clients = [];
+    let instances = await getExisting();
+    let del_clients = [];
 
-            if (instances.length > 0) {
-                instances.forEach(entity => {
-                    del_clients.push(oAuthApi.deleteOauthClient(entity.id));
-                });
-            }
-
-            return Promise.all(del_clients);
+    if (instances.length > 0) {
+        instances.forEach(entity => {
+            del_clients.push(oAuthApi.deleteOauthClient(entity.id));
         });
+    }
+
+    return Promise.all(del_clients);
 }
 
 /**
@@ -46,43 +41,39 @@ function remove(logFunc) {
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
  *                          is the Genesys Cloud object details of that type.
  */
-function create(logFunc, data) {
+async function create(logFunc, data) {
     let authData = {};
 
     // Assign employee role to the oauth client because required
     // to have a role id on creation
-    return authorizationApi.getAuthorizationRoles({
-        name: 'employee'
-    })
-        .then((result) => {
-            let employeeRole = result.entities[0];
+    let rolesResult = await authorizationApi.getAuthorizationRoles({
+                                name: 'employee'
+                            });
+    let employeeRole = rolesResult.entities[0];
+    let authPromises = [];
 
-            let authPromises = [];
+    data.forEach((oauth) => {
+        let oauthClient = {
+            name: config.prefix + oauth.name,
+            description: oauth.description,
+            authorizedGrantType: oauth.authorizedGrantType,
+            roleIds: [employeeRole.id]
+        };
 
-            data.forEach((oauth) => {
-                let oauthClient = {
-                    name: config.prefix + oauth.name,
-                    description: oauth.description,
-                    authorizedGrantType: oauth.authorizedGrantType,
-                    roleIds: [employeeRole.id]
-                };
+        authPromises.push((async () => {
+            try{
+                let result = await oAuthApi.postOauthClients(oauthClient);
+                authData[oauth.name] = result;
 
-                authPromises.push(
-                    oAuthApi.postOauthClients(oauthClient)
-                        .then((data) => {
-                            authData[oauth.name] = data;
+                logFunc('Created ' + result.name + ' auth client');
+            } catch(e) {
+                console.log(e);
+            }
+        })());
+    });
 
-                            logFunc('Created ' + data.name + ' auth client');
-                        })
-                        .catch((err) => console.log(err))
-                );
-
-
-            })
-
-            return Promise.all(authPromises);
-        })
-        .then(() => authData);
+    await Promise.all(authPromises);
+    return authData;
 }
 
 /**
@@ -92,7 +83,7 @@ function create(logFunc, data) {
  * @param {Object} installedData contains everything that was installed by the wizard
  * @param {String} userId User id if needed
  */
-function configure(logFunc, installedData, userId) {
+async function configure(logFunc, installedData, userId) {
     let promiseArr = [];
     let oauthData = installedData['oauth-client'];
 

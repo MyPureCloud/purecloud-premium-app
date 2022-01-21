@@ -8,35 +8,32 @@ const integrationsApi = new platformClient.IntegrationsApi();
  * Get existing apps based on the prefix
  * @returns {Promise.<Array>} Genesys Cloud Integrations
  */
-function getExisting() {
+async function getExisting() {
     let integrations = []
 
     // Internal recursive function for calling 
     // next pages (if any) of the integrations
-    let _getIntegrations = (pageNum) => {
-        return integrationsApi.getIntegrations({
-            pageSize: 100,
-            pageNumber: pageNum
-        })
-            .then((data) => {
-                data.entities
-                    .filter(entity => {
-                        return entity.integrationType.id == config.premiumAppIntegrationTypeId &&
-                            entity.name.startsWith(config.prefix);
-                    }).forEach(integration =>
-                        integrations.push(integration));
+    let _getIntegrations = async (pageNum) => {
+        let data = await integrationsApi.getIntegrations({pageSize: 100, pageNumber: pageNum})
+        data.entities
+            .filter(entity => {
+                return entity.integrationType.id == config.premiumAppIntegrationTypeId &&
+                    entity.name.startsWith(config.prefix);
+            }).forEach(integration =>
+                integrations.push(integration));
 
-                if (data.nextUri) {
-                    return _getIntegrations(pageNum + 1);
-                }
-            });
+        if (data.nextUri) {
+            return _getIntegrations(pageNum + 1);
+        }
     }
 
-    return _getIntegrations(1)
-        .then(() => {
-            return integrations;
-        })
-        .catch(e => console.error(e));
+    try{
+        await _getIntegrations(1)
+    } catch(e) {
+        console.error(e);
+    }
+
+    return integrations;
 }
 
 /**
@@ -44,21 +41,19 @@ function getExisting() {
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(logFunc) {
+async function remove(logFunc) {
     logFunc('Uninstalling Other App Instances...');
 
-    return getExisting()
-        .then((instances) => {
-            let del_apps = [];
+    let instances = await getExisting();
+    let del_apps = [];
 
-            if (instances.length > 0) {
-                instances.forEach(entity => {
-                    del_apps.push(integrationsApi.deleteIntegration(entity.id));
-                });
-            }
-
-            return Promise.all(del_apps);
+    if (instances.length > 0) {
+        instances.forEach(entity => {
+            del_apps.push(integrationsApi.deleteIntegration(entity.id));
         });
+    }
+
+    return Promise.all(del_apps);
 }
 
 /**
@@ -68,9 +63,8 @@ function remove(logFunc) {
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
  *                          is the Genesys Cloud object details of that type.
  */
-function create(logFunc, data) {
+async function create(logFunc, data) {
     let integrationPromises = [];
-    let enableIntegrationPromises = [];
     let integrationsData = {};
 
     data.forEach((instance) => {
@@ -83,17 +77,15 @@ function create(logFunc, data) {
         };
 
         // Rename and add Group Filtering
-        integrationPromises.push(
-            integrationsApi.postIntegrations(integrationBody)
-                .then((data) => {
-                    logFunc("Created instance: " + instance.name);
-                    integrationsData[instance.name] = data;
-                })
-        );
+        integrationPromises.push((async () => {
+            let result = await integrationsApi.postIntegrations(integrationBody);
+            logFunc('Created instance: ' + instance.name);
+            integrationsData[instance.name] = result;
+        })());
     });
 
-    return Promise.all(integrationPromises)
-        .then(() => integrationsData);
+    await Promise.all(integrationPromises);
+    return integrationsData;
 }
 
 /**
@@ -103,7 +95,7 @@ function create(logFunc, data) {
  * @param {Object} installedData contains everything that was installed by the wizard
  * @param {String} userId User id if needed
  */
-function configure(logFunc, installedData, userId) {
+async function configure(logFunc, installedData, userId) {
     let instanceInstallationData = config.provisioningInfo['app-instance'];
     let appInstancesData = installedData['app-instance'];
 
@@ -140,25 +132,24 @@ function configure(logFunc, installedData, userId) {
             integrationConfig.body.properties.permissions = appInstanceInstall.permissions || 'camera,microphone,geolocation';
         }
 
-        promisesArr.push(
-            integrationsApi.putIntegrationConfigCurrent(
-                appInstance.id,
-                integrationConfig
-            )
-                .then((data) => {
-                    logFunc('Configured instance: ' + appInstance.name);
+        promisesArr.push((async () => {
+            try {
+                await integrationsApi.putIntegrationConfigCurrent(appInstance.id, integrationConfig);
 
-                    let opts = {
-                        body: {
-                            intendedState: 'ENABLED'
-                        }
-                    };
+                logFunc('Configured instance: ' + appInstance.name);
 
-                    return integrationsApi.patchIntegration(appInstance.id, opts)
-                })
-                .then((data) => logFunc('Enabled instance: ' + data.name))
-                .catch((err) => console.error(err))
-        );
+                let opts = {
+                    body: {
+                        intendedState: 'ENABLED'
+                    }
+                };
+                
+                const patchData = await integrationsApi.patchIntegration(appInstance.id, opts);
+                logFunc('Enabled instance: ' + patchData.name);
+            } catch(e) {
+                console.error(e);
+            } 
+        })());
     });
 
     return Promise.all(promisesArr);
