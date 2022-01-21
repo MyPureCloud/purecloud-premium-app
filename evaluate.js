@@ -16,10 +16,17 @@ const colors = require('colors');
 const configFilePath = path.join(__dirname, 'docs/wizard/config/config.js')
 const languageDirPath = path.join(__dirname, 'docs/wizard/assets/languages')
 
-// Constants to check
+// Default config constants to check
 const defaultClientId = 'e7de8a75-62bb-43eb-9063-38509f8c21af';
 const defaultIntegrationTypeId = 'premium-app-example';
 const defaultViewPermission = 'integration:examplePremiumApp:view';
+
+// Default language file text to check (en-us)
+const defaultLanguage = {
+  'txt-premium-app-name': 'Premium App',
+  'txt-greeting-2': 'Welcome to the Premium App Example Application',
+  'txt-not-available-message': 'We\'re sorry but your Genesys Cloud org does not have the Premium App Sample Product enabled. Please contact Genesys Cloud.',
+}
 
 // Message arrays
 const passedMessages = [];
@@ -69,9 +76,9 @@ const Evaluator = {
     }
 
     if(value1 !== value2){
-      return Promise.resolve([true, `${value1Name} is not equal to ${value2} -- ${additionalComment}`])
+      return Promise.resolve([true, `${value1Name} is not equal to '${value2.toString()}' -- ${additionalComment}`])
     } else {
-      return Promise.resolve([false, `${value1Name} is equal to ${value2} -- ${additionalComment}`])
+      return Promise.resolve([false, `${value1Name} is equal to '${value2.toString()}' -- ${additionalComment}`])
     }
   },
 
@@ -289,10 +296,44 @@ async function evaluateLanguageFiles(){
   await Evaluator.evaluateArr(Evaluator.CRITICAL, toBeEvaluated);
 }
 
+/**
+ * Checks the properties of the language JSON file (en-us language only for now)
+ * and evaluates if they were updates and no longer the default values.
+ * If en-us does not exist or is not the default language, skip this entire section.
+ * In that case, we'll assume that because they're using a different default language, that the text would 
+ * already be their own.
+ */
+async function evaluateWizardText(){
+  let langFileObject = null;
+
+  // If en-us.json does not exist, skip
+  try {
+    const langFileData = await fs.readFile(path.join(languageDirPath, 'en-us.json'));
+    langFileObject = JSON.parse(langFileData.toString());
+  } catch(e) {
+    console.log(e)
+    return;
+  }
+
+  // If language default is not en-us, skip
+  if(config.defaultLanguage != 'en-us') return;
+
+  const forEvaluation = [];
+
+  Object.keys(defaultLanguage).forEach(textKey => {
+    forEvaluation.push(Evaluator.notEqual(langFileObject[textKey], defaultLanguage[textKey], 
+      textKey, `text should be personalized`));
+  })
+
+  await Evaluator.evaluateArr(Evaluator.CRITICAL, forEvaluation)
+}
+
 async function evaluateAll(){
   config = await getConfigObject();
   await evaluateConfig();
   await evaluateLanguageFiles();
+  await evaluateWizardText();
+
 
   printMessages();
 }
