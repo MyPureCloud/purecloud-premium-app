@@ -11,8 +11,8 @@ export default {
         console.info(`modal: ${message}`);
 
         elLoadingModal.style.display = '';
-        let elMessage = elLoadingModal.querySelectorAll('.modal-message')[0]
-            .innerText = message;
+        elLoadingModal.querySelectorAll('.modal-message')[0]
+            .innerText = message ? message : '';
     },
 
     /**
@@ -20,23 +20,35 @@ export default {
      */
     hideLoadingModal() {
         console.info('hide-modal');
+        if(!elLoadingModal) return;
         elLoadingModal.style.display = 'none';
     },
 
     /**
-     * Show the content div of the page
+     * Hide the contents of the main section and replace it with the loading indicator
      */
-    showContent() {
-        let elContent = document.querySelectorAll('.content')[0];
-        elContent.style.visibility = '';
+    loadMain() {
+        let elContent = document.querySelectorAll('#main-text')[0];
+        let elLoading = document.querySelectorAll('#loading-container')[0];
+        if(!elContent) return;
+        if(!elLoading) return;
+
+        elContent.style.display = 'none';
+        elLoading.style.display = 'block';
     },
 
     /**
-     * Hide the content div of the page
+     * Show the contents of the main section and hide the loading indicator
      */
-    hideContent() {
-        let elContent = document.querySelectorAll('.content')[0];
-        elContent.style.visibility = 'hidden';
+    unloadMain() {
+        console.info('show-main');
+        let elContent = document.querySelectorAll('#main-text')[0];
+        let elLoading = document.querySelectorAll('#loading-container')[0];
+        if(!elContent) return;
+        if(!elLoading) return;
+
+        elContent.style.display = 'block';
+        elLoading.style.display = 'none';
     },
 
     /**

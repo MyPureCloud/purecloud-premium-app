@@ -144,13 +144,29 @@ function checkUserPermissions(checkType, userPermissions) {
 }
 
 /**
+ * Get the name of the current html page
+ * @returns {String} eg index.html, install.html, etc..
+ */
+function getPage(){
+    const pathParts = window.location.pathname.split('/');
+    const page = pathParts[pathParts.length - 1];
+
+    return page;
+}
+
+/**
  * Setup function
  * @returns {Promise}
  */
 async function setup() {
-    view.showLoadingModal('Loading...');
+    if(getPage() === 'index.html') {
+        console.log('asd')
+        view.showLoadingModal();
+    } else {
+        view.loadMain();
+    }
+
     view.setupPage();
-    view.hideContent();
 
     setDynamicParameters();
 
@@ -162,6 +178,7 @@ async function setup() {
         await runPageScript();
 
         view.hideLoadingModal();
+        view.unloadMain();
     } catch (e) {
         console.error(e);
     }
@@ -172,8 +189,7 @@ async function setup() {
  * @returns {Promise}
  */
 async function runPageScript() {
-    let pathParts = window.location.pathname.split('/');
-    let page = pathParts[pathParts.length - 1];
+    const page = getPage();
     let userMe = null;
 
     // Run Page Specific Scripts
@@ -221,14 +237,8 @@ async function runPageScript() {
                     if (missingPermissions && missingPermissions.length > 0) {
                         localStorage.setItem(premiumAppIntegrationTypeId + ':missingPermissions', missingPermissions.toString());
                         window.location.href = './unlicensed.html';
-                    } else {
-                        // No missing permission or no required permission - granted access to install
-                        view.showContent();
                     }
-                } else {
-                    // No check of permissions on install or product not available warning should take priority
-                    view.showContent();
-                }
+                } 
             }
 
             break;
@@ -243,7 +253,6 @@ async function runPageScript() {
             userMe = getUserFromLocalStorage();
             view.showUserName(userMe.name);
 
-            view.showContent();
             break;
         case 'install.html':
             // Get user details
@@ -271,10 +280,8 @@ async function runPageScript() {
             let elStartBtn = document.getElementById('start');
             elStartBtn.addEventListener('click', () => install());
 
-            view.showContent();
             break;
         case 'finish.html':
-            view.showContent();
             setTimeout(() => {
                 window.location.href = config.redirectURLOnWizardCompleted;
             }, 2000);
@@ -283,7 +290,6 @@ async function runPageScript() {
         case 'uninstall.html':
             alert('The uninstall button is for development purposes only. Remove this button before demo.');
 
-            view.showContent();
             view.showLoadingModal('Uninstalling...');
 
             await wizard.uninstall();

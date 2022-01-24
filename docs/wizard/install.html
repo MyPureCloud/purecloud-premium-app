@@ -49,77 +49,82 @@
         </ul>
 
         <main>
-            <p>
-                <span class="txt-install-summary">These are the steps that will be automatically performed for
-                    you!</span>
-            </p>
-
-            <div id="messages" class="messages">
-                <div class="message">
-                    <div class="message-title">
-                        <span>1. </span><span class="txt-create-role">Create Role</span>
-                    </div>
-                    <div class="message-content">
-                        <div>
-                            <span class="txt-create-role-msg">
-                                Create a role specifically to provide access to the app.
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="message">
-                    <div class="message-title">
-                        <span>2. </span><span class="txt-create-group">Create Groups</span>
-                    </div>
-                    <div class="message-content">
-                        <div>
-                            <span class="txt-create-group-msg">
-                                Groups will provide filtering to users' access to the app instances.
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="message">
-                    <div class="message-title">
-                        <span>3. </span><span class="txt-create-app-instance">Create instances</span>
-                    </div>
-                    <div class="message-content">
-                        <div>
-                            <span class="txt-create-app-instance-msg">
-                                More instances of the app will be created with different URI endpoints to provide
-                                different features of the app.
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="message">
-                    <div class="message-title">
-                        <span>4. </span><span class="txt-create-oauth-client">Create OAuth Client</span>
-                    </div>
-                    <div class="message-content">
-                        <div>
-                            <span class="txt-create-oauth-client-msg">
-                                An optional OAuth Client could be created for server-to-server communication. After
-                                creation, it should be followed by a method that will pass the OAuth Client information
-                                to the app's server.
-                            </span>
-                        </div>
-                    </div>
-                </div>
+            <div id="loading-container">
+                <img id="loading-img" class="logo" src='./assets/img/loading.svg' alt="" srcset="">
             </div>
+            <div id="main-text">                
+                <p>
+                    <span class="txt-install-summary">These are the steps that will be automatically performed for
+                        you!</span>
+                </p>
 
-            <p class="sink-more">
-                <span class="txt-please-click">
-                    Please click the button to start the installation.
-                </span>
-            </p>
+                <div id="messages" class="messages">
+                    <div class="message">
+                        <div class="message-title">
+                            <span>1. </span><span class="txt-create-role">Create Role</span>
+                        </div>
+                        <div class="message-content">
+                            <div>
+                                <span class="txt-create-role-msg">
+                                    Create a role specifically to provide access to the app.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
-            <button id="start" class="btn-info right">
-                <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i>
-            </button>
+                    <div class="message">
+                        <div class="message-title">
+                            <span>2. </span><span class="txt-create-group">Create Groups</span>
+                        </div>
+                        <div class="message-content">
+                            <div>
+                                <span class="txt-create-group-msg">
+                                    Groups will provide filtering to users' access to the app instances.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="message">
+                        <div class="message-title">
+                            <span>3. </span><span class="txt-create-app-instance">Create instances</span>
+                        </div>
+                        <div class="message-content">
+                            <div>
+                                <span class="txt-create-app-instance-msg">
+                                    More instances of the app will be created with different URI endpoints to provide
+                                    different features of the app.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="message">
+                        <div class="message-title">
+                            <span>4. </span><span class="txt-create-oauth-client">Create OAuth Client</span>
+                        </div>
+                        <div class="message-content">
+                            <div>
+                                <span class="txt-create-oauth-client-msg">
+                                    An optional OAuth Client could be created for server-to-server communication. After
+                                    creation, it should be followed by a method that will pass the OAuth Client information
+                                    to the app's server.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="sink-more">
+                    <span class="txt-please-click">
+                        Please click the button to start the installation.
+                    </span>
+                </p>
+
+                <button id="start" class="btn-info right">
+                    <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i>
+                </button>
+            </div>
         </main>
     </div>
     <footer>
@@ -127,13 +132,14 @@
     </footer>
 
     <!-- MODAL-->
-    <div id="loading-modal">
+    <div id="loading-modal" style="display: none;">
         <div class="overlay"></div>
         <div class="modal">
             <img id="loading-img" class="logo" src='./assets/img/loading.svg' alt="" srcset="">
             <div class="modal-message"></div>
         </div>
     </div>
+        
 
     <script type="module">
         import config from './config/config.js';
