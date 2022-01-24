@@ -62,10 +62,10 @@ export default {
     /**
      * Show the username of the current user for greeting purposes
      */
-    showUserName(user) {
+    showUserName(userName) {
         let el = document.getElementById('username');
         if (el) {
-            el.innerText = user.name;
+            el.innerText = userName;
         }
     },
 

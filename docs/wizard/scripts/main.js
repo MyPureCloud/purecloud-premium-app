@@ -194,7 +194,7 @@ async function runPageScript() {
             userMe = userDetails;
             localStorage.setItem(`${premiumAppIntegrationTypeId}:userdetails`, JSON.stringify(userMe));
 
-            view.showUserName(userDetails);
+            view.showUserName(userMe.name);
 
             // Check product availability
             const productAvailable = await validateProductAvailability()
@@ -241,6 +241,7 @@ async function runPageScript() {
 
             // Details about the authenticated user if needed by the custom page
             userMe = getUserFromLocalStorage();
+            view.showUserName(userMe.name);
 
             view.showContent();
             break;
