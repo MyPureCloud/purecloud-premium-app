@@ -75,6 +75,10 @@ main {
     /* box-shadow: 7px 7px #DDDDDD; */
 }
 
+#main-text {
+    display: none
+}
+
 p {
     margin: 12px;
 }
@@ -146,11 +150,6 @@ button {
 }
 
 /* Modal */
-.adjust-text {
-   /* margin-top: -100px; */
-    color: #FF4F1F;
-    font-size-adjust: unset;
-}
 
 
 /* Progress */
@@ -263,9 +262,17 @@ button {
     height: 100%;
     width: 100%;
     z-index: 10;
-    background-color: #ffffffea;
+    background-color: #ffffff;
 }
 
+
+#loading-container > img {
+    width: 100px;
+}
+
+#loading-modal {
+    display: block;
+}
 
 .modal {
     width: 400px;
@@ -285,5 +292,6 @@ button {
 
 .modal .modal-message {
     margin-top: 20px;
-    font-size: 20px;
+    font-size: 18px;
+    color: #b9b9b9;
 }

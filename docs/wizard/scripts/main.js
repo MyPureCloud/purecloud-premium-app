@@ -16,8 +16,6 @@ const premiumAppIntegrationTypeId = config.premiumAppIntegrationTypeId;
 // Variables
 let pcLanguage;
 let pcEnvironment;
-let userMe = null;
-
 
 /**
  * Set values for environment and language, prioritizng values on the query
@@ -56,13 +54,25 @@ function authenticateGenesysCloud() {
 }
 
 /**
- * Get user details with its roles
+ * Get user details with its roles from the Genesys API
  * @returns {Promise} usersApi result
  */
 function getUserDetails() {
     let opts = { 'expand': ['organization', 'authorization'] };
 
     return usersApi.getUsersMe(opts);
+}
+
+/**
+ * Get the user details saved in localstorage from first API call
+ * null when not found
+ * @returns {Object} user details
+ */
+function getUserFromLocalStorage(){
+    const userMeString = localStorage.getItem(`${premiumAppIntegrationTypeId}:userdetails`);
+    if(!userMeString) throw new Error('User authentication failed.');
+
+    return JSON.parse(userMeString);
 }
 
 /**
@@ -134,31 +144,41 @@ function checkUserPermissions(checkType, userPermissions) {
 }
 
 /**
+ * Get the name of the current html page
+ * @returns {String} eg index.html, install.html, etc..
+ */
+function getPage(){
+    const pathParts = window.location.pathname.split('/');
+    const page = pathParts[pathParts.length - 1];
+
+    return page;
+}
+
+/**
  * Setup function
  * @returns {Promise}
  */
 async function setup() {
-    view.showLoadingModal('Loading...');
+    if(getPage() === 'index.html') {
+        console.log('asd')
+        view.showLoadingModal();
+    } else {
+        view.loadMain();
+    }
+
     view.setupPage();
-    view.hideContent();
 
     setDynamicParameters();
 
     try {
         // Authenticate and get current user
         await authenticateGenesysCloud();
-        const userDetails = await getUserDetails();
-        userMe = userDetails;
-        view.showUserName(userDetails);
 
         await config.setPageLanguage(pcLanguage);
-
-        // Initialize the Wizard object
-        wizard.setup(client, userMe);
-
         await runPageScript();
 
         view.hideLoadingModal();
+        view.unloadMain();
     } catch (e) {
         console.error(e);
     }
@@ -169,8 +189,8 @@ async function setup() {
  * @returns {Promise}
  */
 async function runPageScript() {
-    let pathParts = window.location.pathname.split('/');
-    let page = pathParts[pathParts.length - 1];
+    const page = getPage();
+    let userMe = null;
 
     // Run Page Specific Scripts
     switch (page) {
@@ -184,6 +204,13 @@ async function runPageScript() {
                     window.location.href = './install.html';
                 }
             });
+
+            // Get user details and save it to localstorage
+            const userDetails = await getUserDetails();
+            userMe = userDetails;
+            localStorage.setItem(`${premiumAppIntegrationTypeId}:userdetails`, JSON.stringify(userMe));
+
+            view.showUserName(userMe.name);
 
             // Check product availability
             const productAvailable = await validateProductAvailability()
@@ -210,14 +237,8 @@ async function runPageScript() {
                     if (missingPermissions && missingPermissions.length > 0) {
                         localStorage.setItem(premiumAppIntegrationTypeId + ':missingPermissions', missingPermissions.toString());
                         window.location.href = './unlicensed.html';
-                    } else {
-                        // No missing permission or no required permission - granted access to install
-                        view.showContent();
                     }
-                } else {
-                    // No check of permissions on install or product not available warning should take priority
-                    view.showContent();
-                }
+                } 
             }
 
             break;
@@ -228,9 +249,18 @@ async function runPageScript() {
                 window.location.href = './install.html';
             });
 
-            view.showContent();
+            // Details about the authenticated user if needed by the custom page
+            userMe = getUserFromLocalStorage();
+            view.showUserName(userMe.name);
+
             break;
         case 'install.html':
+            // Get user details
+            userMe = getUserFromLocalStorage();
+
+            // Initialize the Wizard object
+            wizard.setup(client, userMe);
+
             async function install() {
                 view.showLoadingModal('Installing..');
                 try {
@@ -250,10 +280,8 @@ async function runPageScript() {
             let elStartBtn = document.getElementById('start');
             elStartBtn.addEventListener('click', () => install());
 
-            view.showContent();
             break;
         case 'finish.html':
-            view.showContent();
             setTimeout(() => {
                 window.location.href = config.redirectURLOnWizardCompleted;
             }, 2000);
@@ -262,7 +290,6 @@ async function runPageScript() {
         case 'uninstall.html':
             alert('The uninstall button is for development purposes only. Remove this button before demo.');
 
-            view.showContent();
             view.showLoadingModal('Uninstalling...');
 
             await wizard.uninstall();
