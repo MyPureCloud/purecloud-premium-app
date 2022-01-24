@@ -35,7 +35,7 @@ const defaultLanguage = {
 // Default image md5 checksum hashes
 const defaulImgHash = {
   footerImg: '3b3fc68be4e84a23b52ef2b9fcd359a8',
-  loadingImg: 'f93222e1e3430e4ad65a02fe161efd53'
+  loadingImg: '862df3c0557cc4e70b524f288eeeb8d9'
 }
 
 // Message arrays
