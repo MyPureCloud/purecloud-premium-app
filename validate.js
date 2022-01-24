@@ -43,8 +43,8 @@ const passedMessages = [];
 const warningMessages = [];
 const criticalMessages = [];
 
-// Like a Test library but much simpler
-const Evaluator = {
+// The validation 'library'
+const Validator = {
   // Levels of importance
   'WARNING': 0,
   'CRITICAL': 1,
@@ -132,7 +132,7 @@ const Evaluator = {
 
   /**
    * Evaluate the contents of the array
-   * @param {*} importanceLevel Evaluator.WARNING or Evaluator.CRITICAL
+   * @param {*} importanceLevel Validator.WARNING or Validator.CRITICAL
    * @param {Array} evaluationArr array of tests 
    */
   async evaluateArr(importanceLevel, evaluationArr) {
@@ -217,36 +217,36 @@ async function evaluateConfig(){
   if(!config) throw new Error('Error on getting the config file.');
 
   // =================== WARNING LEVEL ===============
-  await Evaluator.evaluateArr(Evaluator.WARNING, [
+  await Validator.evaluateArr(Validator.WARNING, [
     // Client ID
-    Evaluator.notEqual(config.clientID, defaultClientId, 'clientID', 'clientID should be replaced with your own client ID.'),
+    Validator.notEqual(config.clientID, defaultClientId, 'clientID', 'clientID should be replaced with your own client ID.'),
 
     // URLs
-    Evaluator.customEvaluation(() => {
+    Validator.customEvaluation(() => {
       let url = new URL(config.wizardUriBase);
       return url.hostname == 'localhost' ? false : true;
     }, 'wizardUriBase is not localhost', 'wizardUriBase is localhost', 'wizardUriBase should be a publically available URL'),
-    Evaluator.customEvaluation(() => {
+    Validator.customEvaluation(() => {
       let url = new URL(config.redirectURLOnWizardCompleted);
       return url.hostname == 'localhost' ? false : true;
     }, 'redirectURLOnWizardCompleted is not localhost', 'redirectURLOnWizardCompleted is localhost', 'redirectURLOnWizardCompleted should be a publically available URL'),
 
     // Integration Type ID
-    Evaluator.notEqual(config.premiumAppIntegrationTypeId, defaultIntegrationTypeId, 'premiumAppIntegrationTypeId', 'Once integration is approved in AppFoundry, premiumAppIntegrationTypeId should match the provided unique ID.'),
+    Validator.notEqual(config.premiumAppIntegrationTypeId, defaultIntegrationTypeId, 'premiumAppIntegrationTypeId', 'Once integration is approved in AppFoundry, premiumAppIntegrationTypeId should match the provided unique ID.'),
 
     // Premium App View Permission
-    Evaluator.notEqual(config.premiumAppViewPermission, defaultViewPermission, 'premiumAppViewPermission', 'Once integration is approved in AppFoundry, premiumAppViewPermission should match the new unique permission.'),
+    Validator.notEqual(config.premiumAppViewPermission, defaultViewPermission, 'premiumAppViewPermission', 'Once integration is approved in AppFoundry, premiumAppViewPermission should match the new unique permission.'),
   ])
 
   // =================== CRITICAL LEVEL ===============
-  await Evaluator.evaluateArr(Evaluator.CRITICAL, [
-    Evaluator.propertyExists(config, 'clientID', 'config', 'ClientID should exist'),
-    Evaluator.propertyExists(config, 'wizardUriBase', 'config', 'wizardUriBase should exist'),
-    Evaluator.propertyExists(config, 'redirectURLOnWizardCompleted', 'config', 'redirectURLOnWizardCompleted should exist'),
-    Evaluator.propertyExists(config, 'premiumAppIntegrationTypeId', 'config', 'premiumAppIntegrationTypeId should exist'),
-    Evaluator.propertyExists(config, 'premiumAppViewPermission', 'config', 'premiumAppViewPermission should exist'),
+  await Validator.evaluateArr(Validator.CRITICAL, [
+    Validator.propertyExists(config, 'clientID', 'config', 'ClientID should exist'),
+    Validator.propertyExists(config, 'wizardUriBase', 'config', 'wizardUriBase should exist'),
+    Validator.propertyExists(config, 'redirectURLOnWizardCompleted', 'config', 'redirectURLOnWizardCompleted should exist'),
+    Validator.propertyExists(config, 'premiumAppIntegrationTypeId', 'config', 'premiumAppIntegrationTypeId should exist'),
+    Validator.propertyExists(config, 'premiumAppViewPermission', 'config', 'premiumAppViewPermission should exist'),
     // checkInstallPermissions
-    Evaluator.customEvaluation(() => {
+    Validator.customEvaluation(() => {
         let installPermisison = config.checkInstallPermissions;
         if(!installPermisison) return false;
 
@@ -257,14 +257,14 @@ async function evaluateConfig(){
       `${config.checkInstallPermissions} is not valid value for checkInstallPermissions`,
       `Valid values: all, premium, wizard, none`
     ),
-    Evaluator.propertyExists(config, 'defaultPcEnvironment', 'config', 'defaultPcEnvironment should exist'),
+    Validator.propertyExists(config, 'defaultPcEnvironment', 'config', 'defaultPcEnvironment should exist'),
     // TODO: Maybe test if pcEnvironment is valid value
-    Evaluator.propertyExists(config, 'prefix', 'config', 'prefix should exist'),
-    Evaluator.propertyExists(config, 'provisioningInfo', 'config', 'provisioningInfo should exist'),
-    Evaluator.propertyExists(config, 'defaultLanguage', 'config', 'defaultLanguage should exist'),
-    Evaluator.propertyExists(config, 'availableLanguageAssets', 'config', 'availableLanguageAssets should exist'),
+    Validator.propertyExists(config, 'prefix', 'config', 'prefix should exist'),
+    Validator.propertyExists(config, 'provisioningInfo', 'config', 'provisioningInfo should exist'),
+    Validator.propertyExists(config, 'defaultLanguage', 'config', 'defaultLanguage should exist'),
+    Validator.propertyExists(config, 'availableLanguageAssets', 'config', 'availableLanguageAssets should exist'),
     // Check if defaultLanguage value is valid
-    Evaluator.customEvaluation(() => {
+    Validator.customEvaluation(() => {
         if(!config.defaultLanguage) return false;
 
         return Object.keys(config.availableLanguageAssets).includes(config.defaultLanguage)
@@ -273,10 +273,10 @@ async function evaluateConfig(){
       `${config.defaultLanguage} is not available in the availableLanguageAssets`,
       `defaultLanguage should be valid`
     ),
-    Evaluator.propertyExists(config, 'installPermissions', 'config', 'installPermissions should exist'),
-    Evaluator.propertyExists(config, 'uninstallPermissions', 'config', 'uninstallPermissions should exist'),
-    Evaluator.propertyExists(config, 'installScopes', 'config', 'installScopes should exist'),
-    Evaluator.propertyExists(config, 'uninstallScopes', 'config', 'uninstallScopes should exist'),
+    Validator.propertyExists(config, 'installPermissions', 'config', 'installPermissions should exist'),
+    Validator.propertyExists(config, 'uninstallPermissions', 'config', 'uninstallPermissions should exist'),
+    Validator.propertyExists(config, 'installScopes', 'config', 'installScopes should exist'),
+    Validator.propertyExists(config, 'uninstallScopes', 'config', 'uninstallScopes should exist'),
 
   ])
 }
@@ -288,7 +288,7 @@ async function evaluateLanguageFiles(){
   const toBeEvaluated = [];
 
   Object.keys(config.availableLanguageAssets).forEach(langKey => {
-    toBeEvaluated.push(Evaluator.customEvaluationAsync(async () => {
+    toBeEvaluated.push(Validator.customEvaluationAsync(async () => {
         const langFilePath = path.join(languageDirPath, `${langKey}.json`);
         try {
           await fs.access(langFilePath, fsConstants.F_OK);
@@ -303,7 +303,7 @@ async function evaluateLanguageFiles(){
     ))
   });
 
-  await Evaluator.evaluateArr(Evaluator.CRITICAL, toBeEvaluated);
+  await Validator.evaluateArr(Validator.CRITICAL, toBeEvaluated);
 }
 
 /**
@@ -331,11 +331,11 @@ async function evaluateWizardText(){
   const forEvaluation = [];
 
   Object.keys(defaultLanguage).forEach(textKey => {
-    forEvaluation.push(Evaluator.notEqual(langFileObject[textKey], defaultLanguage[textKey], 
+    forEvaluation.push(Validator.notEqual(langFileObject[textKey], defaultLanguage[textKey], 
       textKey, `text should be personalized`));
   })
 
-  await Evaluator.evaluateArr(Evaluator.CRITICAL, forEvaluation)
+  await Validator.evaluateArr(Validator.CRITICAL, forEvaluation)
 }
 
 /**
@@ -361,7 +361,7 @@ async function evaluateImages(){
 
   const footerImgSrc = htmlValue.querySelector('#footer-logo').getAttribute('src');
   const footerImgData = await fs.readFile(path.join(wizardPath, footerImgSrc));
-  forEvaluation.push(Evaluator.customEvaluation(() => {
+  forEvaluation.push(Validator.customEvaluation(() => {
       return md5(footerImgData) !== defaulImgHash.footerImg;
     },
     `Footer image has been replaced`,
@@ -372,7 +372,7 @@ async function evaluateImages(){
   // Loading Image
   const loaderImgSrc = htmlValue.querySelector('#loading-img').getAttribute('src');
   const loaderImgData = await fs.readFile(path.join(wizardPath, loaderImgSrc));
-  forEvaluation.push(Evaluator.customEvaluation(() => {
+  forEvaluation.push(Validator.customEvaluation(() => {
       return md5(loaderImgData) !== defaulImgHash.loadingImg;
     },
     `"Loading" graphic has been replaced`,
@@ -380,7 +380,7 @@ async function evaluateImages(){
     `Personalize UI`
   ));
 
-  await Evaluator.evaluateArr(Evaluator.CRITICAL, forEvaluation);
+  await Validator.evaluateArr(Validator.CRITICAL, forEvaluation);
 }
 
 /**
@@ -402,18 +402,18 @@ async function evaluateStyles(){
 
   const titleColor = getStyleValue(cssValue, '.title', 'color');
   if (titleColor){
-    forEvaluation.push(Evaluator.notEqual(titleColor, '#FF4F1F', '.title CSS', 'Personalize CSS'));
+    forEvaluation.push(Validator.notEqual(titleColor, '#FF4F1F', '.title CSS', 'Personalize CSS'));
   }
   const messageTitleColor = getStyleValue(cssValue, '.message-title', 'background-color');
   if (messageTitleColor){
-    forEvaluation.push(Evaluator.notEqual(messageTitleColor, '#FF4F1F', '.message-title CSS', 'Personalize CSS'));
+    forEvaluation.push(Validator.notEqual(messageTitleColor, '#FF4F1F', '.message-title CSS', 'Personalize CSS'));
   }
   const buttonColor = getStyleValue(cssValue, '.btn-info', 'background-color');
   if (buttonColor){
-    forEvaluation.push(Evaluator.notEqual(buttonColor, '#FF4F1F', '.btn-info CSS', 'Personalize CSS'));
+    forEvaluation.push(Validator.notEqual(buttonColor, '#FF4F1F', '.btn-info CSS', 'Personalize CSS'));
   }
 
-  await Evaluator.evaluateArr(Evaluator.WARNING, forEvaluation);
+  await Validator.evaluateArr(Validator.WARNING, forEvaluation);
 }
 
 
@@ -441,25 +441,25 @@ async function evaluateStyles(){
   return value;
 }
 
-async function evaluateAll(){
+async function validateAll(){
   config = await getConfigObject();
   
-  const evaluations = [evaluateConfig(), 
+  const validations = [evaluateConfig(), 
     evaluateLanguageFiles(), 
     evaluateWizardText(),
     evaluateImages(),
     evaluateStyles()
   ]
 
-  await Promise.all(evaluations)
+  await Promise.all(validations)
   printMessages();
 }
 
 
 console.log('====================================================================='.bgBrightCyan.black);
 console.log(`-----------------          QUIDDITCH                -----------------`.bgBrightCyan.black);
-console.log(`-----------------      PREMIUM WIZARD EVALUATOR     -----------------`.bgBrightCyan.black);
+console.log(`-----------------      PREMIUM WIZARD VALIDATION    -----------------`.bgBrightCyan.black);
 console.log(`-----------------          (v3.0.0)                 -----------------`.bgBrightCyan.black);
 console.log('====================================================================='.bgBrightCyan.black);
 console.log();
-evaluateAll();
+validateAll();
