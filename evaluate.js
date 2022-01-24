@@ -12,6 +12,7 @@ const fsConstants = require('fs').constants;
 const path = require('path');
 const colors = require('colors');
 const HTMLParser = require('node-html-parser');
+const css = require('css');
 const md5 = require('md5');
 
 // File paths
@@ -33,7 +34,8 @@ const defaultLanguage = {
 
 // Default image md5 checksum hashes
 const defaulImgHash = {
-  footerImg: '3b3fc68be4e84a23b52ef2b9fcd359a8'
+  footerImg: '3b3fc68be4e84a23b52ef2b9fcd359a8',
+  loadingImg: 'f93222e1e3430e4ad65a02fe161efd53'
 }
 
 // Message arrays
@@ -367,19 +369,92 @@ async function evaluateImages(){
     `Personalize UI`
   ));
 
+  // Loading Image
+  const loaderImgSrc = htmlValue.querySelector('#loading-img').getAttribute('src');
+  const loaderImgData = await fs.readFile(path.join(wizardPath, loaderImgSrc));
+  forEvaluation.push(Evaluator.customEvaluation(() => {
+      return md5(loaderImgData) !== defaulImgHash.loadingImg;
+    },
+    `"Loading" graphic has been replaced`,
+    `"Loading" graphic is still the default svg`,
+    `Personalize UI`
+  ));
+
   await Evaluator.evaluateArr(Evaluator.CRITICAL, forEvaluation);
+}
+
+/**
+ * Evaluate CSS values
+ */
+async function evaluateStyles(){
+  let forEvaluation = [];
+  let cssString = null;
+  let cssValue = null;
+
+  try {
+    const cssData = await fs.readFile(path.join(wizardPath, 'styles/style.css'));
+    cssString = cssData.toString();
+    cssValue = css.parse(cssString);
+  } catch(e) {
+    console.error(`Error in parsing style.css`)
+    throw e;
+  }
+
+  const titleColor = getStyleValue(cssValue, '.title', 'color');
+  if (titleColor){
+    forEvaluation.push(Evaluator.notEqual(titleColor, '#FF4F1F', '.title CSS', 'Personalize CSS'));
+  }
+  const messageTitleColor = getStyleValue(cssValue, '.message-title', 'background-color');
+  if (messageTitleColor){
+    forEvaluation.push(Evaluator.notEqual(messageTitleColor, '#FF4F1F', '.message-title CSS', 'Personalize CSS'));
+  }
+  const buttonColor = getStyleValue(cssValue, '.btn-info', 'background-color');
+  if (buttonColor){
+    forEvaluation.push(Evaluator.notEqual(buttonColor, '#FF4F1F', '.btn-info CSS', 'Personalize CSS'));
+  }
+
+  await Evaluator.evaluateArr(Evaluator.WARNING, forEvaluation);
+}
+
+
+/**
+ * Get the value of a selectors's property
+ * @param {Object} ast Parsed object by 'css'
+ * @param {String} selector CSS selector (not multiple)
+ * @param {String} property property of the element
+ * @returns {String|null} value of the selector's property
+ * */ 
+ function getStyleValue(ast, selector, property) {
+  const cssRules = ast.stylesheet.rules;
+  const rule = cssRules.find(rule => {
+    if(!rule.selectors) return false;
+    return rule.selectors.includes(selector);
+  });
+  if(!rule) return null;
+  
+  const declaration = rule.declarations.find(declaration => declaration.property == property);
+  if(!declaration) return null;
+
+  const value = declaration.value;
+  if(!value) return null;
+
+  return value;
 }
 
 async function evaluateAll(){
   config = await getConfigObject();
-  await evaluateConfig();
-  await evaluateLanguageFiles();
-  await evaluateWizardText();
-  await evaluateImages();
-  // await evaluateStyles();
+  
+  const evaluations = [evaluateConfig(), 
+    evaluateLanguageFiles(), 
+    evaluateWizardText(),
+    evaluateImages(),
+    evaluateStyles()
+  ]
 
+  await Promise.all(evaluations)
   printMessages();
 }
+
 
 console.log('====================================================================='.bgBrightCyan.black);
 console.log(`-----------------          QUIDDITCH                -----------------`.bgBrightCyan.black);
