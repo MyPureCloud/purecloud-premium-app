@@ -16,8 +16,6 @@ const premiumAppIntegrationTypeId = config.premiumAppIntegrationTypeId;
 // Variables
 let pcLanguage;
 let pcEnvironment;
-let userMe = null;
-
 
 /**
  * Set values for environment and language, prioritizng values on the query
@@ -56,13 +54,25 @@ function authenticateGenesysCloud() {
 }
 
 /**
- * Get user details with its roles
+ * Get user details with its roles from the Genesys API
  * @returns {Promise} usersApi result
  */
 function getUserDetails() {
     let opts = { 'expand': ['organization', 'authorization'] };
 
     return usersApi.getUsersMe(opts);
+}
+
+/**
+ * Get the user details saved in localstorage from first API call
+ * null when not found
+ * @returns {Object} user details
+ */
+function getUserFromLocalStorage(){
+    const userMeString = localStorage.getItem(`${premiumAppIntegrationTypeId}:userdetails`);
+    if(!userMeString) throw new Error('User authentication failed.');
+
+    return JSON.parse(userMeString);
 }
 
 /**
@@ -147,15 +157,8 @@ async function setup() {
     try {
         // Authenticate and get current user
         await authenticateGenesysCloud();
-        const userDetails = await getUserDetails();
-        userMe = userDetails;
-        view.showUserName(userDetails);
 
         await config.setPageLanguage(pcLanguage);
-
-        // Initialize the Wizard object
-        wizard.setup(client, userMe);
-
         await runPageScript();
 
         view.hideLoadingModal();
@@ -171,6 +174,7 @@ async function setup() {
 async function runPageScript() {
     let pathParts = window.location.pathname.split('/');
     let page = pathParts[pathParts.length - 1];
+    let userMe = null;
 
     // Run Page Specific Scripts
     switch (page) {
@@ -184,6 +188,13 @@ async function runPageScript() {
                     window.location.href = './install.html';
                 }
             });
+
+            // Get user details and save it to localstorage
+            const userDetails = await getUserDetails();
+            userMe = userDetails;
+            localStorage.setItem(`${premiumAppIntegrationTypeId}:userdetails`, JSON.stringify(userMe));
+
+            view.showUserName(userDetails);
 
             // Check product availability
             const productAvailable = await validateProductAvailability()
@@ -228,9 +239,18 @@ async function runPageScript() {
                 window.location.href = './install.html';
             });
 
+            // Details about the authenticated user if needed by the custom page
+            userMe = getUserFromLocalStorage();
+
             view.showContent();
             break;
         case 'install.html':
+            // Get user details
+            userMe = getUserFromLocalStorage();
+
+            // Initialize the Wizard object
+            wizard.setup(client, userMe);
+
             async function install() {
                 view.showLoadingModal('Installing..');
                 try {
