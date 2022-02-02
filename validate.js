@@ -190,6 +190,34 @@ function printMessages(){
 }
 
 /**
+ * Print message to validation.log file
+ */
+function logToFile(){
+  let log = '';
+  let ts = Date.now();
+  let dateTime = (new Date(ts)).toISOString();
+
+  log += `${dateTime}\n\n`;
+
+  log += ' --------- PASSED ----------\n';  
+  if(passedMessages.length <= 0) log += 'none\n';
+  passedMessages.forEach((m, i) => log += `${i + 1}. ${m}\n`);
+  log += '\n';
+
+  log += ' --------- WARNING ----------\n';  
+  if(warningMessages.length <= 0) log += 'none\n';
+  warningMessages.forEach((m, i) => log += `${i + 1}. ${m}\n`);
+  log += '\n';
+
+  log += ' --------- CRITICAL ----------\n';  
+  if(criticalMessages.length <= 0) log += 'none\n';
+  criticalMessages.forEach((m, i) => log += `${i + 1}. ${m}\n`);
+  log += '\n';
+
+  fs.writeFile('validation.log', log);
+}
+
+/**
  * Get the config file and return the contents as an object
  * @returns {Promise<Object|null>}
  */
@@ -453,6 +481,7 @@ async function validateAll(){
 
   await Promise.all(validations)
   printMessages();
+  logToFile();
 }
 
 
