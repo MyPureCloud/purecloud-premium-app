@@ -1,6 +1,23 @@
 import config from '../config/config.js';
+import { PAGES } from './enums.js'
 
 const elLoadingModal = document.getElementById('loading-modal');
+
+const indexPage = document.getElementById('index-page');
+const customSetupPage = document.getElementById('custom-setup-page');
+const installDetailsPage = document.getElementById('install-details-page');
+const installDonePage = document.getElementById('installation-finished-page');
+const errorPage = document.getElementById('error-page');
+const uninstallPage = document.getElementById('uninstall-page');
+
+function hideAllPages(){    
+    indexPage.style.display = 'none';
+    customSetupPage.style.display = 'none';
+    installDetailsPage.style.display = 'none';
+    installDonePage.style.display = 'none';
+    errorPage.style.display = 'none';
+    uninstallPage.style.display = 'none';
+}
 
 export default {
     /**
@@ -25,30 +42,34 @@ export default {
     },
 
     /**
-     * Hide the contents of the main section and replace it with the loading indicator
+     * Show contents of the specific page
      */
-    loadMain() {
-        let elContent = document.querySelectorAll('#main-text')[0];
-        let elLoading = document.querySelectorAll('#loading-container')[0];
-        if(!elContent) return;
-        if(!elLoading) return;
-
-        elContent.style.display = 'none';
-        elLoading.style.display = 'block';
-    },
-
-    /**
-     * Show the contents of the main section and hide the loading indicator
-     */
-    unloadMain() {
-        console.info('show-main');
-        let elContent = document.querySelectorAll('#main-text')[0];
-        let elLoading = document.querySelectorAll('#loading-container')[0];
-        if(!elContent) return;
-        if(!elLoading) return;
-
-        elContent.style.display = 'block';
-        elLoading.style.display = 'none';
+    displayPage(page){
+        hideAllPages();
+        switch(page){
+            case PAGES.INDEX_PAGE:
+                indexPage.style.display = 'block';
+                break;
+            case PAGES.CUSTOM_SETUP:
+                customSetupPage.style.display = 'block';
+                break;
+            case PAGES.INSTALL_DETAILS:
+                installDetailsPage.style.display = 'block';
+                break;
+            case PAGES.DONE:
+                installDonePage.style.display = 'block';
+                break;
+            case PAGES.UNINSTALL:
+                uninstallPage.style.display = 'block';
+                break;
+            case PAGES.ERROR:
+                errorPage.style.display = 'block';
+                break;
+            default:
+                hideAllPages();
+                console.error('Unknown page');
+                break;
+        }
     },
 
     /**

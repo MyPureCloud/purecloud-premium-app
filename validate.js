@@ -463,3 +463,7 @@ console.log(`-----------------          (v3.0.0)                 ---------------
 console.log('====================================================================='.bgBrightCyan.black);
 console.log();
 validateAll();
+
+/**
+ * TODO: verify that div ids for 'pages' exist in index.html
+ */

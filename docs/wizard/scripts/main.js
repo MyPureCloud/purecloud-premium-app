@@ -1,12 +1,11 @@
 import config from '../config/config.js';
 import view from './view.js';
 import wizard from './wizard.js';
+import { PAGES } from './enums.js'
 
 // Genesys Cloud
 const platformClient = require('platformClient');
-const client = platformClient.ApiClient.instance;
-
-// API 
+const client = platformClient.ApiClient.instance; 
 const usersApi = new platformClient.UsersApi();
 const integrationsApi = new platformClient.IntegrationsApi();
 
@@ -16,6 +15,9 @@ const premiumAppIntegrationTypeId = config.premiumAppIntegrationTypeId;
 // Variables
 let pcLanguage;
 let pcEnvironment;
+let startPage = PAGES.INDEX_PAGE;
+let currentPage = null;
+let userMe = null;
 
 /**
  * Set values for environment and language, prioritizng values on the query
@@ -41,6 +43,17 @@ function setDynamicParameters() {
 }
 
 /**
+ * Get the name of the current html page
+ * @returns {String} eg index.html, install.html, etc..
+ */
+ function getPage(){
+    const pathParts = window.location.pathname.split('/');
+    const page = pathParts[pathParts.length - 1];
+
+    return page;
+}
+
+/**
  * Authenticate with Genesys Cloud
  * @returns {Promise} login info
  */
@@ -49,7 +62,7 @@ function authenticateGenesysCloud() {
     client.setPersistSettings(true, premiumAppIntegrationTypeId);
     return client.loginImplicitGrant(
         config.clientID,
-        config.wizardUriBase + 'index.html'
+        window.location.href
     );
 }
 
@@ -61,18 +74,6 @@ function getUserDetails() {
     let opts = { 'expand': ['organization', 'authorization'] };
 
     return usersApi.getUsersMe(opts);
-}
-
-/**
- * Get the user details saved in localstorage from first API call
- * null when not found
- * @returns {Object} user details
- */
-function getUserFromLocalStorage(){
-    const userMeString = localStorage.getItem(`${premiumAppIntegrationTypeId}:userdetails`);
-    if(!userMeString) throw new Error('User authentication failed.');
-
-    return JSON.parse(userMeString);
 }
 
 /**
@@ -89,6 +90,122 @@ async function validateProductAvailability() {
         console.log('PRODUCT NOT AVAILABLE');
     }
     return productAvailable;
+}
+
+/**
+ * Navigate to a new page
+* @param {Enum.PAGES} targetPage the target page
+ */
+async function switchPage(targetPage){
+    currentPage = targetPage;
+    console.log(`Going to page: ${currentPage}`);
+
+    view.displayPage(targetPage);
+    switch(targetPage){
+        case PAGES.INDEX_PAGE:
+            // Check product availability
+            const productAvailable = await validateProductAvailability()
+            if (productAvailable) {
+                view.showProductAvailable();
+            } else {
+                view.showProductUnavailable();
+            }
+            
+            // Check if has an existing installation
+            const integrationInstalled = await wizard.isExisting();
+            if (integrationInstalled) {
+                // If the wizard install process was already performed, only check the Premium App View permission
+                if (!userMe.authorization.permissions.includes(config.premiumAppViewPermission)) {
+                    localStorage.setItem(premiumAppIntegrationTypeId + ':missingPermissions', config.premiumAppViewPermission);
+                    window.location.href = './unlicensed.html';
+                } else {
+                    window.location.href = config.redirectURLOnWizardCompleted;
+                }
+            } else {
+                // JSM TODO - rest-ce que ca ne va pas masquer le cas ou product is not available???
+                if (config.checkInstallPermissions && productAvailable == true) {
+                    let missingPermissions = checkUserPermissions(config.checkInstallPermissions, userMe.authorization.permissions);
+                    if (missingPermissions && missingPermissions.length > 0) {
+                        localStorage.setItem(premiumAppIntegrationTypeId + ':missingPermissions', missingPermissions.toString());
+                        window.location.href = './unlicensed.html';
+                    }
+                } 
+            }
+            break;
+        case PAGES.CUSTOM_SETUP:
+            break;
+        case PAGES.INSTALL_DETAILS:
+            break;
+        case PAGES.DONE:
+            setTimeout(() => {
+                window.location.href = config.redirectURLOnWizardCompleted;
+            }, 2000);
+
+            break;
+        case PAGES.UNINSTALL:
+            alert('The uninstall button is for development purposes only. Remove this button before demo.');
+
+            view.showLoadingModal('Uninstalling...');
+
+            await wizard.uninstall();
+            setTimeout(() => {
+                window.location.href = config.wizardUriBase + 'index.html';
+            }, 2000);
+
+            break;
+        case PAGES.ERROR:
+            break;
+        default:
+            throw new Error('Unknown page');
+    }
+    console.log(`Loaded page: ${currentPage}`);
+}
+
+/**
+ * Assign navigation functionality for buttons
+ */
+function setButtonEventListeners(){
+    const nextButtons = Array.from(document.getElementsByClassName('btn-next'));
+    const installButton = document.getElementById('btn-install');
+
+    nextButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            console.log(currentPage)
+            switch(currentPage){
+                case PAGES.INDEX_PAGE:
+                    if (config.enableCustomSetupPageBeforeInstall) {
+                        switchPage(PAGES.CUSTOM_SETUP);
+                    } else {
+                        switchPage(PAGES.INSTALL_DETAILS);
+                    }
+                    break;
+                case PAGES.CUSTOM_SETUP:
+                    switchPage(PAGES.INSTALL_DETAILS);
+                    break;
+            }
+        })
+    });
+
+    if(installButton) {
+        installButton.addEventListener('click', () => {
+            (async () => {
+                view.showLoadingModal('Installing..');
+                try {
+                    const customSetupStatus = await wizard.install();
+                    if (customSetupStatus.status) {
+                        switchPage(PAGES.DONE);
+                    } 
+                    // TODO:
+                    // else {
+                    //     localStorage.setItem(premiumAppIntegrationTypeId + ':failureCause', customSetupStatus.cause);
+                    //     window.location.href = './post-custom-setup-failure.html';
+                    // }
+                } catch(e) {
+                    console.error(e);
+                }
+            })();
+        })
+    }
 }
 
 /**
@@ -143,29 +260,13 @@ function checkUserPermissions(checkType, userPermissions) {
     return missingPermissions;
 }
 
-/**
- * Get the name of the current html page
- * @returns {String} eg index.html, install.html, etc..
- */
-function getPage(){
-    const pathParts = window.location.pathname.split('/');
-    const page = pathParts[pathParts.length - 1];
-
-    return page;
-}
 
 /**
  * Setup function
  * @returns {Promise}
  */
 async function setup() {
-    if(getPage() === 'index.html') {
-        console.log('asd')
-        view.showLoadingModal();
-    } else {
-        view.loadMain();
-    }
-
+    view.showLoadingModal();
     view.setupPage();
 
     setDynamicParameters();
@@ -173,136 +274,25 @@ async function setup() {
     try {
         // Authenticate and get current user
         await authenticateGenesysCloud();
-
         await config.setPageLanguage(pcLanguage);
-        await runPageScript();
 
+        userMe = await getUserDetails();
+        
+        // Initialize the Wizard object
+        wizard.setup(client, userMe);
+        
+        setButtonEventListeners();
+        await switchPage(startPage);
+
+        // Prepare page for viewing
+        view.showUserName(userMe.name);
         view.hideLoadingModal();
-        view.unloadMain();
     } catch (e) {
         console.error(e);
     }
 }
 
-/**
- * Runs page specific script.
- * @returns {Promise}
- */
-async function runPageScript() {
-    const page = getPage();
-    let userMe = null;
 
-    // Run Page Specific Scripts
-    switch (page) {
-        case 'index.html':
-            // Button Handler
-            let elNextBtn = document.getElementById('next');
-            elNextBtn.addEventListener('click', () => {
-                if (config.enableCustomSetupPageBeforeInstall) {
-                    window.location.href = './custom-setup.html';
-                } else {
-                    window.location.href = './install.html';
-                }
-            });
-
-            // Get user details and save it to localstorage
-            const userDetails = await getUserDetails();
-            userMe = userDetails;
-            localStorage.setItem(`${premiumAppIntegrationTypeId}:userdetails`, JSON.stringify(userMe));
-
-            view.showUserName(userMe.name);
-
-            // Check product availability
-            const productAvailable = await validateProductAvailability()
-            if (productAvailable) {
-                view.showProductAvailable();
-            } else {
-                view.showProductUnavailable();
-            }
-            
-            // Check if has an existing installation
-            const integrationInstalled = await wizard.isExisting();
-            if (integrationInstalled) {
-                // If the wizard install process was already performed, only check the Premium App View permission
-                if (!userMe.authorization.permissions.includes(config.premiumAppViewPermission)) {
-                    localStorage.setItem(premiumAppIntegrationTypeId + ':missingPermissions', config.premiumAppViewPermission);
-                    window.location.href = './unlicensed.html';
-                } else {
-                    window.location.href = config.redirectURLOnWizardCompleted;
-                }
-            } else {
-                // JSM TODO - rest-ce que ca ne va pas masquer le cas ou product is not available???
-                if (config.checkInstallPermissions && productAvailable == true) {
-                    let missingPermissions = checkUserPermissions(config.checkInstallPermissions, userMe.authorization.permissions);
-                    if (missingPermissions && missingPermissions.length > 0) {
-                        localStorage.setItem(premiumAppIntegrationTypeId + ':missingPermissions', missingPermissions.toString());
-                        window.location.href = './unlicensed.html';
-                    }
-                } 
-            }
-
-            break;
-        case 'custom-setup.html':
-            // Button Handler
-            let elSetupBtn = document.getElementById('next');
-            elSetupBtn.addEventListener('click', () => {
-                window.location.href = './install.html';
-            });
-
-            // Details about the authenticated user if needed by the custom page
-            userMe = getUserFromLocalStorage();
-            view.showUserName(userMe.name);
-
-            break;
-        case 'install.html':
-            // Get user details
-            userMe = getUserFromLocalStorage();
-
-            // Initialize the Wizard object
-            wizard.setup(client, userMe);
-
-            async function install() {
-                view.showLoadingModal('Installing..');
-                try {
-                    const customSetupStatus = await wizard.install();
-                    if (customSetupStatus.status) {
-                        window.location.href = './finish.html';
-                    } else {
-                        localStorage.setItem(premiumAppIntegrationTypeId + ':failureCause', customSetupStatus.cause);
-                        window.location.href = './post-custom-setup-failure.html';
-                    }
-                } catch(e) {
-                    console.error(e);
-                }
-            }
-            
-            // Button Handler
-            let elStartBtn = document.getElementById('start');
-            elStartBtn.addEventListener('click', () => install());
-
-            break;
-        case 'finish.html':
-            setTimeout(() => {
-                window.location.href = config.redirectURLOnWizardCompleted;
-            }, 2000);
-
-            break;
-        case 'uninstall.html':
-            alert('The uninstall button is for development purposes only. Remove this button before demo.');
-
-            view.showLoadingModal('Uninstalling...');
-
-            await wizard.uninstall();
-            setTimeout(() => {
-                window.location.href = config.wizardUriBase
-                    + 'index.html';
-            }, 2000);
-
-            break;
-        default:
-            throw new Error('Unknown page');
-    }
-}
-
-
+// TODO: Change uninstallation determination to query parameter/state
+if(getPage() == 'uninstall.html') startPage = PAGES.UNINSTALL;
 setup();
