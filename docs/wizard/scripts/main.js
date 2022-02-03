@@ -2,6 +2,7 @@ import config from '../config/config.js';
 import view from './view.js';
 import wizard from './wizard.js';
 import { PAGES } from './enums.js'
+import { setPageLanguage } from './language-manager.js';
 
 // Genesys Cloud
 const platformClient = require('platformClient');
@@ -11,69 +12,71 @@ const integrationsApi = new platformClient.IntegrationsApi();
 
 // Constants
 const premiumAppIntegrationTypeId = config.premiumAppIntegrationTypeId;
+const startPage = PAGES.INDEX_PAGE;
 
 // Variables
 let pcLanguage;
 let pcEnvironment;
-let startPage = PAGES.INDEX_PAGE;
+let state; // State from implicit grant 
 let currentPage = null;
 let userMe = null;
 
 /**
- * Set values for environment and language, prioritizng values on the query
- * parameters
+ * Get the query parameters and return an object 
+ * @returns {Object} {language(?): ..., environment(?): ..., uninstall(?): ...}
  */
-function setDynamicParameters() {
+function getQueryParameters() {
     // Get Query Parameters
     const urlParams = new URLSearchParams(window.location.search);
-    let tempLanguage = urlParams.get(config.languageQueryParam);
-    let tempPcEnv = urlParams.get(config.genesysCloudEnvironmentQueryParam);
+    let language = urlParams.get(config.languageQueryParam);
+    let environment = urlParams.get(config.genesysCloudEnvironmentQueryParam);
+    let uninstall = urlParams.get('uninstall');
+    let ret = {};
 
-    // Language
-    pcLanguage = tempLanguage ||
-        localStorage.getItem(premiumAppIntegrationTypeId + ':language') ||
-        config.defaultLanguage;
-    localStorage.setItem(premiumAppIntegrationTypeId + ':language', pcLanguage);
+    if(language) ret.language = language;
+    if(environment) ret.environment = environment;
+    if(uninstall) ret.uninstall = uninstall;
 
-    // Environment
-    pcEnvironment = tempPcEnv ||
-        localStorage.getItem(premiumAppIntegrationTypeId + ':environment') ||
-        config.defaultPcEnvironment;
-    localStorage.setItem(premiumAppIntegrationTypeId + ':environment', pcEnvironment);
+    return ret;
 }
 
 /**
- * Get the name of the current html page
- * @returns {String} eg index.html, install.html, etc..
+ * Gets the string text from the translations files.
+ * @param {String} key The key for the entry in the JSON file
+ * @param {String} language 
+ * @returns {String} the translated text
  */
- function getPage(){
-    const pathParts = window.location.pathname.split('/');
-    const page = pathParts[pathParts.length - 1];
+function getTranslatedText(key, language){
+    if(!language) language = config.defaultLanguage;
+    let ret = '';
+    // TODO:
 
-    return page;
+    return ret;
 }
 
 /**
  * Authenticate with Genesys Cloud
- * @returns {Promise} login info
+ * @returns {Promise}
  */
-function authenticateGenesysCloud() {
+async function authenticateGenesysCloud() {
+    const queryParams = getQueryParameters();
+
+    // Determine Genesys Cloud environment
+    pcEnvironment = queryParams.environment ? queryParams.environment : config.defaultPcEnvironment;
     client.setEnvironment(pcEnvironment);
-    client.setPersistSettings(true, premiumAppIntegrationTypeId);
-    return client.loginImplicitGrant(
-        config.clientID,
-        window.location.href
-    );
-}
 
-/**
- * Get user details with its roles from the Genesys API
- * @returns {Promise} usersApi result
- */
-function getUserDetails() {
-    let opts = { 'expand': ['organization', 'authorization'] };
+    // Authenticate with Genesys Cloud and get the state
+    client.setPersistSettings(true, premiumAppIntegrationTypeId); 
+    const authData = await client.loginImplicitGrant(
+        config.clientID, 
+        `${config.wizardUriBase}index.html`, 
+        { state: JSON.stringify(queryParams) }
+    ); 
+    state = JSON.parse(authData.state);
+    console.log(state);
 
-    return usersApi.getUsersMe(opts);
+    // Set language
+    pcLanguage = state.language ? state.language : config.defaultLanguage;
 }
 
 /**
@@ -87,7 +90,7 @@ async function validateProductAvailability() {
         console.log('PRODUCT AVAILABLE');
         return true;
     } catch(e) {
-        console.log('PRODUCT NOT AVAILABLE');
+        console.log('PRODUCT UNAVAILABLE')
     }
     return productAvailable;
 }
@@ -105,11 +108,11 @@ async function switchPage(targetPage){
         case PAGES.INDEX_PAGE:
             // Check product availability
             const productAvailable = await validateProductAvailability()
-            if (productAvailable) {
-                view.showProductAvailable();
-            } else {
-                view.showProductUnavailable();
-            }
+            if (!productAvailable) {
+                showErrorPage(
+                    getTranslatedText('txt-product-not-available'),
+                    getTranslatedText('txt-not-available-message'));
+            } 
             
             // Check if has an existing installation
             const integrationInstalled = await wizard.isExisting();
@@ -148,9 +151,12 @@ async function switchPage(targetPage){
             view.showLoadingModal('Uninstalling...');
 
             await wizard.uninstall();
-            setTimeout(() => {
-                window.location.href = config.wizardUriBase + 'index.html';
-            }, 2000);
+            await new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    window.history.replaceState(null, '', `${config.wizardUriBase}index.html`);
+                    resolve();
+                }, 2000);
+            });
 
             break;
         case PAGES.ERROR:
@@ -260,6 +266,15 @@ function checkUserPermissions(checkType, userPermissions) {
     return missingPermissions;
 }
 
+/**
+ * Go to the error page
+ * @param {String} errorTitle title of the error
+ * @param {String} errorMessage Full message for the error
+ */
+function showErrorPage(errorTitle, errorMessage){
+    view.setError(errorTitle, errorMessage);
+    switchPage(PAGES.ERROR);
+}
 
 /**
  * Setup function
@@ -269,22 +284,24 @@ async function setup() {
     view.showLoadingModal();
     view.setupPage();
 
-    setDynamicParameters();
-
     try {
         // Authenticate and get current user
         await authenticateGenesysCloud();
-        await config.setPageLanguage(pcLanguage);
-
-        userMe = await getUserDetails();
+        await setPageLanguage(pcLanguage);
+        userMe = await usersApi.getUsersMe({ 'expand': ['organization', 'authorization'] });
         
         // Initialize the Wizard object
         wizard.setup(client, userMe);
         
-        setButtonEventListeners();
+        // Check if app is for uninstallation
+        // ie. query parameter 'uninstall=true'
+        if(state.uninstall === 'true') await switchPage(PAGES.UNINSTALL);
+        
+        // Load the Home page
         await switchPage(startPage);
 
-        // Prepare page for viewing
+        // View related
+        setButtonEventListeners();
         view.showUserName(userMe.name);
         view.hideLoadingModal();
     } catch (e) {
@@ -292,7 +309,4 @@ async function setup() {
     }
 }
 
-
-// TODO: Change uninstallation determination to query parameter/state
-if(getPage() == 'uninstall.html') startPage = PAGES.UNINSTALL;
 setup();

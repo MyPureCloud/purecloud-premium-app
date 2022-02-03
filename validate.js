@@ -466,4 +466,5 @@ validateAll();
 
 /**
  * TODO: verify that div ids for 'pages' exist in index.html
+ * TODO: Make sure wizarduribase hase / at the end of it
  */

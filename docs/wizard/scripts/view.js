@@ -42,6 +42,27 @@ export default {
     },
 
     /**
+     * Hide the language sleection
+     */
+    hideLanguageSelection(){
+        const elemLangContainer = document.getElementById('language-container');
+        elemLangContainer.style.display = 'none';
+    },
+    
+    /**
+     * Set the text in the error page
+     * @param {String} title title of the error
+     * @param {String} message messaage of the error
+     */
+    setError(title, message){
+        const elemTitle = document.getElementById('error-title');
+        const elemMessage = document.getElementById('error-message');
+
+        if(title) elemTitle.innerText = title;
+        if(message) elemMessage.innerText = message;
+    },
+
+    /**
      * Show contents of the specific page
      */
     displayPage(page){

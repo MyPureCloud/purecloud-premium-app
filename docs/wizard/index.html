@@ -28,6 +28,9 @@
   <header>
     <p id="content-header-text"><span class="txt-premium-app-name">Premium App</span> /&nbsp; <span
         class="txt-premium-home">Home</span></p>
+    <div id="language-container">
+      <p><span>Language:</span><select id="language-select"></select></p>
+    </div>
   </header>
 
   <div class="content">
@@ -75,18 +78,6 @@
           </p>
           <button class="btn-next" class="btn-info right">
             <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i></button>
-        </div>
-        <div id="unavailable" class="">
-          <p class="fail">
-            <span class="txt-product-not-available">Product not avaiable.</span> <i
-              class="fas fa-times-circle enlarge"></i>
-          </p>
-          <p>
-            <span class="txt-not-available-message">
-              We're sorry but your Genesys Cloud org does not have the Premium App Sample Product enabled.
-              Please contact the authorities.
-            </span>
-          </p>
         </div>
       </div>
       <!-- CUSTOM SETUP PAGE -->
@@ -184,7 +175,14 @@
           </div>
         </p>
       </div>
-      <div id="error-page"></div>
+      <div id="error-page">
+        <div>
+          <h3><i class="fas fa-times-circle enlarge"></i> 
+            <span id="error-title">Unknown Error</span>
+          </h3>
+          <p id="error-message">Sorry but something went wrong, please contact your administrator.</p>
+        </div>
+      </div>
       <div id="uninstall-page"></div>
     </main>
   </div>

@@ -27,10 +27,16 @@ body {
 }
 
 header {
+    display: flex;
+    justify-content: space-between;
     margin: 0;
     padding: 5px 0px 2px 10px;
     background-color: #FFF;
     box-shadow: 0px 2px 5px #dddddd;
+}
+
+#language-container {
+
 }
 
 .content {
