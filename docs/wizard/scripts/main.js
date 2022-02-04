@@ -202,47 +202,73 @@ async function switchPage(targetPage){
  * Assign navigation functionality for buttons
  */
 function setButtonEventListeners(){
-    const nextButtons = Array.from(document.getElementsByClassName('btn-next'));
-    const installButton = document.getElementById('btn-install');
+  const nextButtons = Array.from(document.getElementsByClassName('btn-next'));
+  const installButton = document.getElementById('btn-install');
 
-    nextButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            console.log(currentPage)
-            switch(currentPage){
-                case PAGES.INDEX_PAGE:
-                    if (config.enableCustomSetupPageBeforeInstall) {
-                        switchPage(PAGES.CUSTOM_SETUP);
-                    } else {
-                        switchPage(PAGES.INSTALL_DETAILS);
-                    }
-                    break;
-                case PAGES.CUSTOM_SETUP:
-                    switchPage(PAGES.INSTALL_DETAILS);
-                    break;
-            }
-        })
-    });
+  nextButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      console.log(currentPage)
+      switch(currentPage){
+        case PAGES.INDEX_PAGE:
+          if (config.enableCustomSetupPageBeforeInstall) {
+            switchPage(PAGES.CUSTOM_SETUP);
+          } else {
+            switchPage(PAGES.INSTALL_DETAILS);
+          }
+          break;
+        case PAGES.CUSTOM_SETUP:
+          switchPage(PAGES.INSTALL_DETAILS);
+          break;
+      }
+    })
+  });
 
-    if(installButton) {
-        installButton.addEventListener('click', () => {
-            (async () => {
-                view.showLoadingModal('Installing..');
-                try {
-                    const customSetupStatus = await wizard.install();
-                    if (customSetupStatus.status) {
-                        switchPage(PAGES.DONE);
-                    } 
-                    // TODO:
-                    // else {
-                    //     localStorage.setItem(premiumAppIntegrationTypeId + ':failureCause', customSetupStatus.cause);
-                    //     window.location.href = './post-custom-setup-failure.html';
-                    // }
-                } catch(e) {
-                    console.error(e);
-                }
-            })();
-        })
-    }
+  if(installButton) {
+    installButton.addEventListener('click', () => {
+      (async () => {
+        view.showLoadingModal('Installing..');
+        try {
+          const customSetupStatus = await wizard.install();
+
+          // Check if Post Custom Setup is successful
+          if (customSetupStatus.status) {
+            switchPage(PAGES.DONE);
+          } else {
+            // Show error from post custom setup
+            showErrorPage(
+              getTranslatedText('txt-post-custom-setup-failure'),
+              getTranslatedText('txt-failure-backend'),
+              'txt-post-custom-setup-failure',
+              'txt-failure-backend',
+              () => {
+                const container = document.createElement('div');
+                container.innerHTML = `
+                  <p>
+                    <b>
+                      <span class="txt-details-failure-backend">${getTranslatedText('txt-details-failure-backend')}:</span>
+                    </b>
+                    <i>
+                      <span class="details-failure-backend">${customSetupStatus.cause}</span>
+                    </i>
+                  </p>
+                  <p>
+                    <span class="txt-resolve-backend">
+                      ${getTranslatedText('txt-resolve-backend')}
+                    </span>
+                  </p>
+                  `;
+                return container;
+              }
+            );
+
+            view.hideLoadingModal();
+          }
+        } catch(e) {
+          console.error(e);
+        }
+      })();
+    })
+  }
 }
 
 /**
@@ -251,55 +277,55 @@ function setButtonEventListeners(){
  * @returns {Array} Array of string. Missing permissions.
  */
 function getMissingInstallPermissions() {
-    const userPermissions = userMe.authorization.permissions;
-    const permissionType = config.checkInstallPermissions;
-    let missingPermissions = [];
+  const userPermissions = userMe.authorization.permissions;
+  const permissionType = config.checkInstallPermissions;
+  let missingPermissions = [];
 
-    if (permissionType === 'premium') {
-        if (!userPermissions.includes(config.premiumAppViewPermission)) {
-            missingPermissions.push(config.premiumAppViewPermission);
-        }
-    } else if (permissionType === 'wizard' || permissionType === 'all') {
-        let permissionsToCheck = [];
+  if (permissionType === 'premium') {
+    if (!userPermissions.includes(config.premiumAppViewPermission)) {
+      missingPermissions.push(config.premiumAppViewPermission);
+    }
+  } else if (permissionType === 'wizard' || permissionType === 'all') {
+    let permissionsToCheck = [];
 
-        if (permissionType === 'all') {
-            permissionsToCheck.push(config.premiumAppViewPermission);
-        }
-
-        let modulesToCheck = Object.keys(config.provisioningInfo);
-        modulesToCheck.push('custom');
-        modulesToCheck.push('wizard');
-        if (config.enableCustomSetupStepAfterInstall === true) {
-            modulesToCheck.push('postCustomSetup');
-        }
-
-        modulesToCheck.forEach(modKey => {
-            config.installPermissions[modKey].forEach(item => {
-                if (!permissionsToCheck.includes(item)) {
-                    permissionsToCheck.push(item);
-                }
-            });
-        });
-
-        // check permissions
-        // first filter on exact match
-        let filteredPermissionsToCheck = permissionsToCheck.filter((perm) => !userPermissions.includes(perm));
-        // second filter using startsWith match criteria - to manage division based permissions
-        for (const checkPerm of filteredPermissionsToCheck) {
-            let permissionFound = false;
-            for (const userPerm of userPermissions) {
-                if (userPerm.startsWith(checkPerm)) {
-                    permissionFound = true;
-                    break;
-                }
-            }
-            if (permissionFound == false) {
-                missingPermissions.push(checkPerm);
-            }
-        }
+    if (permissionType === 'all') {
+      permissionsToCheck.push(config.premiumAppViewPermission);
     }
 
-    return missingPermissions;
+    let modulesToCheck = Object.keys(config.provisioningInfo);
+    modulesToCheck.push('custom');
+    modulesToCheck.push('wizard');
+    if (config.enableCustomSetupStepAfterInstall === true) {
+      modulesToCheck.push('postCustomSetup');
+    }
+
+    modulesToCheck.forEach(modKey => {
+      config.installPermissions[modKey].forEach(item => {
+        if (!permissionsToCheck.includes(item)) {
+          permissionsToCheck.push(item);
+        }
+      });
+    });
+
+    // check permissions
+    // first filter on exact match
+    let filteredPermissionsToCheck = permissionsToCheck.filter((perm) => !userPermissions.includes(perm));
+    // second filter using startsWith match criteria - to manage division based permissions
+    for (const checkPerm of filteredPermissionsToCheck) {
+      let permissionFound = false;
+      for (const userPerm of userPermissions) {
+        if (userPerm.startsWith(checkPerm)) {
+          permissionFound = true;
+          break;
+        }
+      }
+      if (permissionFound == false) {
+        missingPermissions.push(checkPerm);
+      }
+    }
+  }
+
+  return missingPermissions;
 }
 
 /**
@@ -311,8 +337,8 @@ function getMissingInstallPermissions() {
  * @param {Function} extraContentFunc (Optional) Function that returns an element to be added to #additional-error-content
  */
 function showErrorPage(errorTitle, errorMessage, titleClass, msgClass, extraContentFunc){
-    view.setError(errorTitle, errorMessage, titleClass, msgClass, extraContentFunc);
-    switchPage(PAGES.ERROR);
+  view.setError(errorTitle, errorMessage, titleClass, msgClass, extraContentFunc);
+  switchPage(PAGES.ERROR);
 }
 
 /**
@@ -328,32 +354,32 @@ function onCustomSetupEnter(){
  * @returns {Promise}
  */
 async function setup() {
-    view.showLoadingModal();
-    view.setupPage();
+  view.showLoadingModal();
+  view.setupPage();
 
-    try {
-        // Authenticate and get current user
-        await authenticateGenesysCloud();
-        await setPageLanguage(pcLanguage);
-        userMe = await usersApi.getUsersMe({ 'expand': ['organization', 'authorization'] });
-        
-        // Initialize the Wizard object
-        wizard.setup(client, userMe);
-        
-        // Check if app is for uninstallation
-        // ie. query parameter 'uninstall=true'
-        if(state.uninstall === 'true') await switchPage(PAGES.UNINSTALL);
-        
-        // Load the Home page
-        await switchPage(startPage);
+  try {
+    // Authenticate and get current user
+    await authenticateGenesysCloud();
+    await setPageLanguage(pcLanguage);
+    userMe = await usersApi.getUsersMe({ 'expand': ['organization', 'authorization'] });
+    
+    // Initialize the Wizard object
+    wizard.setup(client, userMe);
+    
+    // Check if app is for uninstallation
+    // ie. query parameter 'uninstall=true'
+    if(state.uninstall === 'true') await switchPage(PAGES.UNINSTALL);
+    
+    // Load the Home page
+    await switchPage(startPage);
 
-        // View related
-        setButtonEventListeners();
-        view.showUserName(userMe.name);
-        view.hideLoadingModal();
-    } catch (e) {
-        console.error(e);
-    }
+    // View related
+    setButtonEventListeners();
+    view.showUserName(userMe.name);
+    view.hideLoadingModal();
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 setup();
