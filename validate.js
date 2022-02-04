@@ -492,3 +492,9 @@ console.log(`-----------------          (v3.0.0)                 ---------------
 console.log('====================================================================='.bgBrightCyan.black);
 console.log();
 validateAll();
+
+/**
+ * TODO: verify that div ids for 'pages' exist in index.html
+ * TODO: Make sure wizarduribase hase / at the end of it
+ * if post custom setup is enabled make sure translation keys exist.
+ */

@@ -143,7 +143,7 @@ export default {
 
     /**
      * Installs all the modules
-     * @returns {Promise<Array>} array of finally function resolves
+     * @returns {Promise<Object>} Status of post-custom-setup eg. { status: true, cause: 'it's a success' }
      */
     async install() {
         let creationPromises = [];
@@ -224,22 +224,22 @@ export default {
             integrationInstance.notes = JSON.stringify(simplifiedData).substring(0,500);
 
             await integrationsApi.putIntegrationConfigCurrent(integrationId, { body: integrationInstance });
-
-            // Execute Post Custom Setup (if requested)
-            if (config.enableCustomSetupStepAfterInstall) {
-                return postCustomSetup.configure(
-                    view.showLoadingModal,
-                    installedData,
-                    userMe,
-                    client
-                );
-            } else {
-                return { status: true, cause: 'no post custom setup' };
-            }
         } catch(e) {
             console.error('Error finalizing installedData');
             throw e;
         }
+
+        // Execute Post Custom Setup (if requested)
+        if (!config.enableCustomSetupStepAfterInstall) {
+            return { status: true, cause: 'no post custom setup' };
+        }
+            
+        return postCustomSetup.configure(
+            view.showLoadingModal,
+            installedData,
+            userMe,
+            client
+        );
     },
 
     /**
