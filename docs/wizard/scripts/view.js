@@ -53,13 +53,39 @@ export default {
      * Set the text in the error page
      * @param {String} title title of the error
      * @param {String} message messaage of the error
+     * @param {String} titleClass (Optional) classname to add to the element. (For use in on-the-fly translation)
+     * @param {String} msgClass (Optional) classname to add to the element. (For use in on-the-fly translation)
+     * @param {Function} extraContentFunc (Optional) Function that returns an element to be added to #additional-error-content
      */
-    setError(title, message){
+    setError(title, message, titleClass, msgClass, extraContentFunc){
         const elemTitle = document.getElementById('error-title');
         const elemMessage = document.getElementById('error-message');
 
-        if(title) elemTitle.innerText = title;
-        if(message) elemMessage.innerText = message;
+        if(title) {
+            elemTitle.className = '';
+            if(titleClass) elemTitle.classList.add(titleClass);
+            elemTitle.innerText = title
+        };
+        if(message) {
+            elemMessage.className = '';
+            if(msgClass) elemMessage.classList.add(msgClass);
+            elemMessage.innerText = message;
+        }
+
+        if(extraContentFunc && typeof extraContentFunc == 'function'){
+            const extraContainer = document.getElementById('additional-error-content');
+            const extraElem = extraContentFunc();
+
+            if(!extraElem instanceof Element) return;
+
+            // Clear out all children elements of the container
+            while (extraContainer.firstChild) {
+                extraContainer.removeChild(extraContainer.lastChild);
+            }
+        
+            // Add the extra content
+            extraContainer.appendChild(extraElem);
+        }
     },
 
     /**

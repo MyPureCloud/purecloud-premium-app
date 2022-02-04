@@ -2,7 +2,7 @@ import config from '../config/config.js';
 import view from './view.js';
 import wizard from './wizard.js';
 import { PAGES } from './enums.js'
-import { setPageLanguage } from './language-manager.js';
+import { setPageLanguage, getTranslatedText } from './language-manager.js';
 
 // Genesys Cloud
 const platformClient = require('platformClient');
@@ -15,7 +15,7 @@ const premiumAppIntegrationTypeId = config.premiumAppIntegrationTypeId;
 const startPage = PAGES.INDEX_PAGE;
 
 // Variables
-let pcLanguage;
+let pcLanguage; // Initial language from query parameter | config.
 let pcEnvironment;
 let state; // State from implicit grant 
 let currentPage = null;
@@ -26,32 +26,26 @@ let userMe = null;
  * @returns {Object} {language(?): ..., environment(?): ..., uninstall(?): ...}
  */
 function getQueryParameters() {
-    // Get Query Parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    let language = urlParams.get(config.languageQueryParam);
-    let environment = urlParams.get(config.genesysCloudEnvironmentQueryParam);
-    let uninstall = urlParams.get('uninstall');
-    let ret = {};
+  // Get Query Parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  let language = urlParams.get(config.languageQueryParam);
+  let environment = urlParams.get(config.genesysCloudEnvironmentQueryParam);
+  let uninstall = urlParams.get('uninstall');
+  let ret = {};
 
-    if(language) ret.language = language;
-    if(environment) ret.environment = environment;
-    if(uninstall) ret.uninstall = uninstall;
+  if(language) ret.language = language;
+  if(environment) ret.environment = environment;
+  if(uninstall) ret.uninstall = uninstall;
 
-    return ret;
+  return ret;
 }
 
-/**
- * Gets the string text from the translations files.
- * @param {String} key The key for the entry in the JSON file
- * @param {String} language 
- * @returns {String} the translated text
- */
-function getTranslatedText(key, language){
-    if(!language) language = config.defaultLanguage;
-    let ret = '';
-    // TODO:
 
-    return ret;
+/**
+ * Redirect to the actual premium app
+ */
+function goToPremiumApp(){
+  window.location.href = config.redirectURLOnWizardCompleted;
 }
 
 /**
@@ -59,24 +53,24 @@ function getTranslatedText(key, language){
  * @returns {Promise}
  */
 async function authenticateGenesysCloud() {
-    const queryParams = getQueryParameters();
+  const queryParams = getQueryParameters();
 
-    // Determine Genesys Cloud environment
-    pcEnvironment = queryParams.environment ? queryParams.environment : config.defaultPcEnvironment;
-    client.setEnvironment(pcEnvironment);
+  // Determine Genesys Cloud environment
+  pcEnvironment = queryParams.environment ? queryParams.environment : config.defaultPcEnvironment;
+  client.setEnvironment(pcEnvironment);
 
-    // Authenticate with Genesys Cloud and get the state
-    client.setPersistSettings(true, premiumAppIntegrationTypeId); 
-    const authData = await client.loginImplicitGrant(
-        config.clientID, 
-        `${config.wizardUriBase}index.html`, 
-        { state: JSON.stringify(queryParams) }
-    ); 
-    state = JSON.parse(authData.state);
-    console.log(state);
+  // Authenticate with Genesys Cloud and get the state
+  client.setPersistSettings(true, premiumAppIntegrationTypeId); 
+  const authData = await client.loginImplicitGrant(
+    config.clientID, 
+    `${config.wizardUriBase}index.html`, 
+    { state: JSON.stringify(queryParams) }
+  ); 
+  state = JSON.parse(authData.state);
+  console.log(state);
 
-    // Set language
-    pcLanguage = state.language ? state.language : config.defaultLanguage;
+  // Set language
+  pcLanguage = state.language ? state.language : config.defaultLanguage;
 }
 
 /**
@@ -84,15 +78,15 @@ async function authenticateGenesysCloud() {
  * @returns {Promise}
  */
 async function validateProductAvailability() {
-    let productAvailable = false;
-    try {
-        await integrationsApi.getIntegrationsType(premiumAppIntegrationTypeId);
-        console.log('PRODUCT AVAILABLE');
-        return true;
-    } catch(e) {
-        console.log('PRODUCT UNAVAILABLE')
-    }
-    return productAvailable;
+  let productAvailable = false;
+  try {
+    await integrationsApi.getIntegrationsType(premiumAppIntegrationTypeId);
+    console.log('PRODUCT AVAILABLE');
+    return true;
+  } catch(e) {
+    console.log('PRODUCT UNAVAILABLE')
+  }
+  return productAvailable;
 }
 
 /**
@@ -100,71 +94,108 @@ async function validateProductAvailability() {
 * @param {Enum.PAGES} targetPage the target page
  */
 async function switchPage(targetPage){
-    currentPage = targetPage;
-    console.log(`Going to page: ${currentPage}`);
+  currentPage = targetPage;
+  console.log(`Going to page: ${currentPage}`);
 
-    view.displayPage(targetPage);
-    switch(targetPage){
-        case PAGES.INDEX_PAGE:
-            // Check product availability
-            const productAvailable = await validateProductAvailability()
-            if (!productAvailable) {
-                showErrorPage(
-                    getTranslatedText('txt-product-not-available'),
-                    getTranslatedText('txt-not-available-message'));
-            } 
-            
-            // Check if has an existing installation
-            const integrationInstalled = await wizard.isExisting();
-            if (integrationInstalled) {
-                // If the wizard install process was already performed, only check the Premium App View permission
-                if (!userMe.authorization.permissions.includes(config.premiumAppViewPermission)) {
-                    localStorage.setItem(premiumAppIntegrationTypeId + ':missingPermissions', config.premiumAppViewPermission);
-                    window.location.href = './unlicensed.html';
-                } else {
-                    window.location.href = config.redirectURLOnWizardCompleted;
-                }
-            } else {
-                // JSM TODO - rest-ce que ca ne va pas masquer le cas ou product is not available???
-                if (config.checkInstallPermissions && productAvailable == true) {
-                    let missingPermissions = checkUserPermissions(config.checkInstallPermissions, userMe.authorization.permissions);
-                    if (missingPermissions && missingPermissions.length > 0) {
-                        localStorage.setItem(premiumAppIntegrationTypeId + ':missingPermissions', missingPermissions.toString());
-                        window.location.href = './unlicensed.html';
-                    }
-                } 
+  view.displayPage(targetPage);
+  switch(targetPage){
+    case PAGES.INDEX_PAGE:
+      // Check product availability
+      const productAvailable = await validateProductAvailability()
+      if (!productAvailable) {
+        showErrorPage(
+          getTranslatedText('txt-product-not-available'),
+          getTranslatedText('txt-not-available-message'),
+          'txt-product-not-available',
+          'txt-not-available-message'
+        );
+      } 
+      
+      // Check if there's an existing installation
+      const integrationInstalled = await wizard.isExisting();
+      if (integrationInstalled) {
+        // If user is lacking permission, don't redirect to Premium App
+        if (!userMe.authorization.permissions.includes(config.premiumAppViewPermission)) {
+          showErrorPage(
+            'Unauthorized',
+            getTranslatedText('txt-missing-permissions'),
+            null,
+            'txt-missing-permissions',
+            // Show the missing permissions in the error page
+            () => {
+              const container = document.createElement('ul');
+              const entryElem = document.createElement('li');
+              entryElem.style.display = 'flex';
+              entryElem.style.justifyContent = 'center';
+              entryElem.innerText = config.premiumAppViewPermission;
+              container.appendChild(entryElem);
+
+              return container;
             }
-            break;
-        case PAGES.CUSTOM_SETUP:
-            break;
-        case PAGES.INSTALL_DETAILS:
-            break;
-        case PAGES.DONE:
-            setTimeout(() => {
-                window.location.href = config.redirectURLOnWizardCompleted;
-            }, 2000);
+          );
+        }
+        goToPremiumApp();
+      } 
 
-            break;
-        case PAGES.UNINSTALL:
-            alert('The uninstall button is for development purposes only. Remove this button before demo.');
+      // If integration is not yet installed, check that the user has necessary install permissions
+      if (config.checkInstallPermissions) {
+        let missingPermissions = getMissingInstallPermissions();
+        if (missingPermissions && missingPermissions.length > 0) {
+          showErrorPage(
+            'Unauthorized',
+            getTranslatedText('txt-missing-permissions'),
+            null,
+            'txt-missing-permissions',
+            // Show the missing permissions in the error page
+            () => {
+              const container = document.createElement('ul');
+              
+              missingPermissions.forEach(perm => {
+                const entryElem = document.createElement('li');
+                entryElem.style.display = 'flex';
+                entryElem.style.justifyContent = 'center';
+                entryElem.innerText = perm;
+                container.appendChild(entryElem);
+              });
 
-            view.showLoadingModal('Uninstalling...');
+              return container;
+            }
+          );
+        }
+      } 
 
-            await wizard.uninstall();
-            await new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    window.history.replaceState(null, '', `${config.wizardUriBase}index.html`);
-                    resolve();
-                }, 2000);
-            });
+      break;
+    case PAGES.CUSTOM_SETUP:
+      onCustomSetupEnter();
+      break;
+    case PAGES.INSTALL_DETAILS:
+      break;
+    case PAGES.DONE:
+      setTimeout(() => {
+        goToPremiumApp();
+      }, 2000);
 
-            break;
-        case PAGES.ERROR:
-            break;
-        default:
-            throw new Error('Unknown page');
-    }
-    console.log(`Loaded page: ${currentPage}`);
+      break;
+    case PAGES.UNINSTALL:
+      alert('The uninstall button is for development purposes only. Remove this button before demo.');
+
+      view.showLoadingModal('Uninstalling...');
+
+      await wizard.uninstall();
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          window.history.replaceState(null, '', `${config.wizardUriBase}index.html`);
+          resolve();
+        }, 2000);
+      });
+
+      break;
+    case PAGES.ERROR:
+      break;
+    default:
+      throw new Error('Unknown page');
+  }
+  console.log(`Loaded page: ${currentPage}`);
 }
 
 /**
@@ -215,18 +246,23 @@ function setButtonEventListeners(){
 }
 
 /**
- * Checks if the user has the necessary permissions
+ * Checks if the user has the necessary intall permissions
+ * based on config.checkInstallPermissions
+ * @returns {Array} Array of string. Missing permissions.
  */
-function checkUserPermissions(checkType, userPermissions) {
+function getMissingInstallPermissions() {
+    const userPermissions = userMe.authorization.permissions;
+    const permissionType = config.checkInstallPermissions;
     let missingPermissions = [];
-    if (checkType === 'premium') {
+
+    if (permissionType === 'premium') {
         if (!userPermissions.includes(config.premiumAppViewPermission)) {
             missingPermissions.push(config.premiumAppViewPermission);
         }
-    } else if (checkType === 'wizard' || checkType === 'all') {
+    } else if (permissionType === 'wizard' || permissionType === 'all') {
         let permissionsToCheck = [];
 
-        if (checkType === 'all') {
+        if (permissionType === 'all') {
             permissionsToCheck.push(config.premiumAppViewPermission);
         }
 
@@ -270,10 +306,21 @@ function checkUserPermissions(checkType, userPermissions) {
  * Go to the error page
  * @param {String} errorTitle title of the error
  * @param {String} errorMessage Full message for the error
+ * @param {String} titleClass (Optional) CSS class to add to the element. (For use in on-the-fly translation)
+ * @param {String} msgClass (Optional) CSS class to add to the element. (For use in on-the-fly translation)
+ * @param {Function} extraContentFunc (Optional) Function that returns an element to be added to #additional-error-content
  */
-function showErrorPage(errorTitle, errorMessage){
-    view.setError(errorTitle, errorMessage);
+function showErrorPage(errorTitle, errorMessage, titleClass, msgClass, extraContentFunc){
+    view.setError(errorTitle, errorMessage, titleClass, msgClass, extraContentFunc);
     switchPage(PAGES.ERROR);
+}
+
+/**
+ * This will run when the user enters the Custom Setup Page.
+ * NOTE: Add your code for any custom initialization functionality here.
+ */
+function onCustomSetupEnter(){
+  console.log('Custom Setup Page');
 }
 
 /**

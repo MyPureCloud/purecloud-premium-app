@@ -62,6 +62,7 @@
 
     <!-- MAIN CONTENT -->
     <main>
+      <!-- ===========================   HOME PAGE   ======================================== -->
       <div id="index-page">
         <div id="available">
           <p class="success">
@@ -92,6 +93,7 @@
           <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i>
         </button>
       </div>
+      <!-- =================----====  INSTALLATION DETAILS PAGE   =========================== -->
       <div id="install-details-page">
         <p>
           <span class="txt-install-summary">These are the steps that will be automatically performed for
@@ -165,6 +167,7 @@
           <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i>
         </button>
       </div>
+      <!-- =======================  INSTALLATION FINISHED PAGE   ============================ -->
       <div id="installation-finished-page">
         <p class="success">
           <div class="txt-finish-install">
@@ -175,14 +178,21 @@
           </div>
         </p>
       </div>
+      <!-- =============================  ERROR PAGE   ====================================== -->
       <div id="error-page">
         <div>
+          <!-- Don't add classes to #error-title and #error-message. They're being modified in code (view.js) -->
+          <!-- If you want to style them, enclose in container elements -->
           <h3><i class="fas fa-times-circle enlarge"></i> 
             <span id="error-title">Unknown Error</span>
           </h3>
           <p id="error-message">Sorry but something went wrong, please contact your administrator.</p>
+          <div id="additional-error-content"> 
+            <!-- Filled dynamically in code (view.js). Don't manually add anything here --> 
+          </div>
         </div>
       </div>
+      <!-- ==========================  UNINSTALL PAGE   ===================================== -->
       <div id="uninstall-page"></div>
     </main>
   </div>

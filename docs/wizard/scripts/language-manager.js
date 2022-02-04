@@ -6,6 +6,7 @@ import config from '../config/config.js';
 import view from './view.js';
 
 let dropDownConfigured = false;
+let currentLanguageSet = null; // Contains the currently loaded language file (Object)
 
 /**
  * Configure the language selector dropdown
@@ -69,6 +70,7 @@ export async function setPageLanguage(requestedLanguage) {
         let fileUri = `${config.wizardUriBase}assets/languages/${langAssetCode}.json`;
         $.getJSON(fileUri)
             .done(data => {
+                currentLanguageSet = data;
                 Object.keys(data).forEach((key) => {
                     let els = document.querySelectorAll(`.${key}`);
                     for (let i = 0; i < els.length; i++) {
@@ -82,4 +84,13 @@ export async function setPageLanguage(requestedLanguage) {
                 resolve();
             });
     });
+}
+
+/**
+ * Gets the string text from the translations files.
+ * @param {String} key The key for the entry in the JSON file
+ * @returns {String} the translated text
+ */
+export function getTranslatedText(key){
+    return currentLanguageSet[key];
 }
