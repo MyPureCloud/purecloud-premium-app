@@ -10,6 +10,7 @@
     "txt-install": "Install",
     "txt-summary": "Summary",
     "txt-back": "Back",
+    "txt-next": "Next",
     "txt-reset": "Reset",
     "txt-language-selection": "Language",
     "txt-product-available": "Product Available",
@@ -43,7 +44,10 @@
     "txt-create-post-custom-setup": "Post Custom Setup",
     "txt-create-post-custom-setup-msg": "Invoke Backend for Post Custom Setup.",
     "txt-please-click": "Please click the button to start the installation.",
-    "txt-finish-install": "Please wait while we take you to the application.",
+    "txt-finish-install": "The integration was successfully installed. \n Here you can review the summary of all provisioned items. \n\n To continue to your application, press the button.",
+    "txt-finish-install-2": "Below is the raw results of the installation in JSON format. \n You may want to store this somewhere as it won't be available anymore upon leaving the wizard. \n The data contains the id and names of the provisioned items.",
     "txt-installed": "Installed",
-    "txt-still-installed-1": "Please wait while we're uninstalling. After installation, you'll be taken to the wizard start screen."
+    "txt-still-installed-1": "Please wait while we're uninstalling. After installation, you'll be taken to the wizard start screen.",
+    "txt-installation-error": "Installation Error",
+    "txt-goto-app": "Go To Application"
 }

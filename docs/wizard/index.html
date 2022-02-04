@@ -89,8 +89,11 @@
           <br><br>
           Update the ./docs/wizard/scripts/main.js to call your custom provisioning functions.
         </p>
+        <button class="btn-prev">
+          <i class="button-icon fas fa-chevron-left"> </i><span class="txt-back">Back</span>
+        </button>
         <button class="btn-next"  class="btn-info right">
-          <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i>
+          <span class="txt-next">Next</span> <i class="button-icon fas fa-chevron-right"></i>
         </button>
       </div>
       <!-- =================----====  INSTALLATION DETAILS PAGE   =========================== -->
@@ -163,19 +166,29 @@
           </span>
         </p>
 
+        <button class="btn-prev">
+          <i class="button-icon fas fa-chevron-left"></i> <span class="txt-back">Back</span>
+        </button>
         <button id="btn-install"  class="btn-info right">
-          <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i>
+          <span class="txt-install">Install</span>
         </button>
       </div>
       <!-- =======================  INSTALLATION FINISHED PAGE   ============================ -->
       <div id="installation-finished-page">
         <p class="success">
           <div class="txt-finish-install">
-            Please wait while we take you to the application.
+            Successfully installed
           </div>
-          <div id="loading" style="margin-top: 30px; text-align: center;">
-            <i class="fa fa-spinner fa-spin" style="font-size:70px; color: #1997CA;"></i>
+          <div id="summary-container">
+            <!-- Dynamically filled. Don't add anything manually here -->
           </div>
+          <div>
+            <p class="txt-finish-install-2">Raw data here: </p>
+            <textarea id="summary-raw-data" cols="70" rows="7"></textarea>
+          </div>
+          <button id="btn-goto-app"  class="btn-info">
+            <span class="txt-goto-app">Go To Application</span>
+          </button>
         </p>
       </div>
       <!-- =============================  ERROR PAGE   ====================================== -->

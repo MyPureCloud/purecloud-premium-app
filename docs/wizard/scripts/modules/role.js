@@ -88,7 +88,7 @@ async function create(logFunc, data) {
 
                 roleData[role.name] = result;
             } catch(e) {
-                console.log(err)
+                console.log(e)
             }
         })());
     });

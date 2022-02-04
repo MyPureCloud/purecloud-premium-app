@@ -32,6 +32,16 @@ export default {
             .innerText = message ? message : '';
     },
 
+     /**
+     * SModify the laoding modal message but doesn't affect visibility.
+     * @param {String} message 
+     */
+    setLoadingModal(message) {
+        console.info(`modal: ${message}`);
+        elLoadingModal.querySelectorAll('.modal-message')[0]
+            .innerText = message ? message : '';
+    },
+
     /**
      * Hide the loading modal
      */
