@@ -203,11 +203,11 @@ async function switchPage(targetPage){
  */
 function setButtonEventListeners(){
   const nextButtons = Array.from(document.getElementsByClassName('btn-next'));
+  const prevButtons = Array.from(document.getElementsByClassName('btn-prev'));
   const installButton = document.getElementById('btn-install');
 
   nextButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      console.log(currentPage)
       switch(currentPage){
         case PAGES.INDEX_PAGE:
           if (config.enableCustomSetupPageBeforeInstall) {
@@ -223,50 +223,26 @@ function setButtonEventListeners(){
     })
   });
 
+  prevButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      switch(currentPage){
+        case PAGES.CUSTOM_SETUP:
+          switchPage(PAGES.INDEX_PAGE);
+          break;
+        case PAGES.INSTALL_DETAILS:
+          if (config.enableCustomSetupPageBeforeInstall) {
+            switchPage(PAGES.CUSTOM_SETUP);
+          } else {
+            switchPage(PAGES.INDEX_PAGE);
+          }
+          break;
+      }
+    })
+  });
+
   if(installButton) {
     installButton.addEventListener('click', () => {
-      (async () => {
-        view.showLoadingModal('Installing..');
-        try {
-          const customSetupStatus = await wizard.install();
-
-          // Check if Post Custom Setup is successful
-          if (customSetupStatus.status) {
-            switchPage(PAGES.DONE);
-          } else {
-            // Show error from post custom setup
-            showErrorPage(
-              getTranslatedText('txt-post-custom-setup-failure'),
-              getTranslatedText('txt-failure-backend'),
-              'txt-post-custom-setup-failure',
-              'txt-failure-backend',
-              () => {
-                const container = document.createElement('div');
-                container.innerHTML = `
-                  <p>
-                    <b>
-                      <span class="txt-details-failure-backend">${getTranslatedText('txt-details-failure-backend')}:</span>
-                    </b>
-                    <i>
-                      <span class="details-failure-backend">${customSetupStatus.cause}</span>
-                    </i>
-                  </p>
-                  <p>
-                    <span class="txt-resolve-backend">
-                      ${getTranslatedText('txt-resolve-backend')}
-                    </span>
-                  </p>
-                  `;
-                return container;
-              }
-            );
-
-            view.hideLoadingModal();
-          }
-        } catch(e) {
-          console.error(e);
-        }
-      })();
+      install();
     })
   }
 }
@@ -339,6 +315,57 @@ function getMissingInstallPermissions() {
 function showErrorPage(errorTitle, errorMessage, titleClass, msgClass, extraContentFunc){
   view.setError(errorTitle, errorMessage, titleClass, msgClass, extraContentFunc);
   switchPage(PAGES.ERROR);
+}
+
+/**
+ * Start the wizard installation
+ */
+async function install() {
+  view.showLoadingModal('Installing..');
+  try {
+    const customSetupStatus = await wizard.install();
+
+    // Check if Post Custom Setup is successful
+    if (customSetupStatus.status) {
+      switchPage(PAGES.DONE);
+    } else {
+      // Show error from post custom setup
+      showErrorPage(
+        getTranslatedText('txt-post-custom-setup-failure'),
+        getTranslatedText('txt-failure-backend'),
+        'txt-post-custom-setup-failure',
+        'txt-failure-backend',
+        () => {
+          const container = document.createElement('div');
+          container.innerHTML = `
+            <p>
+              <b>
+                <span class="txt-details-failure-backend">${getTranslatedText('txt-details-failure-backend')}:</span>
+              </b>
+              <i>
+                <span class="details-failure-backend">${customSetupStatus.cause}</span>
+              </i>
+            </p>
+            <p>
+              <span class="txt-resolve-backend">
+                ${getTranslatedText('txt-resolve-backend')}
+              </span>
+            </p>
+            `;
+          return container;
+        }
+      );
+    }
+  } catch(e) {
+    console.error(e);
+    // Show error page on any error during installation
+    showErrorPage(
+      getTranslatedText('txt-installation-error'),
+      `\n ${e.name} - ${e.message}. \n ${e.stack?e.stack:''}`,
+      'txt-installation-error'
+    );
+  }
+  view.hideLoadingModal();
 }
 
 /**

@@ -160,7 +160,7 @@ export default {
 
                 creationPromises.push(
                     module.create(
-                        view.showLoadingModal,
+                        view.setLoadingModal,
                         moduleProvisioningData
                     )
                 );
@@ -180,7 +180,7 @@ export default {
             modules.forEach((module) => {
                 configurationPromises.push(
                     module.configure(
-                        view.showLoadingModal,
+                        view.setLoadingModal,
                         installedData,
                         userMe.id
                     )
@@ -193,7 +193,7 @@ export default {
         }
 
         // Run 'finally' methods
-        view.showLoadingModal('Executing Final Steps...');
+        view.setLoadingModal('Executing Final Steps...');
         try {
             // Loop through all items with finally 
             Object.keys(config.provisioningInfo).forEach(key => {
@@ -235,7 +235,7 @@ export default {
         }
             
         return postCustomSetup.configure(
-            view.showLoadingModal,
+            view.setLoadingModal,
             installedData,
             userMe,
             client

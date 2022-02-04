@@ -10,6 +10,7 @@
     "txt-install": "Install",
     "txt-summary": "Summary",
     "txt-back": "Back",
+    "txt-next": "Next",
     "txt-reset": "Reset",
     "txt-language-selection": "Language",
     "txt-product-available": "Product Available",
@@ -45,5 +46,6 @@
     "txt-please-click": "Please click the button to start the installation.",
     "txt-finish-install": "Please wait while we take you to the application.",
     "txt-installed": "Installed",
-    "txt-still-installed-1": "Please wait while we're uninstalling. After installation, you'll be taken to the wizard start screen."
+    "txt-still-installed-1": "Please wait while we're uninstalling. After installation, you'll be taken to the wizard start screen.",
+    "txt-installation-error": "Installation Error"
 }

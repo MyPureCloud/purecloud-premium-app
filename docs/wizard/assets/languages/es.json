@@ -10,6 +10,7 @@
     "txt-install": "Instalar",
     "txt-summary": "Resumen",
     "txt-back": "Atrás",
+    "txt-next": "Siguiente",
     "txt-reset": "Restablecer",
     "txt-language-selection": "Idioma",
     "txt-product-available": "Producto disponible",
@@ -45,5 +46,6 @@
     "txt-please-click": "Haga clic en el botón para comenzar la instalación",
     "txt-finish-install": "Espere mientras lo llevamos a la aplicación.",
     "txt-installed": "Instalado",
-    "txt-still-installed-1": "Por favor espere mientras estamos desinstalando"
+    "txt-still-installed-1": "Por favor espere mientras estamos desinstalando",
+    "txt-installation-error": "Error de Instalacion"
 }
