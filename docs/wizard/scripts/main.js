@@ -3,6 +3,7 @@ import view from './view.js';
 import wizard from './wizard.js';
 import { PAGES } from './enums.js'
 import { setPageLanguage, getTranslatedText } from './language-manager.js';
+import { getResourcePath, beautifyModuleKey, getQueryParameters } from './utils.js'
 
 // Genesys Cloud
 const platformClient = require('platformClient');
@@ -20,26 +21,6 @@ let pcEnvironment;
 let state; // State from implicit grant 
 let currentPage = null;
 let userMe = null;
-
-/**
- * Get the query parameters and return an object 
- * @returns {Object} {language(?): ..., environment(?): ..., uninstall(?): ...}
- */
-function getQueryParameters() {
-  // Get Query Parameters
-  const urlParams = new URLSearchParams(window.location.search);
-  let language = urlParams.get(config.languageQueryParam);
-  let environment = urlParams.get(config.genesysCloudEnvironmentQueryParam);
-  let uninstall = urlParams.get('uninstall');
-  let ret = {};
-
-  if(language) ret.language = language;
-  if(environment) ret.environment = environment;
-  if(uninstall) ret.uninstall = uninstall;
-
-  return ret;
-}
-
 
 /**
  * Redirect to the actual premium app
@@ -100,81 +81,15 @@ async function switchPage(targetPage){
   view.displayPage(targetPage);
   switch(targetPage){
     case PAGES.INDEX_PAGE:
-      // Check product availability
-      const productAvailable = await validateProductAvailability()
-      if (!productAvailable) {
-        showErrorPage(
-          getTranslatedText('txt-product-not-available'),
-          getTranslatedText('txt-not-available-message'),
-          'txt-product-not-available',
-          'txt-not-available-message'
-        );
-      } 
-      
-      // Check if there's an existing installation
-      const integrationInstalled = await wizard.isExisting();
-      if (integrationInstalled) {
-        // If user is lacking permission, don't redirect to Premium App
-        if (!userMe.authorization.permissions.includes(config.premiumAppViewPermission)) {
-          showErrorPage(
-            'Unauthorized',
-            getTranslatedText('txt-missing-permissions'),
-            null,
-            'txt-missing-permissions',
-            // Show the missing permissions in the error page
-            () => {
-              const container = document.createElement('ul');
-              const entryElem = document.createElement('li');
-              entryElem.style.display = 'flex';
-              entryElem.style.justifyContent = 'center';
-              entryElem.innerText = config.premiumAppViewPermission;
-              container.appendChild(entryElem);
-
-              return container;
-            }
-          );
-        }
-        goToPremiumApp();
-      } 
-
-      // If integration is not yet installed, check that the user has necessary install permissions
-      if (config.checkInstallPermissions) {
-        let missingPermissions = getMissingInstallPermissions();
-        if (missingPermissions && missingPermissions.length > 0) {
-          showErrorPage(
-            'Unauthorized',
-            getTranslatedText('txt-missing-permissions'),
-            null,
-            'txt-missing-permissions',
-            // Show the missing permissions in the error page
-            () => {
-              const container = document.createElement('ul');
-              
-              missingPermissions.forEach(perm => {
-                const entryElem = document.createElement('li');
-                entryElem.style.display = 'flex';
-                entryElem.style.justifyContent = 'center';
-                entryElem.innerText = perm;
-                container.appendChild(entryElem);
-              });
-
-              return container;
-            }
-          );
-        }
-      } 
-
+      await onInitialPageEnter();
       break;
     case PAGES.CUSTOM_SETUP:
-      onCustomSetupEnter();
+      await onCustomSetupEnter();
       break;
     case PAGES.INSTALL_DETAILS:
       break;
     case PAGES.DONE:
-      setTimeout(() => {
-        goToPremiumApp();
-      }, 2000);
-
+      await onInstallationSummaryEnter();
       break;
     case PAGES.UNINSTALL:
       alert('The uninstall button is for development purposes only. Remove this button before demo.');
@@ -205,6 +120,7 @@ function setButtonEventListeners(){
   const nextButtons = Array.from(document.getElementsByClassName('btn-next'));
   const prevButtons = Array.from(document.getElementsByClassName('btn-prev'));
   const installButton = document.getElementById('btn-install');
+  const goToAppButton = document.getElementById('btn-goto-app');
 
   nextButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -243,6 +159,12 @@ function setButtonEventListeners(){
   if(installButton) {
     installButton.addEventListener('click', () => {
       install();
+    })
+  }
+
+  if(goToAppButton) {
+    goToAppButton.addEventListener('click', () => {
+      goToPremiumApp();
     })
   }
 }
@@ -369,11 +291,136 @@ async function install() {
 }
 
 /**
+ * This will run when the user enters home page
+ */
+async function onInitialPageEnter(){
+  // Check product availability
+  const productAvailable = await validateProductAvailability()
+  if (!productAvailable) {
+    showErrorPage(
+      getTranslatedText('txt-product-not-available'),
+      getTranslatedText('txt-not-available-message'),
+      'txt-product-not-available',
+      'txt-not-available-message'
+    );
+  } 
+
+  // Check if there's an existing installation
+  const integrationInstalled = await wizard.isExisting();
+  if (integrationInstalled) {
+    // If user is lacking permission, don't redirect to Premium App
+    if (!userMe.authorization.permissions.includes(config.premiumAppViewPermission)) {
+      showErrorPage(
+        'Unauthorized',
+        getTranslatedText('txt-missing-permissions'),
+        null,
+        'txt-missing-permissions',
+        // Show the missing permissions in the error page
+        () => {
+          const container = document.createElement('ul');
+          const entryElem = document.createElement('li');
+          entryElem.style.display = 'flex';
+          entryElem.style.justifyContent = 'center';
+          entryElem.innerText = config.premiumAppViewPermission;
+          container.appendChild(entryElem);
+
+          return container;
+        }
+      );
+    }
+    goToPremiumApp();
+  } 
+
+  // If integration is not yet installed, check that the user has necessary install permissions
+  if (config.checkInstallPermissions) {
+    let missingPermissions = getMissingInstallPermissions();
+    if (missingPermissions && missingPermissions.length > 0) {
+      showErrorPage(
+        'Unauthorized',
+        getTranslatedText('txt-missing-permissions'),
+        null,
+        'txt-missing-permissions',
+        // Show the missing permissions in the error page
+        () => {
+          const container = document.createElement('ul');
+          
+          missingPermissions.forEach(perm => {
+            const entryElem = document.createElement('li');
+            entryElem.style.display = 'flex';
+            entryElem.style.justifyContent = 'center';
+            entryElem.innerText = perm;
+            container.appendChild(entryElem);
+          });
+
+          return container;
+        }
+      );
+    }
+  } 
+}
+
+/**
+ * This will run after the installation and upon entering the PAGES.DONE page.
+ * Show the summary of the provisioned items.
+ */
+async function onInstallationSummaryEnter() {
+  const installedData = wizard.getSimpleInstalledData();
+  const dataKeys = Object.keys(installedData);
+
+  // Show the results in the page
+  // TODO: Make this more pretty
+  const summaryContainer = document.getElementById('summary-container');
+  if(!summaryContainer) return; 
+
+  // Create an array that contains HTML string per object category 
+  const summaryElems = dataKeys.map((category, i) => {
+    let childElemsString = '';
+
+    const installedObjects = installedData[category];
+    const installedObjectsKeys = Object.keys(installedObjects);
+    // Build the children elements for the category
+    installedObjectsKeys.forEach(objKey => {
+      const obj = installedObjects[objKey]
+      const resourcePath = getResourcePath(pcEnvironment, category, obj.id)
+
+      if(resourcePath){
+        childElemsString += `
+          <p><a href="${resourcePath}" target="_blank">${config.prefix}${objKey}</a></p>
+        `;
+      } else {
+        childElemsString += `
+          <p>${config.prefix}${objKey}</p>
+        `;
+      }
+    });
+
+    const template = `
+      <div id="installation-summary-${dataKeys[i]}" class="install-summary-category">
+        <h3>${beautifyModuleKey(category)}</h3>
+        ${childElemsString}
+      </div>
+    `
+
+    return template;
+  });
+
+  // Add the elements
+  summaryElems.forEach(summary => {
+    summaryContainer.innerHTML += summary;
+  })
+
+  // Add the raw installation data to the textarea
+  const textAreaSummary = document.getElementById('summary-raw-data');
+  if(!textAreaSummary) return;
+  textAreaSummary.value = JSON.stringify(installedData);
+}
+
+/**
  * This will run when the user enters the Custom Setup Page.
  * NOTE: Add your code for any custom initialization functionality here.
  */
-function onCustomSetupEnter(){
-  console.log('Custom Setup Page');
+async function onCustomSetupEnter(){
+  console.log('Custom Page Here');
 }
 
 /**

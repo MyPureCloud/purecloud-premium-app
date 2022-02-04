@@ -44,8 +44,10 @@
     "txt-create-post-custom-setup": "Post Custom Setup",
     "txt-create-post-custom-setup-msg": "Invoque el backend para Post Custom Setup.",
     "txt-please-click": "Haga clic en el botón para comenzar la instalación",
-    "txt-finish-install": "Espere mientras lo llevamos a la aplicación.",
+    "txt-finish-install": "La integración se instaló correctamente. \n Por favor revise el resumen de elementos aprovisionados. \n Para continuar con su aplicación, presione el botón.",
+    "txt-finish-install-2": "A continuación se muestran los resultados sin procesar de la instalación en formato JSON. \n Es posible que desee almacenar esto en algún lugar, ya que ya no estará disponible al salir del asistente. \n Los datos contienen la identificación y los nombres de los elementos aprovisionados.",
     "txt-installed": "Instalado",
     "txt-still-installed-1": "Por favor espere mientras estamos desinstalando",
-    "txt-installation-error": "Error de Instalacion"
+    "txt-installation-error": "Error de Instalacion",
+    "txt-goto-app": "Ir a la aplicación"
 }

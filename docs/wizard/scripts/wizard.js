@@ -256,5 +256,14 @@ export default {
         });
 
         return Promise.all(promiseArr);
-    }
+    },
+
+
+    /**
+     * Gets the simplified installed data for use in other modules
+     * @returns {Object}
+     */
+    getSimpleInstalledData() {
+        return simplifyInstalledData();
+    },
 }
