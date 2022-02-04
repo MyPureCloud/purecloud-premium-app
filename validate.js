@@ -496,5 +496,6 @@ validateAll();
 /**
  * TODO: verify that div ids for 'pages' exist in index.html
  * TODO: Make sure wizarduribase hase / at the end of it
- * if post custom setup is enabled make sure translation keys exist.
+ * TODO: if post custom setup is enabled make sure translation keys exist.
+ * TODO: Make sure uninstall is disabled in config.js
  */

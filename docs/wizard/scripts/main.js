@@ -442,7 +442,7 @@ async function setup() {
     
     // Check if app is for uninstallation
     // ie. query parameter 'uninstall=true'
-    if(state.uninstall === 'true') await switchPage(PAGES.UNINSTALL);
+    if(config.enableUninstall && state.uninstall === 'true') await switchPage(PAGES.UNINSTALL);
     
     // Load the Home page
     await switchPage(startPage);

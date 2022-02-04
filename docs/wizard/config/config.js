@@ -56,6 +56,10 @@ export default {
     // Enable the dynamic build of the Install Summary on install.html page
     enableDynamicInstallSummary: true,
 
+    // Allows you to deprovision the installed object by adding the query parameter 'uninstall=true'
+    // in the wizard URL. This is merely for testing and should be 'false' in production.
+    enableUninstall: true,
+
     // To be added to names of Genesys Cloud objects created by the wizard
     prefix: 'PREMIUM_EXAMPLE_',
 
