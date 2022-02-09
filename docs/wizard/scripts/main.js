@@ -116,12 +116,13 @@ async function switchPage(targetPage){
 /**
  * Assign navigation functionality for buttons
  */
-function setButtonEventListeners(){
+function setEventListeners(){
   const nextButtons = Array.from(document.getElementsByClassName('btn-next'));
   const prevButtons = Array.from(document.getElementsByClassName('btn-prev'));
   const installButton = document.getElementById('btn-install');
   const goToAppButton = document.getElementById('btn-goto-app');
 
+  // Buttons
   nextButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       switch(currentPage){
@@ -167,6 +168,20 @@ function setButtonEventListeners(){
       goToPremiumApp();
     })
   }
+
+  // Progreess bar animation
+  $('.steps').on('click', '.step--active', function() {
+    $(this).removeClass('step--incomplete').addClass('step--complete');
+    $(this).removeClass('step--active').addClass('step--inactive');
+    $(this).next().removeClass('step--inactive').addClass('step--active');
+  });
+  
+  $('.steps').on('click', '.step--complete', function() {
+    $(this).removeClass('step--complete').addClass('step--incomplete');
+    $(this).removeClass('step--inactive').addClass('step--active');
+    $(this).nextAll().removeClass('step--complete').addClass('step--incomplete');
+    $(this).nextAll().removeClass('step--active').addClass('step--inactive');
+  });
 }
 
 /**
@@ -448,7 +463,7 @@ async function setup() {
     await switchPage(startPage);
 
     // View related
-    setButtonEventListeners();
+    setEventListeners();
     view.showUserName(userMe.name);
     view.hideLoadingModal();
   } catch (e) {
@@ -457,3 +472,7 @@ async function setup() {
 }
 
 setup();
+
+
+
+

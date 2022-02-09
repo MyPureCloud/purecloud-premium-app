@@ -9,6 +9,7 @@
 
   <link href='//fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' async type='text/css'>
   <link rel="stylesheet" href="./styles/style.css">
+  <link rel="stylesheet" href="./styles/progress-bar.css">
 
   <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
   <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.3.0/purecloud-client-app-sdk.js"></script>
@@ -34,39 +35,46 @@
   </header>
 
   <div class="content">
-    <div class="title">
-      <span class="txt-greeting">
-        Hi
-      </span>
-      <span id="username"></span>!
-      <div class="txt-greeting-2">
-        welcome to the Premium App Example
-      </div>
-    </div>
-
-    <!-- NAVIGATION INDICATORS -->
-    <ul class="progress-bar">
-      <li class="active current">
-        <span class="txt-start">Start</span>
-      </li>
-      <li id="progress-custom-setup" class="">
-        <span class="txt-setup">Custom Setup</span>
-      </li>
-      <li class="">
-        <span class="txt-install">Install</span>
-      </li>
-      <li class="">
-        <span class="txt-summary">Summary</span>
-      </li>
-    </ul>
-
     <!-- MAIN CONTENT -->
     <main>
+      <div class="title">
+        <span class="txt-greeting">
+          Hi
+        </span>
+        <span id="username"></span>!
+        <div class="txt-greeting-2">
+          welcome to the Premium App Example
+        </div>
+      </div>
+  
+      <!-- NAVIGATION INDICATORS -->
+      <div class="steps-container">
+        <ul class="steps">
+          <li id="marker-step-1" class="step step--incomplete step--active">
+            <span class="step__icon"></span>
+            <span class="step__label">Start</span>
+          </li>
+          <li id="marker-step-2" class="step step--incomplete step--inactive">
+            <span class="step__icon"></span>
+            <span class="step__label">Setup</span>
+          </li>
+          <li id="marker-step-3" class="step step--incomplete step--inactive">
+            <span class="step__icon"></span>
+            <span class="step__label">Install</span>
+          </li>
+          <li id="marker-step-4" class="step step--incomplete step--inactive">
+            <span class="step__icon"></span>
+            <span class="step__label">Summary</span>
+          </li>
+        </ul>
+      </div>
+
       <!-- ===========================   HOME PAGE   ======================================== -->
       <div id="index-page">
         <div id="available">
           <p class="success">
-            <span class="txt-product-available">Product Available </span> <i class="fas fa-check-circle enlarge"></i>
+            <i class="fas fa-check-circle enlarge"></i>
+            <div class="txt-product-available">Product Available </div> 
           </p>
           <p class="reminders">
             <p class="txt-available-message">Reminders:</p>
@@ -90,7 +98,7 @@
           Update the ./docs/wizard/scripts/main.js to call your custom provisioning functions.
         </p>
         <button class="btn-prev">
-          <i class="button-icon fas fa-chevron-left"> </i><span class="txt-back">Back</span>
+          <i class="button-icon fas fa-chevron-left"> </i> <span class="txt-back">Back</span>
         </button>
         <button class="btn-next"  class="btn-info right">
           <span class="txt-next">Next</span> <i class="button-icon fas fa-chevron-right"></i>
@@ -103,63 +111,68 @@
             you!</span>
         </p>
 
-        <div id="messages" class="messages">
-          <div class="message">
-            <div class="message-title">
-              <span>1. </span><span class="txt-create-role">Create Role</span>
-            </div>
-            <div class="message-content">
-              <div>
-                <span class="txt-create-role-msg">
-                  Create a role specifically to provide access to the app.
-                </span>
+        <div class="message-container">
+          <div id="messages" class="messages">
+            <div class="message">
+              <div class="message-title">
+                <span>1. </span><span class="txt-create-role">Create Role</span>
+                <hr>
+              </div>
+              <div class="message-content">
+                <div>
+                  <span class="txt-create-role-msg">
+                    Create a role specifically to provide access to the app.
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="message">
-            <div class="message-title">
-              <span>2. </span><span class="txt-create-group">Create Groups</span>
-            </div>
-            <div class="message-content">
-              <div>
-                <span class="txt-create-group-msg">
-                  Groups will provide filtering to users' access to the app instances.
-                </span>
+            <div class="message">
+              <div class="message-title">
+                <span>2. </span><span class="txt-create-group">Create Groups</span>
+                <hr>
+              </div>
+              <div class="message-content">
+                <div>
+                  <span class="txt-create-group-msg">
+                    Groups will provide filtering to users' access to the app instances.
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="message">
-            <div class="message-title">
-              <span>3. </span><span class="txt-create-app-instance">Create instances</span>
-            </div>
-            <div class="message-content">
-              <div>
-                <span class="txt-create-app-instance-msg">
-                  More instances of the app will be created with different URI endpoints to provide
-                  different features of the app.
-                </span>
+            <div class="message">
+              <div class="message-title">
+                <span>3. </span><span class="txt-create-app-instance">Create instances</span>
+              </div>
+              <hr>
+              <div class="message-content">
+                <div>
+                  <span class="txt-create-app-instance-msg">
+                    More instances of the app will be created with different URI endpoints to provide
+                    different features of the app.
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="message">
-            <div class="message-title">
-              <span>4. </span><span class="txt-create-oauth-client">Create OAuth Client</span>
-            </div>
-            <div class="message-content">
-              <div>
-                <span class="txt-create-oauth-client-msg">
-                  An optional OAuth Client could be created for server-to-server communication. After
-                  creation, it should be followed by a method that will pass the OAuth Client information
-                  to the app's server.
-                </span>
+            <div class="message">
+              <div class="message-title">
+                <span>4. </span><span class="txt-create-oauth-client">Create OAuth Client</span>
+              </div>
+              <hr>
+              <div class="message-content">
+                <div>
+                  <span class="txt-create-oauth-client-msg">
+                    An optional OAuth Client could be created for server-to-server communication. After
+                    creation, it should be followed by a method that will pass the OAuth Client information
+                    to the app's server.
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-
         <p class="sink-more">
           <span class="txt-please-click">
             Please click the button to start the installation.
@@ -169,7 +182,7 @@
         <button class="btn-prev">
           <i class="button-icon fas fa-chevron-left"></i> <span class="txt-back">Back</span>
         </button>
-        <button id="btn-install"  class="btn-info right">
+        <button id="btn-install">
           <span class="txt-install">Install</span>
         </button>
       </div>
