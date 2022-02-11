@@ -1,5 +1,5 @@
 export default {
-    clientID: 'e7de8a75-62bb-43eb-9063-38509f8c21af',
+    clientID: 'fd2ba742-446f-46c5-bbbc-1cad2f34ac3a',
 
     // 'wizardUriBase': 'http://localhost:8080/wizard/',
     wizardUriBase: 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
