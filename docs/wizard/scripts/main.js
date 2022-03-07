@@ -87,6 +87,7 @@ async function switchPage(targetPage){
       await onCustomSetupEnter();
       break;
     case PAGES.INSTALL_DETAILS:
+      await onInstallDetailsEnter();
       break;
     case PAGES.DONE:
       await onInstallationSummaryEnter();
@@ -116,12 +117,13 @@ async function switchPage(targetPage){
 /**
  * Assign navigation functionality for buttons
  */
-function setButtonEventListeners(){
+function setEventListeners(){
   const nextButtons = Array.from(document.getElementsByClassName('btn-next'));
   const prevButtons = Array.from(document.getElementsByClassName('btn-prev'));
   const installButton = document.getElementById('btn-install');
   const goToAppButton = document.getElementById('btn-goto-app');
 
+  // Buttons
   nextButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       switch(currentPage){
@@ -167,6 +169,20 @@ function setButtonEventListeners(){
       goToPremiumApp();
     })
   }
+
+  // Progreess bar animation
+  $('.steps').on('click', '.step--active', function() {
+    $(this).removeClass('step--incomplete').addClass('step--complete');
+    $(this).removeClass('step--active').addClass('step--inactive');
+    $(this).next().removeClass('step--inactive').addClass('step--active');
+  });
+  
+  $('.steps').on('click', '.step--complete', function() {
+    $(this).removeClass('step--complete').addClass('step--incomplete');
+    $(this).removeClass('step--inactive').addClass('step--active');
+    $(this).nextAll().removeClass('step--complete').addClass('step--incomplete');
+    $(this).nextAll().removeClass('step--active').addClass('step--inactive');
+  });
 }
 
 /**
@@ -359,6 +375,38 @@ async function onInitialPageEnter(){
   } 
 }
 
+async function onInstallDetailsEnter(){
+  if (config.enableDynamicInstallSummary == true) {
+    let messagesDiv = document.getElementById('messages');
+    messagesDiv.innerHTML = '';
+
+    let modulesToInstall = Object.keys(config.provisioningInfo);
+    if (config.enableCustomSetupStepAfterInstall === true) {
+        modulesToInstall.push('post-custom-setup');
+    }
+    let moduleIndex = 0;
+    modulesToInstall.forEach(modKey => {
+        moduleIndex++;
+        let messageDiv = document.createElement("div");
+        messageDiv.className = "message";
+
+        let messageTitle = document.createElement("div");
+        messageTitle.className = "message-title";
+        messageTitle.innerHTML = "<span>" + moduleIndex.toString() + ". </span><span class='txt-create-" + modKey + "'></span><hr>";
+        messageDiv.appendChild(messageTitle);
+
+        let messageContent = document.createElement("div");
+        messageContent.className = "message-content";
+        messageContent.innerHTML = "<div><span class='txt-create-" + modKey + "-msg'></span></div>";
+        messageDiv.appendChild(messageContent);
+
+        messagesDiv.appendChild(messageDiv);
+    });
+
+    await setPageLanguage(pcLanguage);
+  }
+}
+
 /**
  * This will run after the installation and upon entering the PAGES.DONE page.
  * Show the summary of the provisioned items.
@@ -385,7 +433,7 @@ async function onInstallationSummaryEnter() {
 
       if(resourcePath){
         childElemsString += `
-          <p><a href="${resourcePath}" target="_blank">${config.prefix}${objKey}</a></p>
+          <p><a class="provisioned-link" href="${resourcePath}" target="_blank">${config.prefix}${objKey}</a></p>
         `;
       } else {
         childElemsString += `
@@ -442,13 +490,13 @@ async function setup() {
     
     // Check if app is for uninstallation
     // ie. query parameter 'uninstall=true'
-    if(state.uninstall === 'true') await switchPage(PAGES.UNINSTALL);
+    if(config.enableUninstall && state.uninstall === 'true') await switchPage(PAGES.UNINSTALL);
     
     // Load the Home page
     await switchPage(startPage);
 
     // View related
-    setButtonEventListeners();
+    setEventListeners();
     view.showUserName(userMe.name);
     view.hideLoadingModal();
   } catch (e) {
@@ -457,3 +505,7 @@ async function setup() {
 }
 
 setup();
+
+
+
+

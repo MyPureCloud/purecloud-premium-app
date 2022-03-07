@@ -19,6 +19,40 @@ function hideAllPages(){
     uninstallPage.style.display = 'none';
 }
 
+function activateMarker(markerNumber){
+    const marker1 = document.getElementById('marker-step-1');
+    const marker2 = document.getElementById('marker-step-2');
+    const marker3 = document.getElementById('marker-step-3');
+    const marker4 = document.getElementById('marker-step-4');
+
+    switch (markerNumber) {
+        case 1:
+            marker1.className = 'step step--incomplete step--active';               
+            marker2.className = 'step step--incomplete step--inactive';               
+            marker3.className = 'step step--incomplete step--inactive';               
+            if(marker4) marker4.className = 'step step--incomplete step--inactive';  
+            break;
+        case 2:
+            marker1.className = 'step step--complete step--inactive';               
+            marker2.className = 'step step--incomplete step--active';               
+            marker3.className = 'step step--incomplete step--inactive';               
+            if(marker4) marker4.className = 'step step--incomplete step--inactive';  
+            break;
+        case 3:
+            marker1.className = 'step step--complete step--inactive';               
+            marker2.className = 'step step--complete step--inactive';               
+            marker3.className = 'step step--incomplete step--active';               
+            if(marker4) marker4.className = 'step step--incomplete step--inactive';
+            break;
+        case 4:
+            marker1.className = 'step step--complete step--inactive';               
+            marker2.className = 'step step--complete step--inactive';               
+            marker3.className = 'step step--complete step--inactive';               
+            if(marker4) marker4.className = 'step step--incomplete step--active';
+            break;
+    }
+}
+
 export default {
     /**
      * Show the loading modal 
@@ -103,17 +137,25 @@ export default {
      */
     displayPage(page){
         hideAllPages();
+
         switch(page){
             case PAGES.INDEX_PAGE:
+                activateMarker(1);
                 indexPage.style.display = 'block';
                 break;
             case PAGES.CUSTOM_SETUP:
+                activateMarker(2);
+
                 customSetupPage.style.display = 'block';
                 break;
             case PAGES.INSTALL_DETAILS:
+                activateMarker(config.enableCustomSetupPageBeforeInstall ? 3 : 2);
+
                 installDetailsPage.style.display = 'block';
                 break;
             case PAGES.DONE:
+                activateMarker(config.enableCustomSetupPageBeforeInstall ? 4 : 3);
+
                 installDonePage.style.display = 'block';
                 break;
             case PAGES.UNINSTALL:
@@ -161,9 +203,18 @@ export default {
 
 
     setupPage() {
-        if (!config.enableCustomSetupPageBeforeInstall && document.getElementById('progress-custom-setup')) {
-            document.getElementById('progress-custom-setup')
-                .style.display = 'none';
+        if (!config.enableCustomSetupPageBeforeInstall) {
+            try {
+                const parent = document.querySelectorAll('.steps')[0];
+                const customMarker = document.getElementById('marker-step-2');
+                parent.removeChild(customMarker);
+
+                document.getElementById('marker-step-3').id = 'marker-step-2';
+                document.getElementById('marker-step-4').id = 'marker-step-3';
+            } catch(e) {
+                console.error('Steps progress bar caused some unknown issue.')
+                console.error(e);
+            }
         }
     }
 }
