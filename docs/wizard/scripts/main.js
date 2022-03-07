@@ -87,6 +87,7 @@ async function switchPage(targetPage){
       await onCustomSetupEnter();
       break;
     case PAGES.INSTALL_DETAILS:
+      await onInstallDetailsEnter();
       break;
     case PAGES.DONE:
       await onInstallationSummaryEnter();
@@ -372,6 +373,38 @@ async function onInitialPageEnter(){
       );
     }
   } 
+}
+
+async function onInstallDetailsEnter(){
+  if (config.enableDynamicInstallSummary == true) {
+    let messagesDiv = document.getElementById('messages');
+    messagesDiv.innerHTML = '';
+
+    let modulesToInstall = Object.keys(config.provisioningInfo);
+    if (config.enableCustomSetupStepAfterInstall === true) {
+        modulesToInstall.push('post-custom-setup');
+    }
+    let moduleIndex = 0;
+    modulesToInstall.forEach(modKey => {
+        moduleIndex++;
+        let messageDiv = document.createElement("div");
+        messageDiv.className = "message";
+
+        let messageTitle = document.createElement("div");
+        messageTitle.className = "message-title";
+        messageTitle.innerHTML = "<span>" + moduleIndex.toString() + ". </span><span class='txt-create-" + modKey + "'></span><hr>";
+        messageDiv.appendChild(messageTitle);
+
+        let messageContent = document.createElement("div");
+        messageContent.className = "message-content";
+        messageContent.innerHTML = "<div><span class='txt-create-" + modKey + "-msg'></span></div>";
+        messageDiv.appendChild(messageContent);
+
+        messagesDiv.appendChild(messageDiv);
+    });
+
+    await setPageLanguage(pcLanguage);
+  }
 }
 
 /**
