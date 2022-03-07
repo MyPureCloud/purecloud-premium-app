@@ -400,7 +400,7 @@ async function onInstallationSummaryEnter() {
 
       if(resourcePath){
         childElemsString += `
-          <p><a href="${resourcePath}" target="_blank">${config.prefix}${objKey}</a></p>
+          <p><a class="provisioned-link" href="${resourcePath}" target="_blank">${config.prefix}${objKey}</a></p>
         `;
       } else {
         childElemsString += `

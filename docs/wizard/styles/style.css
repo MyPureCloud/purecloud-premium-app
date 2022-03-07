@@ -37,6 +37,7 @@ header {
 
 .content {
     padding-top: 20px;
+    padding-bottom: 40px;
     flex: 1 0 auto;
 }
 
@@ -248,4 +249,20 @@ hr {
     margin-top: 20px;
     font-size: 18px;
     color: #b9b9b9;
+}
+
+#summary-raw-data {
+    border: 1px solid #ccc;
+    color: #777;
+    margin-bottom: 25px;
+    margin-top: 10px;
+}
+
+#summary-container {
+    margin-top: 20px;
+}
+
+.provisioned-link {
+    color: #00AE9E;
+    text-decoration: none;
 }
