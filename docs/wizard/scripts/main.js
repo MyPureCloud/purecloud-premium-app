@@ -33,11 +33,8 @@ function goToPremiumApp(){
  * Authenticate with Genesys Cloud
  * @returns {Promise}
  */
-async function authenticateGenesysCloud() {
-  const queryParams = getQueryParameters();
-
-  // Determine Genesys Cloud environment
-  pcEnvironment = queryParams.environment ? queryParams.environment : config.defaultPcEnvironment;
+async function authenticateGenesysCloud(appParams) {
+  // Set Genesys Cloud environment
   client.setEnvironment(pcEnvironment);
 
   // Authenticate with Genesys Cloud and get the state
@@ -45,13 +42,10 @@ async function authenticateGenesysCloud() {
   const authData = await client.loginImplicitGrant(
     config.clientID, 
     `${config.wizardUriBase}index.html`, 
-    { state: JSON.stringify(queryParams) }
+    { state: JSON.stringify(appParams) }
   ); 
   state = JSON.parse(authData.state);
   console.log(state);
-
-  // Set language
-  pcLanguage = state.language ? state.language : config.defaultLanguage;
 }
 
 /**
@@ -480,9 +474,57 @@ async function setup() {
   view.setupPage();
 
   try {
-    // Authenticate and get current user
-    await authenticateGenesysCloud();
+    // Retrieve URL Query Params or Hash
+    let appParams = getQueryParameters();
+
+    // Determine Genesys Cloud environment
+    pcEnvironment = appParams.environment ? appParams.environment : config.defaultPcEnvironment;
+    // Set language
+    pcLanguage = appParams.language ? appParams.language : config.defaultLanguage;
     await setPageLanguage(pcLanguage);
+
+    if (appParams.error === true) {
+      if (appParams.errorCode != "access_denied") {
+        showErrorPage(
+          getTranslatedText('txt-error-access-invalid'),
+          getTranslatedText('txt-error-access-invalid-msg'),
+          'txt-error-access-invalid',
+          'txt-error-access-invalid-msg',
+          () => {
+            const container = document.createElement('ul');
+            const entryElem = document.createElement('li');
+            entryElem.style.display = 'flex';
+            entryElem.style.justifyContent = 'center';
+            entryElem.innerText = "\"" + appParams.errorDescription + "\"";
+            container.appendChild(entryElem);
+
+            return container;
+          }
+        );
+      } else {
+        showErrorPage(
+          getTranslatedText('txt-error-access-denied'),
+          getTranslatedText('txt-error-access-denied-msg'),
+          'txt-error-access-denied',
+          'txt-error-access-denied-msg',
+          () => {
+            const container = document.createElement('ul');
+            const entryElem = document.createElement('li');
+            entryElem.style.display = 'flex';
+            entryElem.style.justifyContent = 'center';
+            entryElem.innerText = "\"" + appParams.errorDescription + "\"";
+            container.appendChild(entryElem);
+
+            return container;
+          }
+        );
+      }
+      view.hideLoadingModal();
+      return;
+    }
+
+    // Authenticate and get current user
+    await authenticateGenesysCloud(appParams);
     userMe = await usersApi.getUsersMe({ 'expand': ['organization', 'authorization'] });
     
     // Initialize the Wizard object
