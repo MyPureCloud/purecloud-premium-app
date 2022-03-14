@@ -2,5 +2,5 @@ This projects contains a sample premium app and an automated on-boarding flow fo
 
 ## Resources
 
-* [Premium Application Wizard Step by Step Guide](https://developer.genesys.cloud/appfoundry/premium-app-wizard "Opens the premium app guide in Genesys Developer Center")
-* [AppFoundry Overview](https://developer.genesys.cloud/appfoundry/premium-app-wizard/index.md "Opens the AppFoundry documentation in Genesys Developer Center")
+* [Premium Application Wizard Step by Step Guide](https://developer.genesys.cloud/appfoundry/premium-app-wizard/"Opens the premium app guide in Genesys Developer Center")
+* [AppFoundry Overview](https://developer.genesys.cloud/appfoundry/ "Opens the AppFoundry documentation in Genesys Developer Center")
