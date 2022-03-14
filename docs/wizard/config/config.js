@@ -1,13 +1,13 @@
 export default {
-    clientID: 'e7de8a75-62bb-43eb-9063-38509f8c21af',
+    clientID: 'fd2ba742-446f-46c5-bbbc-1cad2f34ac3a',
 
-    wizardUriBase: 'http://localhost:8080/wizard/',
-    // wizardUriBase: 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
+    // wizardUriBase: 'http://localhost:8080/wizard/',
+    wizardUriBase: 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
 
     // The actual URL of the landing page of your web app or your web site (when wizard has been run).
     // previously - defined as premiumAppURL
-    redirectURLOnWizardCompleted: 'http://localhost:8080/premium-app-sample/index.html',
-    // redirectURLOnWizardCompleted: 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html',
+    // redirectURLOnWizardCompleted: 'http://localhost:8080/premium-app-sample/index.html',
+    redirectURLOnWizardCompleted: 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html',
 
     // Genesys Cloud assigned name for the premium app
     // This should match the integration type name of the Premium App

@@ -21,9 +21,10 @@ const languageDirPath = path.join(__dirname, 'docs/wizard/assets/languages')
 const wizardPath = path.join(__dirname, 'docs/wizard')
 
 // Default config constants to check
-const defaultClientId = 'e7de8a75-62bb-43eb-9063-38509f8c21af';
+const defaultClientId = 'fd2ba742-446f-46c5-bbbc-1cad2f34ac3a';
 const defaultIntegrationTypeId = 'premium-app-example';
 const defaultViewPermission = 'integration:examplePremiumApp:view';
+const defaultPrefix = 'PREMIUM_EXAMPLE_';
 
 // Default language file text to check (en-us)
 const defaultLanguage = {
@@ -246,9 +247,6 @@ async function evaluateConfig(){
 
   // =================== WARNING LEVEL ===============
   await Validator.evaluateArr(Validator.WARNING, [
-    // Client ID
-    Validator.notEqual(config.clientID, defaultClientId, 'clientID', 'clientID should be replaced with your own client ID.'),
-
     // URLs
     Validator.customEvaluation(() => {
       let url = new URL(config.wizardUriBase);
@@ -268,6 +266,8 @@ async function evaluateConfig(){
 
   // =================== CRITICAL LEVEL ===============
   await Validator.evaluateArr(Validator.CRITICAL, [
+    // Client ID
+    Validator.notEqual(config.clientID, defaultClientId, 'clientID', 'clientID should be replaced with your own client ID.'),
     Validator.propertyExists(config, 'clientID', 'config', 'ClientID should exist'),
     Validator.propertyExists(config, 'wizardUriBase', 'config', 'wizardUriBase should exist'),
     Validator.propertyExists(config, 'redirectURLOnWizardCompleted', 'config', 'redirectURLOnWizardCompleted should exist'),
@@ -288,6 +288,7 @@ async function evaluateConfig(){
     Validator.propertyExists(config, 'defaultPcEnvironment', 'config', 'defaultPcEnvironment should exist'),
     // TODO: Maybe test if pcEnvironment is valid value
     Validator.propertyExists(config, 'prefix', 'config', 'prefix should exist'),
+    Validator.notEqual(config.prefix, defaultPrefix, 'prefix', 'Prefix should be updated to be unique'),
     Validator.propertyExists(config, 'provisioningInfo', 'config', 'provisioningInfo should exist'),
     Validator.propertyExists(config, 'defaultLanguage', 'config', 'defaultLanguage should exist'),
     Validator.propertyExists(config, 'availableLanguageAssets', 'config', 'availableLanguageAssets should exist'),
@@ -430,15 +431,15 @@ async function evaluateStyles(){
 
   const titleColor = getStyleValue(cssValue, '.title', 'color');
   if (titleColor){
-    forEvaluation.push(Validator.notEqual(titleColor, '#FF4F1F', '.title CSS', 'Personalize CSS'));
+    forEvaluation.push(Validator.notEqual(titleColor, '#3B90AA', '.title CSS', 'Personalize CSS'));
   }
-  const messageTitleColor = getStyleValue(cssValue, '.message-title', 'background-color');
+  const messageTitleColor = getStyleValue(cssValue, '.message-title', 'color');
   if (messageTitleColor){
-    forEvaluation.push(Validator.notEqual(messageTitleColor, '#FF4F1F', '.message-title CSS', 'Personalize CSS'));
+    forEvaluation.push(Validator.notEqual(messageTitleColor, '#00AE9E', '.message-title color CSS', 'Personalize CSS'));
   }
-  const buttonColor = getStyleValue(cssValue, '.btn-info', 'background-color');
+  const buttonColor = getStyleValue(cssValue, 'button', 'background-color');
   if (buttonColor){
-    forEvaluation.push(Validator.notEqual(buttonColor, '#FF4F1F', '.btn-info CSS', 'Personalize CSS'));
+    forEvaluation.push(Validator.notEqual(buttonColor, '#00AE9E', 'button background-color CSS', 'Personalize CSS'));
   }
 
   await Validator.evaluateArr(Validator.WARNING, forEvaluation);
