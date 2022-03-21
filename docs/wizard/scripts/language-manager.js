@@ -7,20 +7,21 @@ import view from './view.js';
 
 let dropDownConfigured = false;
 let currentLanguageSet = null; // Contains the currently loaded language file (Object)
+let currentLanguageCode = null;
 
 /**
  * Configure the language selector dropdown
  * @param {String} currentlySelected language key that's selected
  */
-function setupDropdownSelector(currentlySelected){
+function setupDropdownSelector(currentlySelected) {
     // Check configuration if language selection enabled
-    if(!config.enableLanguageSelection){
+    if (!config.enableLanguageSelection) {
         view.hideLanguageSelection();
         return;
     }
 
     const elemDropdown = document.getElementById('language-select');
-    if(!elemDropdown) return;
+    if (!elemDropdown) return;
 
     // Add languages to the drop down selector
     Object.keys(config.availableLanguageAssets).forEach(langKey => {
@@ -55,19 +56,19 @@ export async function setPageLanguage(requestedLanguage) {
     // Manage pcLangTag with possible formats like: en, en-US, en_US, en-CA, en_CA, ...
     // Transform: replace _ with -, tolowercase
     // Check en-us, en-ca, ... - if not found, check en - if not found, use default language
-    let langAssetCode = requestedLanguage.toLowerCase().replace('_', '-');
-    if (Object.keys(config.availableLanguageAssets).includes(langAssetCode) === false) {
-        langAssetCode = langAssetCode.split('-')[0];
-        if (Object.keys(config.availableLanguageAssets).includes(langAssetCode) === false) {
-            langAssetCode = config.defaultLanguage;
+    currentLanguageCode = requestedLanguage.toLowerCase().replace('_', '-');
+    if (Object.keys(config.availableLanguageAssets).includes(currentLanguageCode) === false) {
+        currentLanguageCode = currentLanguageCode.split('-')[0];
+        if (Object.keys(config.availableLanguageAssets).includes(currentLanguageCode) === false) {
+            currentLanguageCode = config.defaultLanguage;
         }
     }
 
     // Configure the drop down selector
-    if(!dropDownConfigured) setupDropdownSelector(langAssetCode);
+    if (!dropDownConfigured) setupDropdownSelector(currentLanguageCode);
 
     return new Promise((resolve, reject) => {
-        let fileUri = `${config.wizardUriBase}assets/languages/${langAssetCode}.json`;
+        let fileUri = `${config.wizardUriBase}assets/languages/${currentLanguageCode}.json`;
         $.getJSON(fileUri)
             .done(data => {
                 currentLanguageSet = data;
@@ -86,11 +87,26 @@ export async function setPageLanguage(requestedLanguage) {
     });
 }
 
+export function getSelectedLanguage() {
+    return currentLanguageCode;
+}
+
+export function localizePage() {
+    if (currentLanguageSet) {
+        Object.keys(currentLanguageSet).forEach((key) => {
+            let els = document.querySelectorAll(`.${key}`);
+            for (let i = 0; i < els.length; i++) {
+                els.item(i).innerText = currentLanguageSet[key];
+            }
+        });
+    }
+}
+
 /**
  * Gets the string text from the translations files.
  * @param {String} key The key for the entry in the JSON file
  * @returns {String} the translated text
  */
-export function getTranslatedText(key){
+export function getTranslatedText(key) {
     return currentLanguageSet[key];
 }

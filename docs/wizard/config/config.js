@@ -8,6 +8,7 @@ export default {
     // previously - defined as premiumAppURL
     // redirectURLOnWizardCompleted: 'http://localhost:8080/premium-app-sample/index.html',
     redirectURLOnWizardCompleted: 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html',
+    redirectURLWithParams: true,
 
     // Genesys Cloud assigned name for the premium app
     // This should match the integration type name of the Premium App
