@@ -90,6 +90,10 @@ p {
     margin: 6px;
 }
 
+.error {
+    color: #C52626;
+}
+
 .txt-product-available {
     color: #00AE9E;
 }

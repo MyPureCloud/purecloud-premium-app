@@ -2,7 +2,7 @@ import config from '../config/config.js';
 import view from './view.js';
 import wizard from './wizard.js';
 import { PAGES } from './enums.js'
-import { setPageLanguage, getTranslatedText } from './language-manager.js';
+import { setPageLanguage, localizePage, getSelectedLanguage, getTranslatedText } from './language-manager.js';
 import { getResourcePath, beautifyModuleKey, getQueryParameters } from './utils.js'
 
 // Genesys Cloud
@@ -26,7 +26,12 @@ let userMe = null;
  * Redirect to the actual premium app
  */
 function goToPremiumApp(){
-  window.location.href = config.redirectURLOnWizardCompleted;
+  let redirectUrl = config.redirectURLOnWizardCompleted;
+  if (config.redirectURLWithParams && config.redirectURLWithParams === true) {
+    let currentLanguage = getSelectedLanguage();
+    redirectUrl += `?${config.genesysCloudEnvironmentQueryParam}=${pcEnvironment}&${config.languageQueryParam}=${currentLanguage}`;
+  }
+  window.location.href = redirectUrl;
 }
 
 /**
@@ -94,7 +99,8 @@ async function switchPage(targetPage){
       await wizard.uninstall();
       await new Promise((resolve, reject) => {
         setTimeout(() => {
-          window.history.replaceState(null, '', `${config.wizardUriBase}index.html`);
+          let currentLanguage = getSelectedLanguage();
+          window.location.href = `${config.wizardUriBase}index.html?${config.genesysCloudEnvironmentQueryParam}=${pcEnvironment}&${config.languageQueryParam}=${currentLanguage}`;
           resolve();
         }, 2000);
       });
@@ -397,7 +403,7 @@ async function onInstallDetailsEnter(){
         messagesDiv.appendChild(messageDiv);
     });
 
-    await setPageLanguage(pcLanguage);
+    localizePage();
   }
 }
 
