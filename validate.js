@@ -6,11 +6,10 @@
  * It will check if default values/images have already been replaced with a different one.
  * It will also do checks on configuration values to make sure they are valid.
  */
-
+const chalk = require("chalk");
 const fs = require('fs').promises;
 const fsConstants = require('fs').constants;
 const path = require('path');
-const colors = require('colors');
 const HTMLParser = require('node-html-parser');
 const css = require('css');
 const md5 = require('md5');
@@ -169,24 +168,24 @@ let config = null; // Config object of the config file
  * Print the result messages
  */
 function printMessages(){
-  console.log(' --------- PASSED ----------'.blue);  
+  console.log(chalk.blue(' --------- PASSED ----------'));  
   if(passedMessages.length <= 0) console.log('none'.grey);
-  passedMessages.forEach((m, i) => console.log(`${i + 1}. ${m}`.green));
+  passedMessages.forEach((m, i) => console.log(chalk.green(`${i + 1}. ${m}`)));
   console.log();
 
-  console.log(' --------- WARNING ----------'.blue);  
+  console.log(chalk.blue(' --------- WARNING ----------'));  
   if(warningMessages.length <= 0) console.log('none'.grey);
-  warningMessages.forEach((m, i) => console.log(`${i + 1}. ${m}`.yellow));
+  warningMessages.forEach((m, i) => console.log(chalk.yellow(`${i + 1}. ${m}`)));
   console.log();
 
-  console.log(' --------- CRITICAL ----------'.blue);  
+  console.log(chalk.blue(' --------- CRITICAL ----------'));
   if(criticalMessages.length <= 0) console.log('none'.grey);
-  criticalMessages.forEach((m, i) => console.log(`${i + 1}. ${m}`.brightRed));
+  criticalMessages.forEach((m, i) => console.log(chalk.redBright(`${i + 1}. ${m}`)));
   console.log();
 
-  console.log('NOTE: Some warnings are acceptable especially if the evaluation is done prior to a demo.'.black.bgWhite.underline);
-  console.log('For production-ready wizards, every test should pass.'.black.bgWhite.underline);
-  console.log('If there are any questions, please contact your Genesys Developer Evangelist POC.'.black.bgWhite.underline);
+  console.log(chalk.black.bgWhite.underline('NOTE: Some warnings are acceptable especially if the evaluation is done prior to a demo.'));
+  console.log(chalk.black.bgWhite.underline('For production-ready wizards, every test should pass.'));
+  console.log(chalk.black.bgWhite.underline('If there are any questions, please contact your Genesys Developer Evangelist POC.'));
   console.log();
 }
 
@@ -486,12 +485,13 @@ async function validateAll(){
 }
 
 
-console.log('====================================================================='.bgBrightCyan.black);
-console.log(`-----------------          QUIDDITCH                -----------------`.bgBrightCyan.black);
-console.log(`-----------------      PREMIUM WIZARD VALIDATION    -----------------`.bgBrightCyan.black);
-console.log(`-----------------          (v3.0.0)                 -----------------`.bgBrightCyan.black);
-console.log('====================================================================='.bgBrightCyan.black);
-console.log();
+console.log(chalk.black.bgCyanBright(`
+=====================================================================
+-----------------          QUIDDITCH                -----------------
+-----------------      PREMIUM WIZARD VALIDATION    -----------------
+-----------------          (v3.0.0)                 -----------------
+=====================================================================
+`));
 validateAll();
 
 /**
