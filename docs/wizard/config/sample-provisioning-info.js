@@ -167,5 +167,39 @@ let sample = {
                 });
             }
         }
+    ],
+    'byoc-cloud-trunk': [
+        {
+            'name': 'BYOC Trunk',
+            'inboundSIPTerminationIdentifier': '-appfoundry-vendor',
+            'protocol': 'UDP',
+            'sipServers': [],
+            'enableSIPDigest': false,
+            'sipDigestRealm': '',
+            'sipDigestUsername': '',
+            'sipDigestPassword': '',
+            'outboundAddressOverrideMethod': 'Always',
+            'outboundAddressOverrideCallerID': '',
+            'outboundNameOverrideMethod': 'Always',
+            'outboundNameOverrideCallerName': 'AppFoundry Vendor',
+            'sipACL': [],
+            'callingAddressOmitPrefix': false,
+            'calledAddressOmitPrefix': false,
+            'enableReleaseLinkTransfer': false,
+            'enableTakeBackAndTransfer': false,
+            'enableConversationHeaders': trfalseue,
+            'enableUUI': false,
+            'uuiType': 'User-to-User',
+            'uuiEncoding': 'Ascii',
+            'uuiProtocolDiscriminator': '02',
+            'autoEnable': true,
+            'enableRecording': false,
+            'enableRecordingConsult': false,
+            'enableRecordingAutomaticLevelControl': false,
+            'enableRecordingOnExternalTransfer': false,
+            'enableRecordingDualChannel': false,
+            'enableRecordingAudioFormat': 'audio/PCMU',
+            'language': 'en-US'
+        }
     ]
 }

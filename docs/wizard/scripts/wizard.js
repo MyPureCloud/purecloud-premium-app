@@ -10,6 +10,7 @@ import dataTableModule from './modules/data-table.js';
 import interactionWidget from './modules/interaction-widget.js';
 import wsDataActions from './modules/ws-data-actions.js';
 import widgetDeployment from './modules/widget-deployment.js';
+import byocCloudTrunkModule from './modules/byoc-cloud-trunk.js';
 // Module Post Custom Setup
 import postCustomSetup from './modules/post-custom-setup.js';
 
@@ -24,7 +25,8 @@ let modules = [
     dataTableModule,
     interactionWidget,
     wsDataActions,
-    widgetDeployment
+    widgetDeployment,
+    byocCloudTrunkModule
 ];
 
 const jobOrder = config.provisioningInfo;
@@ -53,7 +55,7 @@ async function getIntegrationId() {
         let pa_instance = instances.find(instance => instance.integrationType.id == config.premiumAppIntegrationTypeId);
 
         return pa_instance ? pa_instance.id : null;
-    } catch(e) {
+    } catch (e) {
         throw e;
     }
 }
@@ -134,9 +136,9 @@ export default {
                 // if it's just an array
                 exists = item.length > 0 ? true : exists;
             });
-            
+
             return exists;
-        } catch(e) {
+        } catch (e) {
             console.error(e);
         }
     },
@@ -149,7 +151,7 @@ export default {
         let creationPromises = [];
         let configurationPromises = [];
         let finalFunctionPromises = [];
-        let creationResult = null; 
+        let creationResult = null;
 
         // Create all the items
         try {
@@ -166,10 +168,10 @@ export default {
                 );
             });
             creationResult = await Promise.all(creationPromises);
-        } catch(e) {
+        } catch (e) {
             console.error('Error on creating objects');
             throw e;
-        } 
+        }
 
         // Configure all objects
         try {
@@ -187,7 +189,7 @@ export default {
                 );
             });
             await Promise.all(configurationPromises);
-        } catch(e) {
+        } catch (e) {
             console.error('Error on configuring objects');
             throw e;
         }
@@ -207,7 +209,7 @@ export default {
                 })
             });
             await Promise.all(finalFunctionPromises);
-        } catch(e) {
+        } catch (e) {
             console.error('Error running finally on objects');
             throw e;
         }
@@ -221,10 +223,15 @@ export default {
             let simplifiedData = simplifyInstalledData();
 
             // NOTE: Cuts off at 500 because of limit to integration notes.
-            integrationInstance.notes = JSON.stringify(simplifiedData).substring(0,500);
+            let installNotes = JSON.stringify(simplifiedData);
+            if (installNotes.length > 500) {
+                integrationInstance.notes = installNotes.substring(0, 500);
+            } else {
+                integrationInstance.notes = installNotes;
+            }
 
             await integrationsApi.putIntegrationConfigCurrent(integrationId, { body: integrationInstance });
-        } catch(e) {
+        } catch (e) {
             console.error('Error finalizing installedData');
             throw e;
         }
@@ -233,7 +240,7 @@ export default {
         if (!config.enableCustomSetupStepAfterInstall) {
             return { status: true, cause: 'no post custom setup' };
         }
-            
+
         return postCustomSetup.configure(
             view.setLoadingModal,
             installedData,
@@ -265,5 +272,9 @@ export default {
      */
     getSimpleInstalledData() {
         return simplifyInstalledData();
+    },
+
+    getInstalledData() {
+        return installedData;
     },
 }

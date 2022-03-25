@@ -7,9 +7,10 @@ import { getResourcePath, beautifyModuleKey, getQueryParameters } from './utils.
 
 // Genesys Cloud
 const platformClient = require('platformClient');
-const client = platformClient.ApiClient.instance; 
+const client = platformClient.ApiClient.instance;
 const usersApi = new platformClient.UsersApi();
 const integrationsApi = new platformClient.IntegrationsApi();
+const authorizationApi = new platformClient.AuthorizationApi();
 
 // Constants
 const premiumAppIntegrationTypeId = config.premiumAppIntegrationTypeId;
@@ -25,7 +26,7 @@ let userMe = null;
 /**
  * Redirect to the actual premium app
  */
-function goToPremiumApp(){
+function goToPremiumApp() {
   let redirectUrl = config.redirectURLOnWizardCompleted;
   if (config.redirectURLWithParams && config.redirectURLWithParams === true) {
     let currentLanguage = getSelectedLanguage();
@@ -43,12 +44,12 @@ async function authenticateGenesysCloud(appParams) {
   client.setEnvironment(pcEnvironment);
 
   // Authenticate with Genesys Cloud and get the state
-  client.setPersistSettings(true, premiumAppIntegrationTypeId); 
+  client.setPersistSettings(true, premiumAppIntegrationTypeId);
   const authData = await client.loginImplicitGrant(
-    config.clientID, 
-    `${config.wizardUriBase}index.html`, 
+    config.clientID,
+    `${config.wizardUriBase}index.html`,
     { state: JSON.stringify(appParams) }
-  ); 
+  );
   state = JSON.parse(authData.state);
   console.log(state);
 }
@@ -63,22 +64,44 @@ async function validateProductAvailability() {
     await integrationsApi.getIntegrationsType(premiumAppIntegrationTypeId);
     console.log('PRODUCT AVAILABLE');
     return true;
-  } catch(e) {
+  } catch (e) {
     console.log('PRODUCT UNAVAILABLE')
   }
   return productAvailable;
 }
 
 /**
+ * Checks if the Genesys Cloud org has the BYOC Cloud Add-On enabled
+ * @returns {Promise}
+ */
+async function validateBYOCAvailability() {
+  let byocAvailable = false;
+  try {
+    let products = await authorizationApi.getAuthorizationProducts();
+    // Check if "byoc" is listed - return true or false
+    for (let product of products.entities) {
+      if (product.id === 'byoc') {
+        byocAvailable = true;
+        console.log('BYOC AVAILABLE')
+        break;
+      }
+    }
+  } catch (e) {
+    console.log('BYOC UNAVAILABLE')
+  }
+  return byocAvailable;
+}
+
+/**
  * Navigate to a new page
 * @param {Enum.PAGES} targetPage the target page
  */
-async function switchPage(targetPage){
+async function switchPage(targetPage) {
   currentPage = targetPage;
   console.log(`Going to page: ${currentPage}`);
 
   view.displayPage(targetPage);
-  switch(targetPage){
+  switch (targetPage) {
     case PAGES.INDEX_PAGE:
       await onInitialPageEnter();
       break;
@@ -117,7 +140,7 @@ async function switchPage(targetPage){
 /**
  * Assign navigation functionality for buttons
  */
-function setEventListeners(){
+function setEventListeners() {
   const nextButtons = Array.from(document.getElementsByClassName('btn-next'));
   const prevButtons = Array.from(document.getElementsByClassName('btn-prev'));
   const installButton = document.getElementById('btn-install');
@@ -126,7 +149,7 @@ function setEventListeners(){
   // Buttons
   nextButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      switch(currentPage){
+      switch (currentPage) {
         case PAGES.INDEX_PAGE:
           if (config.enableCustomSetupPageBeforeInstall) {
             switchPage(PAGES.CUSTOM_SETUP);
@@ -143,7 +166,7 @@ function setEventListeners(){
 
   prevButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      switch(currentPage){
+      switch (currentPage) {
         case PAGES.CUSTOM_SETUP:
           switchPage(PAGES.INDEX_PAGE);
           break;
@@ -158,19 +181,21 @@ function setEventListeners(){
     })
   });
 
-  if(installButton) {
+  if (installButton) {
     installButton.addEventListener('click', () => {
       install();
     })
   }
 
-  if(goToAppButton) {
+  if (goToAppButton) {
     goToAppButton.addEventListener('click', () => {
       goToPremiumApp();
     })
   }
 
   // Progreess bar animation
+  // Note: Disable steps click
+  /*
   $('.steps').on('click', '.step--active', function() {
     $(this).removeClass('step--incomplete').addClass('step--complete');
     $(this).removeClass('step--active').addClass('step--inactive');
@@ -183,6 +208,7 @@ function setEventListeners(){
     $(this).nextAll().removeClass('step--complete').addClass('step--incomplete');
     $(this).nextAll().removeClass('step--active').addClass('step--inactive');
   });
+  */
 }
 
 /**
@@ -250,7 +276,7 @@ function getMissingInstallPermissions() {
  * @param {String} msgClass (Optional) CSS class to add to the element. (For use in on-the-fly translation)
  * @param {Function} extraContentFunc (Optional) Function that returns an element to be added to #additional-error-content
  */
-function showErrorPage(errorTitle, errorMessage, titleClass, msgClass, extraContentFunc){
+function showErrorPage(errorTitle, errorMessage, titleClass, msgClass, extraContentFunc) {
   view.setError(errorTitle, errorMessage, titleClass, msgClass, extraContentFunc);
   switchPage(PAGES.ERROR);
 }
@@ -294,12 +320,12 @@ async function install() {
         }
       );
     }
-  } catch(e) {
+  } catch (e) {
     console.error(e);
     // Show error page on any error during installation
     showErrorPage(
       getTranslatedText('txt-installation-error'),
-      `\n ${e.name} - ${e.message}. \n ${e.stack?e.stack:''}`,
+      `\n ${e.name} - ${e.message}. \n ${e.stack ? e.stack : ''}`,
       'txt-installation-error'
     );
   }
@@ -309,9 +335,9 @@ async function install() {
 /**
  * This will run when the user enters home page
  */
-async function onInitialPageEnter(){
+async function onInitialPageEnter() {
   // Check product availability
-  const productAvailable = await validateProductAvailability()
+  const productAvailable = await validateProductAvailability();
   if (!productAvailable) {
     showErrorPage(
       getTranslatedText('txt-product-not-available'),
@@ -319,7 +345,21 @@ async function onInitialPageEnter(){
       'txt-product-not-available',
       'txt-not-available-message'
     );
-  } 
+    return;
+  }
+
+  if (config.checkProductBYOC === true) {
+    const byocAvailable = await validateBYOCAvailability();
+    if (!byocAvailable) {
+      showErrorPage(
+        getTranslatedText('txt-byoc-not-available'),
+        getTranslatedText('txt-no-byoc-message'),
+        'txt-byoc-not-available',
+        'txt-no-byoc-message'
+      );
+      return;
+    }
+  }
 
   // Check if there's an existing installation
   const integrationInstalled = await wizard.isExisting();
@@ -343,64 +383,66 @@ async function onInitialPageEnter(){
           return container;
         }
       );
+      return;
     }
     goToPremiumApp();
-  } 
+  } else {
+    // If integration is not yet installed, check that the user has necessary install permissions
+    if (config.checkInstallPermissions) {
+      let missingPermissions = getMissingInstallPermissions();
+      if (missingPermissions && missingPermissions.length > 0) {
+        showErrorPage(
+          'Unauthorized',
+          getTranslatedText('txt-missing-permissions'),
+          null,
+          'txt-missing-permissions',
+          // Show the missing permissions in the error page
+          () => {
+            const container = document.createElement('ul');
 
-  // If integration is not yet installed, check that the user has necessary install permissions
-  if (config.checkInstallPermissions) {
-    let missingPermissions = getMissingInstallPermissions();
-    if (missingPermissions && missingPermissions.length > 0) {
-      showErrorPage(
-        'Unauthorized',
-        getTranslatedText('txt-missing-permissions'),
-        null,
-        'txt-missing-permissions',
-        // Show the missing permissions in the error page
-        () => {
-          const container = document.createElement('ul');
-          
-          missingPermissions.forEach(perm => {
-            const entryElem = document.createElement('li');
-            entryElem.style.display = 'flex';
-            entryElem.style.justifyContent = 'center';
-            entryElem.innerText = perm;
-            container.appendChild(entryElem);
-          });
+            missingPermissions.forEach(perm => {
+              const entryElem = document.createElement('li');
+              entryElem.style.display = 'flex';
+              entryElem.style.justifyContent = 'center';
+              entryElem.innerText = perm;
+              container.appendChild(entryElem);
+            });
 
-          return container;
-        }
-      );
+            return container;
+          }
+        );
+        return;
+      }
     }
-  } 
+  }
 }
 
-async function onInstallDetailsEnter(){
+async function onInstallDetailsEnter() {
   if (config.enableDynamicInstallSummary == true) {
     let messagesDiv = document.getElementById('messages');
     messagesDiv.innerHTML = '';
 
     let modulesToInstall = Object.keys(config.provisioningInfo);
     if (config.enableCustomSetupStepAfterInstall === true) {
-        modulesToInstall.push('post-custom-setup');
+      modulesToInstall.push('post-custom-setup');
     }
     let moduleIndex = 0;
     modulesToInstall.forEach(modKey => {
-        moduleIndex++;
-        let messageDiv = document.createElement("div");
-        messageDiv.className = "message";
+      moduleIndex++;
+      let messageDiv = document.createElement("div");
+      messageDiv.className = "message";
 
-        let messageTitle = document.createElement("div");
-        messageTitle.className = "message-title";
-        messageTitle.innerHTML = "<span>" + moduleIndex.toString() + ". </span><span class='txt-create-" + modKey + "'></span><hr>";
-        messageDiv.appendChild(messageTitle);
+      let messageTitle = document.createElement("div");
+      messageTitle.className = "message-title";
+      messageTitle.innerHTML = "<span>" + moduleIndex.toString() + ". </span><span class='txt-create-" + modKey + "'></span><hr>";
+      messageDiv.appendChild(messageTitle);
 
-        let messageContent = document.createElement("div");
-        messageContent.className = "message-content";
-        messageContent.innerHTML = "<div><span class='txt-create-" + modKey + "-msg'></span></div>";
-        messageDiv.appendChild(messageContent);
+      let messageContent = document.createElement("div");
+      messageContent.className = "message-content";
+      messageContent.innerHTML = "<div><span class='txt-create-" + modKey + "-msg'></span></div>";
+      messageDiv.appendChild(messageContent);
 
-        messagesDiv.appendChild(messageDiv);
+      messagesDiv.appendChild(messageDiv);
     });
 
     localizePage();
@@ -412,13 +454,14 @@ async function onInstallDetailsEnter(){
  * Show the summary of the provisioned items.
  */
 async function onInstallationSummaryEnter() {
-  const installedData = wizard.getSimpleInstalledData();
+  const installedData = wizard.getInstalledData();
   const dataKeys = Object.keys(installedData);
+  const simpleInstalledData = wizard.getSimpleInstalledData();
 
   // Show the results in the page
   // TODO: Make this more pretty
   const summaryContainer = document.getElementById('summary-container');
-  if(!summaryContainer) return; 
+  if (!summaryContainer) return;
 
   // Create an array that contains HTML string per object category 
   const summaryElems = dataKeys.map((category, i) => {
@@ -431,7 +474,7 @@ async function onInstallationSummaryEnter() {
       const obj = installedObjects[objKey]
       const resourcePath = getResourcePath(pcEnvironment, category, obj.id)
 
-      if(resourcePath){
+      if (resourcePath) {
         childElemsString += `
           <p><a class="provisioned-link" href="${resourcePath}" target="_blank">${config.prefix}${objKey}</a></p>
         `;
@@ -439,6 +482,23 @@ async function onInstallationSummaryEnter() {
         childElemsString += `
           <p>${config.prefix}${objKey}</p>
         `;
+      }
+      // Special treatment for OAuth Client and Widget Deployment
+      if (category === 'oauth-client') {
+        childElemsString += `
+          <span><b>Client ID: </b>${obj.id}</span>
+          <br/>
+          <span><b>Client Secret: </b>${obj.secret}</span>
+          <br/><br/>
+        `;
+      }
+      if (category === 'widget-deployment') {
+        childElemsString += `
+        <span><b>Deployment Key: </b>${obj.id}</span>
+        <br/>
+        <span><b>Org ID: </b>${userMe.organization.id}</span>
+        <br/><br/>
+      `;
       }
     });
 
@@ -459,15 +519,19 @@ async function onInstallationSummaryEnter() {
 
   // Add the raw installation data to the textarea
   const textAreaSummary = document.getElementById('summary-raw-data');
-  if(!textAreaSummary) return;
-  textAreaSummary.value = JSON.stringify(installedData);
+  if (!textAreaSummary) return;
+  if (config.displaySummarySimplifiedData === true) {
+    textAreaSummary.value = JSON.stringify(simpleInstalledData);
+  } else {
+    textAreaSummary.style.display = 'none';
+  }
 }
 
 /**
  * This will run when the user enters the Custom Setup Page.
  * NOTE: Add your code for any custom initialization functionality here.
  */
-async function onCustomSetupEnter(){
+async function onCustomSetupEnter() {
   console.log('Custom Page Here');
 }
 
@@ -532,14 +596,14 @@ async function setup() {
     // Authenticate and get current user
     await authenticateGenesysCloud(appParams);
     userMe = await usersApi.getUsersMe({ 'expand': ['organization', 'authorization'] });
-    
+
     // Initialize the Wizard object
     wizard.setup(client, userMe);
-    
+
     // Check if app is for uninstallation
     // ie. query parameter 'uninstall=true'
-    if(config.enableUninstall && state.uninstall === 'true') await switchPage(PAGES.UNINSTALL);
-    
+    if (config.enableUninstall && state.uninstall === 'true') await switchPage(PAGES.UNINSTALL);
+
     // Load the Home page
     await switchPage(startPage);
 

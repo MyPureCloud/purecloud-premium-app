@@ -4,9 +4,9 @@
  */
 import config from '../config/config.js';
 import view from './view.js';
-import localizedLabels from '../assets/languages/languages.js';
 
 let dropDownConfigured = false;
+let currentLanguageSet = null; // Contains the currently loaded language file (Object)
 let currentLanguageCode = null;
 
 /**
@@ -20,19 +20,22 @@ function setupDropdownSelector(currentlySelected) {
         return;
     }
 
-    const selectorDropdown = $("#language-select");
-    if (!selectorDropdown) return;
+    const elemDropdown = document.getElementById('language-select');
+    if (!elemDropdown) return;
 
     // Add languages to the drop down selector
     Object.keys(config.availableLanguageAssets).forEach(langKey => {
-        const newOption = `<option value="${langKey}" ${currentlySelected === langKey ? 'selected' : ''}>${config.availableLanguageAssets[langKey]}</option>`;
+        const newOption = document.createElement('option');
+        newOption.value = langKey;
+        newOption.selected = currentlySelected === langKey;
+        newOption.innerText = config.availableLanguageAssets[langKey];
 
-        selectorDropdown.append(newOption);
+        elemDropdown.appendChild(newOption);
     });
 
     // When a new language is selected
-    selectorDropdown.on('change', function () {
-        const selectedLang = this.value;
+    elemDropdown.addEventListener('change', function () {
+        const selectedLang = elemDropdown.options[elemDropdown.selectedIndex].value;
         setPageLanguage(selectedLang)
             .then(() => {
                 console.log('Localization applied: ', selectedLang);
@@ -40,7 +43,7 @@ function setupDropdownSelector(currentlySelected) {
             .catch((e) => {
                 console.error(e);
             });
-    });
+    })
 
     dropDownConfigured = true;
 }
@@ -61,15 +64,27 @@ export async function setPageLanguage(requestedLanguage) {
         }
     }
 
-    if (!localizedLabels.hasOwnProperty(currentLanguageCode)) {
-        currentLanguageCode = config.defaultLanguage;
-    }
-
     // Configure the drop down selector
     if (!dropDownConfigured) setupDropdownSelector(currentLanguageCode);
 
-    localizePage();
-    return true;
+    return new Promise((resolve, reject) => {
+        let fileUri = `${config.wizardUriBase}assets/languages/${currentLanguageCode}.json`;
+        $.getJSON(fileUri)
+            .done(data => {
+                currentLanguageSet = data;
+                Object.keys(data).forEach((key) => {
+                    let els = document.querySelectorAll(`.${key}`);
+                    for (let i = 0; i < els.length; i++) {
+                        els.item(i).innerText = data[key];
+                    }
+                })
+                resolve();
+            })
+            .fail(xhr => {
+                console.log('Language file not found.');
+                resolve();
+            });
+    });
 }
 
 export function getSelectedLanguage() {
@@ -77,12 +92,13 @@ export function getSelectedLanguage() {
 }
 
 export function localizePage() {
-    if (localizedLabels[currentLanguageCode]) {
-        Object.keys(localizedLabels[currentLanguageCode]).forEach((key) => {
-            $(`.${key}`).text(localizedLabels[currentLanguageCode][key]);
+    if (currentLanguageSet) {
+        Object.keys(currentLanguageSet).forEach((key) => {
+            let els = document.querySelectorAll(`.${key}`);
+            for (let i = 0; i < els.length; i++) {
+                els.item(i).innerText = currentLanguageSet[key];
+            }
         });
-    } else {
-        console.log('Language not found.');
     }
 }
 
@@ -92,10 +108,5 @@ export function localizePage() {
  * @returns {String} the translated text
  */
 export function getTranslatedText(key) {
-    if (localizedLabels[currentLanguageCode] && localizedLabels[currentLanguageCode][key]) {
-        return localizedLabels[currentLanguageCode][key];
-    } else {
-        console.log('Language Label not found.');
-        return '';
-    }
+    return currentLanguageSet[key];
 }
