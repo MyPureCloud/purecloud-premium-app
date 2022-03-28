@@ -70,6 +70,7 @@ async function create(logFunc, data) {
     data.forEach((instance) => {
         let integrationBody = {
             body: {
+                name: config.prefix + instance.name,
                 integrationType: {
                     id: config.premiumAppIntegrationTypeId
                 }

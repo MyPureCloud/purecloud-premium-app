@@ -28,5 +28,6 @@ export const GC_OBJECT_BASE_URL_MAP = {
     'oauth-client': '/directory/#/admin/integrations/oauth/',
     'role': '/directory/#/admin/directory/rolesV2/',
     'widget-deployment': '/directory/#/admin/integrations/widgets/',
-    'ws-data-actions': '/directory/#/admin/integrations/apps/custom-rest-actions/'
+    'ws-data-actions': '/directory/#/admin/integrations/apps/custom-rest-actions/',
+    'byoc-cloud-trunk': '/directory/#/engage/telephonyAdmin/trunks/external?id=',
 }

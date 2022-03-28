@@ -27,6 +27,7 @@ export default {
     // Permissions required for running the Wizard App
     // all, premium, wizard, none (default)
     checkInstallPermissions: 'none',
+    checkProductBYOC: false,
 
     // Default Values for fail-safe/testing. Shouldn't have to be changed since the app
     // must be able to determine the environment from the query parameter 
@@ -56,6 +57,9 @@ export default {
 
     // Enable the dynamic build of the Install Summary on install.html page
     enableDynamicInstallSummary: true,
+
+    // Displays Text Area for Simplified Installed Data (Summary)
+    displaySummarySimplifiedData: true,
 
     // Allows you to deprovision the installed object by adding the query parameter 'uninstall=true'
     // in the wizard URL. This is merely for testing and should be 'false' in production.
@@ -135,7 +139,8 @@ export default {
         'oauth-client': ['authorization:role:view', 'oauth:client:view', 'oauth:client:add', 'oauth:client:edit'],
         'widget-deployment': ['widgets:deployment:view', 'widgets:deployment:add', 'widgets:deployment:edit'],
         'ws-data-actions': ['integrations:integration:view', 'integrations:integration:add', 'integrations:integration:edit', 'integrations:action:add', 'integrations:action:edit'],
-        'data-table': ['architect:datatable:view', 'architect:datatable:add']
+        'data-table': ['architect:datatable:view', 'architect:datatable:add'],
+        'byoc-cloud-trunk': ['telephony:plugin:all']
     },
     uninstallPermissions: {
         'custom': [],
@@ -148,7 +153,8 @@ export default {
         'oauth-client': ['oauth:client:delete'],
         'widget-deployment': ['widgets:deployment:delete'],
         'ws-data-actions': ['integrations:integration:delete'],
-        'data-table': ['architect:datatable:delete']
+        'data-table': ['architect:datatable:delete'],
+        'byoc-cloud-trunk': ['telephony:plugin:all']
     },
 
     // These are the necessary scopes that the Vendor Wizard's OAuth Client (defined in Vendor's org) must have to allow the wizard to install or uninstall
@@ -164,7 +170,8 @@ export default {
         'oauth-client': ['authorization:readonly', 'user-basic-info', 'oauth'],
         'widget-deployment': ['widgets'],
         'ws-data-actions': ['integrations'],
-        'data-table': ['architect']
+        'data-table': ['architect'],
+        'byoc-cloud-trunk': ['telephony']
     },
     uninstallScopes: {
         'custom': [],
@@ -177,6 +184,7 @@ export default {
         'oauth-client': ['oauth'],
         'widget-deployment': ['widgets'],
         'ws-data-actions': ['integrations'],
-        'data-table': ['architect']
+        'data-table': ['architect'],
+        'byoc-cloud-trunk': ['telephony']
     },
 }
