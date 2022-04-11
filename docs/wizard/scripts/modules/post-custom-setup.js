@@ -13,6 +13,15 @@ const platformClient = require('platformClient');
 async function configure(logFunc, installedData, user, gcClient) {
     return new Promise(async (resolve, reject) => {
         logFunc('Post Custom Setup...');
+
+        resolve({ status: true, cause: 'SUCCESS' });
+
+        // successful
+        // resolve({status: true, cause: ''})
+        // failure
+        // resolve({status: false, cause: 'detailed reason or empty string'})
+
+        /*
         try {
             let provisionBody = {
                 apiEnvironment: gcClient.config.environment,
@@ -24,30 +33,13 @@ async function configure(logFunc, installedData, user, gcClient) {
                 requestorName: user.name,
                 requestorUsername: user.username,
                 requestorEmail: user.email,
-                // oauthClientId: installedData['oauth-client'][config.provisioningInfo['oauth-client'][0].name].id,
-                // oauthClientSecret: installedData['oauth-client'][config.provisioningInfo['oauth-client'][0].name].secret,
-                // wsCredentialId: installedData['gc-data-actions'][config.provisioningInfo['gc-data-actions'][0].name].credentialId,
-                // wsCredentialType: installedData['gc-data-actions'][config.provisioningInfo['gc-data-actions'][0].name].credentialType,
-                // widgetDeploymentKey: installedData['widget-deployment'][config.provisioningInfo['widget-deployment'][0].name].id,
+                oauthClientId: installedData['oauth-client'][config.provisioningInfo['oauth-client'][0].name].id,
+                oauthClientSecret: installedData['oauth-client'][config.provisioningInfo['oauth-client'][0].name].secret,
+                wsCredentialId: installedData['gc-data-actions'][config.provisioningInfo['gc-data-actions'][0].name].credentialId,
+                wsCredentialType: installedData['gc-data-actions'][config.provisioningInfo['gc-data-actions'][0].name].credentialType,
+                widgetDeploymentKey: installedData['widget-deployment'][config.provisioningInfo['widget-deployment'][0].name].id,
                 openMessagingIntegrationId: installedData['open-messaging'][config.provisioningInfo['open-messaging'][0].name].id
             };
-
-            // Example with a forced wait
-            /*
-            let waitTimer = new Promise((resolve, reject) => {
-                console.log('Wait for something...');
-                setTimeout(() => resolve(), 3000);
-            })
-                .then(() => {
-                    // TODO - Add your code for post custom setup
-                    resolve({status: true, cause: ''});
-                });
-            */
-
-            // successful
-            // resolve({status: true, cause: ''})
-            // failure
-            // resolve({status: false, cause: 'detailed reason or empty string'})
 
             // TODO - Add your code for post custom setup
 
@@ -65,6 +57,7 @@ async function configure(logFunc, installedData, user, gcClient) {
             console.error(e);
             resolve({ status: false, cause: 'ERROR - Request to backend failed' });
         }
+        */
 
     });
 }

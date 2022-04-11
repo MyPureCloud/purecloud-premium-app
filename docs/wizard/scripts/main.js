@@ -291,10 +291,8 @@ async function install() {
 
     // Check if Post Custom Setup is successful
     if (customSetupStatus.status) {
-      console.log("JSM HERE: ", customSetupStatus.status);
       switchPage(PAGES.DONE);
     } else {
-      console.log("JSM ERROR");
       // Show error from post custom setup
       showErrorPage(
         getTranslatedText('txt-post-custom-setup-failure'),
