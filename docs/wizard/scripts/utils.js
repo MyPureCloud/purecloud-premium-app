@@ -1,5 +1,5 @@
 import config from '../config/config.js';
-import { GC_OBJECT_BASE_URL_MAP } from './enums.js';
+import { GC_OBJECT_BASE_URL_MAP, GC_CATEGORY_URL_MAP, GC_CATEGORY_LABEL } from './enums.js';
 
 /**
  * Build the complete URL for the resource. Used in the summary page
@@ -8,11 +8,15 @@ import { GC_OBJECT_BASE_URL_MAP } from './enums.js';
  * @param {String} id id of the actual GC object
  * @returns {String|null} path to the resource.
  */
-export function getResourcePath(environment, category, id){
-    const categoryPath = GC_OBJECT_BASE_URL_MAP[category];
-    if(!categoryPath) return null;
-    
-    return `https://apps.${environment}${categoryPath}${id}`;
+export function getResourcePath(environment, category, id) {
+    let objectBasePath = GC_OBJECT_BASE_URL_MAP[category];
+    if (!objectBasePath) {
+        let categoryPath = GC_CATEGORY_URL_MAP[category];
+        if (!categoryPath) return null;
+        return `https://apps.${environment}${categoryPath}`;
+    } else {
+        return `https://apps.${environment}${objectBasePath}${id}`;
+    }
 }
 
 /**
@@ -20,20 +24,24 @@ export function getResourcePath(environment, category, id){
  * Used for summary page
  * @param {String} key the exported provisioningKey of the module
  */
-export function beautifyModuleKey(key){
-    const words = key.split('-');
-    const capitalizedWords = words.map(word => {
-              return word.charAt(0).toUpperCase() + word.slice(1);
-            })
-    return capitalizedWords.join(' ') + 's'; 
+export function beautifyModuleKey(key) {
+    let categoryLabel = GC_CATEGORY_LABEL[key];
+    if (!categoryLabel) {
+        const words = key.split('-');
+        const capitalizedWords = words.map(word => {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        })
+        return capitalizedWords.join(' ') + 's';
+    } else {
+        return categoryLabel;
+    }
 }
-
 
 /**
  * Get the query parameters and return an object 
  * @returns {Object} {language(?): ..., environment(?): ..., uninstall(?): ...}
  */
- export function getQueryParameters() {
+export function getQueryParameters() {
     let ret = {};
     if (window.location.hash && window.location.hash.length > 1 && window.location.hash.indexOf('error') >= 0) {
         // Manage Error

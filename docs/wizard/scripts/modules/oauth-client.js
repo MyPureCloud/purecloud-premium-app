@@ -27,11 +27,20 @@ async function remove(logFunc) {
 
     if (instances.length > 0) {
         instances.forEach(entity => {
-            del_clients.push(oAuthApi.deleteOauthClient(entity.id));
+            del_clients.push((async () => {
+                try{
+                    entity.state = 'inactive';
+                    let result = await oAuthApi.putOauthClient(entity.id, entity);
+                    await oAuthApi.deleteOauthClient(entity.id);
+                    logFunc('Deleted ' + entity.name + ' auth client');
+                } catch(e) {
+                    console.log(e);
+                }
+            })());
         });
     }
 
-    return Promise.all(del_clients);
+    return Promise.all(del_clients);    
 }
 
 /**

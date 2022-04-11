@@ -11,29 +11,61 @@ const platformClient = require('platformClient');
  * @returns {Promise.<Object>}
  */
 async function configure(logFunc, installedData, user, gcClient) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         logFunc('Post Custom Setup...');
+        try {
+            let provisionBody = {
+                apiEnvironment: gcClient.config.environment,
+                apiBase: gcClient.config.basePath,
+                apiAuth: gcClient.config.authUrl,
+                orgId: user.organization.id,
+                orgName: user.organization.name,
+                requestorId: user.id,
+                requestorName: user.name,
+                requestorUsername: user.username,
+                requestorEmail: user.email,
+                // oauthClientId: installedData['oauth-client'][config.provisioningInfo['oauth-client'][0].name].id,
+                // oauthClientSecret: installedData['oauth-client'][config.provisioningInfo['oauth-client'][0].name].secret,
+                // wsCredentialId: installedData['gc-data-actions'][config.provisioningInfo['gc-data-actions'][0].name].credentialId,
+                // wsCredentialType: installedData['gc-data-actions'][config.provisioningInfo['gc-data-actions'][0].name].credentialType,
+                // widgetDeploymentKey: installedData['widget-deployment'][config.provisioningInfo['widget-deployment'][0].name].id,
+                openMessagingIntegrationId: installedData['open-messaging'][config.provisioningInfo['open-messaging'][0].name].id
+            };
 
-        // Example with a forced wait
-        /*
-        let waitTimer = new Promise((resolve, reject) => {
-            console.log('Wait for something...');
-            setTimeout(() => resolve(), 3000);
-        })
-            .then(() => {
-                // TODO - Add your code for post custom setup
-                resolve({status: true, cause: ''});
-            });
-        */
+            // Example with a forced wait
+            /*
+            let waitTimer = new Promise((resolve, reject) => {
+                console.log('Wait for something...');
+                setTimeout(() => resolve(), 3000);
+            })
+                .then(() => {
+                    // TODO - Add your code for post custom setup
+                    resolve({status: true, cause: ''});
+                });
+            */
 
-        // successful
-        // resolve({status: true, cause: ''})
-        // failure
-        // resolve({status: false, cause: 'detailed reason or empty string'})
+            // successful
+            // resolve({status: true, cause: ''})
+            // failure
+            // resolve({status: false, cause: 'detailed reason or empty string'})
 
-        // TODO - Add your code for post custom setup
-        // resolve({status: false, cause: 'Rejected because of XYZ'});
-        resolve({status: true, cause: ''});
+            // TODO - Add your code for post custom setup
+
+            let backendResult = await fetch(new Request('/provision', {
+                method: 'POST',
+                body: JSON.stringify(provisionBody)
+            }));
+
+            if (backendResult.status === 200) {
+                resolve({ status: true, cause: 'SUCCESS' });
+            } else {
+                resolve({ status: true, cause: 'ERROR - Request to backend failed because of XYZ' });
+            }
+        } catch (e) {
+            console.error(e);
+            resolve({ status: false, cause: 'ERROR - Request to backend failed' });
+        }
+
     });
 }
 

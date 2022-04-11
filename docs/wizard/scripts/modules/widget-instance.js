@@ -5,19 +5,22 @@ const integrationsApi = new platformClient.IntegrationsApi();
 
 
 /**
- * Get existing apps based on the prefix
- * @returns {Promise.<Array>} Genesys Cloud Integrations
- */
+* Get existing widgets based on the prefix
+* @returns {Promise.<Array>} Array of Genesys Cloud OAuth Clients
+*/
 async function getExisting() {
     let integrations = []
 
     // Internal recursive function for calling 
     // next pages (if any) of the integrations
     let _getIntegrations = async (pageNum) => {
-        let data = await integrationsApi.getIntegrations({pageSize: 100, pageNumber: pageNum})
+        let data = await integrationsApi.getIntegrations({
+                            pageSize: 100,
+                            pageNumber: pageNum
+                        });
         data.entities
             .filter(entity => {
-                return entity.integrationType.id == config.premiumAppIntegrationTypeId &&
+                return entity.integrationType.id == config.premiumWidgetIntegrationTypeId &&
                     entity.name.startsWith(config.prefix);
             }).forEach(integration =>
                 integrations.push(integration));
@@ -27,33 +30,34 @@ async function getExisting() {
         }
     }
 
-    try{
-        await _getIntegrations(1)
+    try {
+        await _getIntegrations(1);
     } catch(e) {
-        console.error(e);
+        console.error(e)
     }
 
     return integrations;
 }
 
 /**
- * Delete all existing PremiumApp instances
+ * Delete all existing PremiumWidget instances
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
 async function remove(logFunc) {
-    logFunc('Uninstalling Other App Instances...');
+    logFunc('Uninstalling Widgets Instances...');
 
     let instances = await getExisting();
-    let del_apps = [];
+
+    let del_widgets = [];
 
     if (instances.length > 0) {
         instances.forEach(entity => {
-            del_apps.push(integrationsApi.deleteIntegration(entity.id));
+            del_widgets.push(integrationsApi.deleteIntegration(entity.id));
         });
     }
 
-    return Promise.all(del_apps);
+    return Promise.all(del_widgets);
 }
 
 /**
@@ -72,7 +76,7 @@ async function create(logFunc, data) {
             body: {
                 name: config.prefix + instance.name,
                 integrationType: {
-                    id: config.premiumAppIntegrationTypeId
+                    id: config.premiumWidgetIntegrationTypeId
                 }
             }
         };
@@ -85,8 +89,8 @@ async function create(logFunc, data) {
         })());
     });
 
-    await Promise.all(integrationPromises);
-    return integrationsData;
+    return Promise.all(integrationPromises)
+        .then(() => integrationsData);
 }
 
 /**
@@ -97,8 +101,8 @@ async function create(logFunc, data) {
  * @param {String} userId User id if needed
  */
 async function configure(logFunc, installedData, userId) {
-    let instanceInstallationData = config.provisioningInfo['app-instance'];
-    let appInstancesData = installedData['app-instance'];
+    let instanceInstallationData = config.provisioningInfo['widget-instance'];
+    let appInstancesData = installedData['widget-instance'];
 
     let promisesArr = [];
 
@@ -113,9 +117,12 @@ async function configure(logFunc, installedData, userId) {
                 version: 1,
                 properties: {
                     url: appInstanceInstall.url,
-                    displayType: appInstanceInstall.type || 'standalone',
-                    featureCategory: '',
-                    groupFilter: appInstanceInstall
+                    queueIdFilterList: [],
+                    communicationTypeFilter: appInstanceInstall
+                        .communicationTypeFilter ?
+                        appInstanceInstall.communicationTypeFilter :
+                        '',
+                    groups: appInstanceInstall
                         .groups.map((groupName) =>
                             installedData.group[groupName].id)
                         .filter(g => g != undefined)
@@ -126,17 +133,16 @@ async function configure(logFunc, installedData, userId) {
             }
         };
 
-        // Manage Wizard during development, before approval, using premiumAppIntegrationTypeId='premium-app-example' (sandbox and permissions in request schema)
-        // and in production, after approval, using premiumAppIntegrationTypeId='premium-app-vendorABC' (sandbox and permissions not allowed in request schema)
-        if (config.premiumAppIntegrationTypeId === 'premium-app-example') {
+        // Manage Wizard during development, before approval, using premiumWidgetIntegrationTypeId='premium-widget-example' (sandbox and permissions in request schema)
+        // and in production, after approval, using premiumWidgetIntegrationTypeId='premium-widget-vendorABC' (sandbox and permissions not allowed in request schema)
+        if (config.premiumAppIntegrationTypeId === 'premium-widget-example') {
             integrationConfig.body.properties.sandbox = appInstanceInstall.sandbox || 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads';
             integrationConfig.body.properties.permissions = appInstanceInstall.permissions || 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen';
         }
 
-        promisesArr.push((async () => {
+        promisesArr.push((async () => { 
             try {
                 await integrationsApi.putIntegrationConfigCurrent(appInstance.id, integrationConfig);
-
                 logFunc('Configured instance: ' + appInstance.name);
 
                 let opts = {
@@ -144,12 +150,13 @@ async function configure(logFunc, installedData, userId) {
                         intendedState: 'ENABLED'
                     }
                 };
+
+                let data = await integrationsApi.patchIntegration(appInstance.id, opts)
                 
-                const patchData = await integrationsApi.patchIntegration(appInstance.id, opts);
-                logFunc('Enabled instance: ' + patchData.name);
+                logFunc('Enabled instance: ' + data.name);
             } catch(e) {
                 console.error(e);
-            } 
+            }
         })());
     });
 
@@ -157,7 +164,7 @@ async function configure(logFunc, installedData, userId) {
 }
 
 export default {
-    provisioningInfoKey: 'app-instance',
+    provisioningInfoKey: 'widget-instance',
 
     getExisting: getExisting,
     remove: remove,

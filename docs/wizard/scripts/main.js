@@ -291,8 +291,10 @@ async function install() {
 
     // Check if Post Custom Setup is successful
     if (customSetupStatus.status) {
+      console.log("JSM HERE: ", customSetupStatus.status);
       switchPage(PAGES.DONE);
     } else {
+      console.log("JSM ERROR");
       // Show error from post custom setup
       showErrorPage(
         getTranslatedText('txt-post-custom-setup-failure'),
@@ -497,6 +499,12 @@ async function onInstallationSummaryEnter() {
         <span><b>Deployment Key: </b>${obj.id}</span>
         <br/>
         <span><b>Org ID: </b>${userMe.organization.id}</span>
+        <br/><br/>
+      `;
+      }
+      if (category === 'open-messaging') {
+        childElemsString += `
+        <span><b>Integration ID: </b>${obj.id}</span>
         <br/><br/>
       `;
       }
