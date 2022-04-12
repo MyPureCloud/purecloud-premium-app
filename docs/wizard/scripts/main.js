@@ -500,6 +500,12 @@ async function onInstallationSummaryEnter() {
         <br/><br/>
       `;
       }
+      if (category === 'open-messaging') {
+        childElemsString += `
+        <span><b>Integration ID: </b>${obj.id}</span>
+        <br/><br/>
+      `;
+      }
     });
 
     const template = `

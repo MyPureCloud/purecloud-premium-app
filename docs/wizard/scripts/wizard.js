@@ -5,11 +5,14 @@ import view from './view.js';
 import roleModule from './modules/role.js';
 import groupModule from './modules/group.js';
 import appInstanceModule from './modules/app-instance.js';
+import widgetInstanceModule from './modules/widget-instance.js';
 import OAuthClientModule from './modules/oauth-client.js';
 import dataTableModule from './modules/data-table.js';
-import interactionWidget from './modules/interaction-widget.js';
-import wsDataActions from './modules/ws-data-actions.js';
-import widgetDeployment from './modules/widget-deployment.js';
+import interactionWidgetModule from './modules/interaction-widget.js';
+import wsDataActionsModule from './modules/ws-data-actions.js';
+import gcDataActionsModule from './modules/gc-data-actions.js';
+import widgetDeploymentModule from './modules/widget-deployment.js';
+import openMessagingModule from './modules/open-messaging.js';
 import byocCloudTrunkModule from './modules/byoc-cloud-trunk.js';
 // Module Post Custom Setup
 import postCustomSetup from './modules/post-custom-setup.js';
@@ -21,11 +24,14 @@ let modules = [
     roleModule,
     groupModule,
     appInstanceModule,
+    widgetInstanceModule,
     OAuthClientModule,
     dataTableModule,
-    interactionWidget,
-    wsDataActions,
-    widgetDeployment,
+    interactionWidgetModule,
+    wsDataActionsModule,
+    gcDataActionsModule,
+    widgetDeploymentModule,
+    openMessagingModule,
     byocCloudTrunkModule
 ];
 

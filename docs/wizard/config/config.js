@@ -18,6 +18,9 @@ export default {
     // previously - defined as appName
     premiumAppIntegrationTypeId: 'premium-app-example',
 
+    // Optional - Some Premium Applications leverage both a premium app and a premium widget
+    premiumWidgetIntegrationTypeId: 'premium-widget-example',
+
     // The minimum permission required for a user to access the Premium App.
     // NOTE: During initial development please use the default permission 
     //      'integration:examplePremiumApp:view'. Once your premium app is approved,
@@ -135,10 +138,13 @@ export default {
         'role': ['authorization:role:view', 'authorization:role:add', 'authorization:grant:add'],
         'group': ['directory:group:add'],
         'app-instance': ['integrations:integration:view', 'integrations:integration:add', 'integrations:integration:edit'],
+        'widget-instance': ['integrations:integration:view', 'integrations:integration:add', 'integrations:integration:edit'],
         'interaction-widget': ['integrations:integration:view', 'integrations:integration:add', 'integrations:integration:edit'],
         'oauth-client': ['authorization:role:view', 'oauth:client:view', 'oauth:client:add', 'oauth:client:edit'],
         'widget-deployment': ['widgets:deployment:view', 'widgets:deployment:add', 'widgets:deployment:edit'],
+        'open-messaging': ['messaging:integration:view', 'messaging:integration:add', 'messaging:integration:edit'],
         'ws-data-actions': ['integrations:integration:view', 'integrations:integration:add', 'integrations:integration:edit', 'integrations:action:add', 'integrations:action:edit'],
+        'gc-data-actions': ['integrations:integration:view', 'integrations:integration:add', 'integrations:integration:edit', 'integrations:action:add', 'integrations:action:edit'],
         'data-table': ['architect:datatable:view', 'architect:datatable:add'],
         'byoc-cloud-trunk': ['telephony:plugin:all']
     },
@@ -149,10 +155,13 @@ export default {
         'role': ['authorization:role:delete'],
         'group': ['directory:group:delete'],
         'app-instance': ['integrations:integration:delete'],
+        'widget-instance': ['integrations:integration:delete'],
         'interaction-widget': ['integrations:integration:delete'],
-        'oauth-client': ['oauth:client:delete'],
+        'oauth-client': ['oauth:client:edit', 'oauth:client:delete'],
         'widget-deployment': ['widgets:deployment:delete'],
+        'open-messaging': ['messaging:integration:delete'],
         'ws-data-actions': ['integrations:integration:delete'],
+        'gc-data-actions': ['integrations:integration:delete'],
         'data-table': ['architect:datatable:delete'],
         'byoc-cloud-trunk': ['telephony:plugin:all']
     },
@@ -166,12 +175,15 @@ export default {
         'role': ['authorization'],
         'group': ['groups'],
         'app-instance': ['integrations'],
+        'widget-instance': ['integrations'],
         'interaction-widget': ['integrations'],
         'oauth-client': ['authorization:readonly', 'user-basic-info', 'oauth'],
         'widget-deployment': ['widgets'],
+        'open-messaging': ['messaging'],
         'ws-data-actions': ['integrations'],
+        'gc-data-actions': ['integrations'],
         'data-table': ['architect'],
-        'byoc-cloud-trunk': ['telephony']
+        'byoc-cloud-trunk': ['telephony', 'organization:readonly']
     },
     uninstallScopes: {
         'custom': [],
@@ -180,10 +192,13 @@ export default {
         'role': ['authorization'],
         'group': ['groups'],
         'app-instance': ['integrations'],
+        'widget-instance': ['integrations'],
         'interaction-widget': ['integrations'],
         'oauth-client': ['oauth'],
         'widget-deployment': ['widgets'],
+        'open-messaging': ['messaging'],
         'ws-data-actions': ['integrations'],
+        'gc-data-actions': ['integrations'],
         'data-table': ['architect'],
         'byoc-cloud-trunk': ['telephony']
     },

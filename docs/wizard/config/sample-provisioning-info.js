@@ -36,25 +36,35 @@ let sample = {
             'name': 'Agent Widget',
             'url': 'https://mypurecloud.github.io/purecloud-premium-app/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}',
             'type': 'widget',
-            'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts',
-            'permissions': 'camera,microphone,geolocation',
+            'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
+            'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
             'groups': ['Agents', 'Supervisors']
         },
         {
             'name': 'Supervisor Widget',
             'url': 'https://mypurecloud.github.io/purecloud-premium-app/supervisor.html?lang={{pcLangTag}}&environment={{pcEnvironment}}',
             'type': 'standalone',
-            'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts',
-            'permissions': 'camera,microphone,geolocation',
+            'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
+            'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
             'groups': ['Supervisors']
+        }
+    ],
+    'widget-instance': [
+        {
+            'name': 'Premium Widget',
+            'url': 'https://app-website.com/?conversationid={{pcConversationId}}&lang={{pcLangTag}}&environment={{pcEnvironment}}',
+            'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
+            'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
+            'groups': ['Agents'],
+            'communicationTypeFilter': 'chat, call, email'
         }
     ],
     'interaction-widget': [
         {
             'name': 'Interaction Widget',
             'url': 'https://app-website.com/?conversationid={{pcConversationId}}&lang={{pcLangTag}}&environment={{pcEnvironment}}',
-            'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts',
-            'permissions': 'camera,microphone,geolocation',
+            'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
+            'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
             'groups': ['Agents'],
             'communicationTypeFilter': 'chat, call, email'
         }
@@ -69,9 +79,20 @@ let sample = {
             'autoEnable': true
         }
     ],
+    'open-messaging': [
+        {
+            'name': 'Open Messaging Integration',
+            'outboundNotificationWebhookUrl': 'https://yourservice.com/messages',
+            'outboundNotificationWebhookSignatureSecretToken': 'OUTBOUND_NOTIFICATION_WEBHOOK_SIGNATURE_SECRET_TOKEN',
+            'webhookHeaders': {
+                "YOUR-HEADER-KEY-1": "YOUR-HEADER-VALUE-1",
+                "YOUR-HEADER-KEY-2": "YOUR-HEADER-VALUE-2"
+            }
+        }
+    ],
     'ws-data-actions': [
         {
-            'name': 'My Web Services',
+            'name': 'Web Services',
             'autoEnable': true,
             /**
              * credential type: userDefinedOAuth, userDefined, basicAuth, none or empty string or no credentialType attribute (if no crdentials required)
@@ -84,7 +105,7 @@ let sample = {
             },
             'data-actions': [
                 {
-                    'name': 'My Data Action',
+                    'name': 'WS Data Action',
                     'secure': false,
                     'autoPublish': true,
                     "config": {
@@ -93,6 +114,63 @@ let sample = {
                             "requestType": "POST",
                             "headers": {
                                 "Authorization": "${authResponse.token_type} ${authResponse.access_token}",
+                                "Content-Type": "application/json"
+                            },
+                            "requestTemplate": "${input.rawRequest}"
+                        },
+                        "response": {
+                            "translationMap": {
+                                "mymsg": "$.msg"
+                            },
+                            "translationMapDefaults": {
+                                "mymsg": "\"\""
+                            },
+                            "successTemplate": "{ \"myoutput\": ${mymsg} }"
+                        }
+                    },
+                    "contract": {
+                        "input": {
+                            "inputSchema": {
+                                "type": "object",
+                                "properties": {
+                                    "access_token": {
+                                        "type": "string"
+                                    }
+                                },
+                                "additionalProperties": true
+                            }
+                        },
+                        "output": {
+                            "successSchema": {
+                                "type": "object",
+                                "properties": {
+                                    "myoutput": {
+                                        "type": "string"
+                                    }
+                                },
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    'gc-data-actions': [
+        {
+            'name': 'Genesys Cloud Services',
+            'autoEnable': true,
+            'oauthClient': 'OAuth Client',
+            'data-actions': [
+                {
+                    'name': 'GC Data Action',
+                    'secure': false,
+                    'autoPublish': true,
+                    "config": {
+                        "request": {
+                            "requestUrlTemplate": "https://test.test.com/test",
+                            "requestType": "POST",
+                            "headers": {
                                 "Content-Type": "application/json"
                             },
                             "requestTemplate": "${input.rawRequest}"
@@ -172,34 +250,44 @@ let sample = {
         {
             'name': 'BYOC Trunk',
             'inboundSIPTerminationIdentifier': '-appfoundry-vendor',
-            'protocol': 'UDP',
-            'sipServers': [],
-            'enableSIPDigest': false,
-            'sipDigestRealm': '',
-            'sipDigestUsername': '',
-            'sipDigestPassword': '',
-            'outboundAddressOverrideMethod': 'Always',
-            'outboundAddressOverrideCallerID': '',
-            'outboundNameOverrideMethod': 'Always',
-            'outboundNameOverrideCallerName': 'AppFoundry Vendor',
-            'sipACL': [],
-            'callingAddressOmitPrefix': false,
-            'calledAddressOmitPrefix': false,
-            'enableReleaseLinkTransfer': false,
-            'enableTakeBackAndTransfer': false,
-            'enableConversationHeaders': trfalseue,
-            'enableUUI': false,
-            'uuiType': 'User-to-User',
-            'uuiEncoding': 'Ascii',
-            'uuiProtocolDiscriminator': '02',
-            'autoEnable': true,
-            'enableRecording': false,
-            'enableRecordingConsult': false,
-            'enableRecordingAutomaticLevelControl': false,
-            'enableRecordingOnExternalTransfer': false,
-            'enableRecordingDualChannel': false,
-            'enableRecordingAudioFormat': 'audio/PCMU',
-            'language': 'en-US'
+            'properties': {
+                'trunk_enabled': true,
+                'trunk_transport_serverProxyList': [],
+                'trunk_transport_protocolVariant': 'udp',
+                'trunk_access_acl_allowList': [],
+                'trunk_recording_enabled': false,
+                'trunk_consult_recording_enabled': false,
+                'trunk_recording_audioFormat': 'audio/PCMU',
+                'trunk_recording_levelControlEnabled': false,
+                'trunk_recording_externalTransfersEnabled': false,
+                'trunk_recording_dualChannel': false,
+                'trunk_sip_conversationHeader': false,
+                'trunk_sip_authentication_credentials_realm': '',
+                'trunk_sip_authentication_credentials_username': '',
+                'trunk_sip_authentication_credentials_password': '',
+                'trunk_sip_uuiEnabled': false,
+                'trunk_sip_uuiHeader': 'User-to-User',
+                'trunk_sip_uuiEncoding': 'Hex',
+                'trunk_sip_uuiPd': '00',
+                'trunk_language': 'en-US',
+                'trunk_outboundIdentity_callingAddress_omitPlusPrefix': false,
+                'trunk_outboundIdentity_calledAddress_omitPlusPrefix': false,
+                'trunk_outboundIdentity_callingName': 'AppFoundry Vendor',
+                // legacy
+                'trunk_outboundIdentity_callingName_overrideMethod': 'Always',
+                // new
+                'trunk_outboundIdentity_suppress_username_if_did_available': false,
+                'trunk_outboundIdentity_suppress_username_if_no_did': false,
+                //
+                'trunk_outboundIdentity_callingAddress': '',
+                // legacy
+                'trunk_outboundIdentity_callingAddress_overrideMethod': 'Always',
+                // new
+                'trunk_calling_id_priority': ['Source', 'Trunk', 'Site', 'Extension'],
+                //
+                'trunk_transfer_takeback_enabled': false,
+                'trunk_rlt_enabled': false
+            }
         }
     ]
 }

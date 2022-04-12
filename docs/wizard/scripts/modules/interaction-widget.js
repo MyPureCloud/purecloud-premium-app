@@ -117,8 +117,8 @@ async function configure(logFunc, installedData, userId) {
                 version: 1,
                 properties: {
                     url: appInstanceInstall.url,
-                    sandbox: appInstanceInstall.sandbox || 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts',
-                    permissions: appInstanceInstall.permissions || 'camera,microphone,geolocation',
+                    sandbox: appInstanceInstall.sandbox || 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
+                    permissions: appInstanceInstall.permissions || 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
                     queueIdFilterList: [],
                     communicationTypeFilter: appInstanceInstall
                         .communicationTypeFilter ?
