@@ -473,8 +473,8 @@ async function validateAll(){
   config = await getConfigObject();
   
   const validations = [evaluateConfig(), 
-    evaluateLanguageFiles(), 
-    evaluateWizardText(),
+    // evaluateLanguageFiles(), 
+    // evaluateWizardText(),
     evaluateImages(),
     evaluateStyles()
   ]
