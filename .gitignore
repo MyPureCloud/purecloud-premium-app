@@ -1,2 +1,4 @@
 node_modules/
 _scratch/
+**/__test_full_config.js
+validation.log

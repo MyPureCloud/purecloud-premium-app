@@ -4,23 +4,39 @@ const platformClient = require('platformClient');
 const integrationsApi = new platformClient.IntegrationsApi();
 
 
- /**
- * Get existing authetication clients based on the prefix
- * @returns {Promise.<Array>} Array of Genesys Cloud OAuth Clients
- */
-function getExisting(){
-    let integrationsOpts = {
-        'pageSize': 100
-    };
-    
-    return integrationsApi.getIntegrations(integrationsOpts)
-    .then((data) => {
-        return(data.entities
+/**
+* Get existing authetication clients based on the prefix
+* @returns {Promise.<Array>} Array of Genesys Cloud OAuth Clients
+*/
+async function getExisting() {
+    let integrations = []
+
+    // Internal recursive function for calling 
+    // next pages (if any) of the integrations
+    let _getIntegrations = async (pageNum) => {
+        let data = await integrationsApi.getIntegrations({
+                            pageSize: 100,
+                            pageNumber: pageNum
+                        });
+        data.entities
             .filter(entity => {
-                return entity.integrationType.id == 'embedded-client-app-interaction-widget' && 
-                        entity.name.startsWith(config.prefix);
-            }));
-    }); 
+                return entity.integrationType.id == 'embedded-client-app-interaction-widget' &&
+                    entity.name.startsWith(config.prefix);
+            }).forEach(integration =>
+                integrations.push(integration));
+
+        if (data.nextUri) {
+            return _getIntegrations(pageNum + 1);
+        }
+    }
+
+    try {
+        await _getIntegrations(1);
+    } catch(e) {
+        console.error(e)
+    }
+
+    return integrations;
 }
 
 /**
@@ -28,25 +44,21 @@ function getExisting(){
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(logFunc){
+async function remove(logFunc) {
     logFunc('Uninstalling Interaction Widgets...');
 
-    return getExisting()
-    .then(apps => {
-        let del_app = [];
+    let instances = await getExisting();
 
-        if (apps.length > 0){
-            // Filter results before deleting
-            apps.map(entity => entity.id)
-                .forEach(iid => {
-                    del_app.push(integrationsApi.deleteIntegration(iid));
-            });
-        }
+    let del_widgets = [];
 
-        return Promise.all(del_app);
-    });
+    if (instances.length > 0) {
+        instances.forEach(entity => {
+            del_widgets.push(integrationsApi.deleteIntegration(entity.id));
+        });
+    }
+
+    return Promise.all(del_widgets);
 }
-
 
 /**
  * Add Genesys Cloud instances based on installation data
@@ -55,14 +67,14 @@ function remove(logFunc){
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
  *                          is the Genesys Cloud object details of that type.
  */
- function create(logFunc, data){
+async function create(logFunc, data) {
     let integrationPromises = [];
-    let enableIntegrationPromises = [];
     let integrationsData = {};
 
     data.forEach((instance) => {
         let integrationBody = {
             body: {
+                name: config.prefix + instance.name,
                 integrationType: {
                     id: 'embedded-client-app-interaction-widget'
                 }
@@ -70,17 +82,15 @@ function remove(logFunc){
         };
 
         // Rename and add Group Filtering
-        integrationPromises.push(
-            integrationsApi.postIntegrations(integrationBody)
-            .then((data) => {
-                logFunc('Created instance: ' + instance.name);
-                integrationsData[instance.name] = data;
-            })
-        );
+        integrationPromises.push((async () => {
+            let result = await integrationsApi.postIntegrations(integrationBody);
+            logFunc('Created instance: ' + instance.name);
+            integrationsData[instance.name] = result;
+        })());
     });
 
     return Promise.all(integrationPromises)
-    .then(() => integrationsData);
+        .then(() => integrationsData);
 }
 
 /**
@@ -90,7 +100,7 @@ function remove(logFunc){
  * @param {Object} installedData contains everything that was installed by the wizard
  * @param {String} userId User id if needed
  */
-function configure(logFunc, installedData, userId){
+async function configure(logFunc, installedData, userId) {
     let instanceInstallationData = config.provisioningInfo['interaction-widget'];
     let appInstancesData = installedData['interaction-widget'];
 
@@ -98,39 +108,37 @@ function configure(logFunc, installedData, userId){
 
     Object.keys(appInstancesData).forEach((instanceKey) => {
         let appInstance = appInstancesData[instanceKey];
-        let appInstanceInstall =  instanceInstallationData
-                                            .find((a) => a.name == instanceKey);
+        let appInstanceInstall = instanceInstallationData
+            .find((a) => a.name == instanceKey);
 
         let integrationConfig = {
             body: {
                 name: config.prefix + instanceKey,
-                version: 1, 
+                version: 1,
                 properties: {
                     url: appInstanceInstall.url,
-                    sandbox: appInstanceInstall.sandbox || 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts',
+                    sandbox: appInstanceInstall.sandbox || 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
+                    permissions: appInstanceInstall.permissions || 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
                     queueIdFilterList: [],
                     communicationTypeFilter: appInstanceInstall
-                            .communicationTypeFilter ? 
-                                    appInstanceInstall.communicationTypeFilter :
-                                    '',
+                        .communicationTypeFilter ?
+                        appInstanceInstall.communicationTypeFilter :
+                        '',
                     groups: appInstanceInstall
-                                    .groups.map((groupName) => 
-                                        installedData.group[groupName].id)
-                                    .filter(g => g != undefined)
+                        .groups.map((groupName) =>
+                            installedData.group[groupName].id)
+                        .filter(g => g != undefined)
                 },
                 advanced: appInstanceInstall.advanced || {},
-                notes: appInstanceInstall.notes || `Provisioned by ${config.appName} integration`,
+                notes: appInstanceInstall.notes || `Provisioned by ${config.premiumAppIntegrationTypeId} integration`,
                 credentials: {}
             }
         };
-       
-        promisesArr.push(
-            integrationsApi.putIntegrationConfigCurrent(
-                appInstance.id, 
-                integrationConfig
-            )
-            .then((data) => {
-                logFunc('Configured instance: ' + appInstance.name);   
+
+        promisesArr.push((async () => { 
+            try {
+                await integrationsApi.putIntegrationConfigCurrent(appInstance.id, integrationConfig);
+                logFunc('Configured instance: ' + appInstance.name);
 
                 let opts = {
                     body: {
@@ -138,11 +146,13 @@ function configure(logFunc, installedData, userId){
                     }
                 };
 
-                return integrationsApi.patchIntegration(appInstance.id, opts)
-            })
-            .then((data) => logFunc('Enabled instance: ' + data.name))
-            .catch((err) => console.error(err))
-        );
+                let data = await integrationsApi.patchIntegration(appInstance.id, opts)
+                
+                logFunc('Enabled instance: ' + data.name);
+            } catch(e) {
+                console.error(e);
+            }
+        })());
     });
 
     return Promise.all(promisesArr);

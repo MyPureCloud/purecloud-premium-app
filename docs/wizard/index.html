@@ -1,98 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Premium App Wizard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Premium App Wizard</title>
 
-    <link href='//fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' async type='text/css'>
-    <link rel="stylesheet" href="./styles/style.css">
+  <link href='//fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' async type='text/css'>
+  <link rel="stylesheet" href="./styles/style.css">
+  <link rel="stylesheet" href="./styles/progress-bar.css">
 
-    <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
-    <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.3.0/purecloud-client-app-sdk.js"></script>
-    
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+  <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
+  <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.3.0/purecloud-client-app-sdk.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
 </head>
+
 <body>
-    <div id="background"></div>
-    <noscript>
-        For full functionality of this site it is necessary to enable JavaScript. Here are the <a href="http://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web browser</a>.
-    </noscript>
+  <div id="background"></div>
+  <noscript>
+    For full functionality of this site it is necessary to enable JavaScript. Here are the <a
+      href="http://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web
+      browser</a>.
+  </noscript>
 
-    <header>
-        <p>Premium App /&nbsp; Home</p>
-    </header>
+  <header>
+    <p id="content-header-text"><span class="txt-premium-app-name">Premium App</span> /&nbsp; <span
+        class="txt-premium-home">Home</span></p>
+    <div id="language-container">
+      <p><span>Language:</span><select id="language-select"></select></p>
+    </div>
+  </header>
 
-    <div class="content">
-        <div class="title">
-            <span class="txt-greeting">
-            Hi 
-            </span>
-            <span id="username"></span>!
-            <div class="txt-greeting-2">
-                welcome to the Premium App Example
-            </div>
+  <div class="content">
+    <!-- MAIN CONTENT -->
+    <main>
+      <div class="title">
+        <span class="txt-greeting">
+          Hi
+        </span>
+        <span id="username"></span>!
+        <div class="txt-greeting-2">
+          welcome to the Premium App Example
         </div>
-
-        <ul class="progress-bar">
-            <li class="active current">
-                <span class="txt-start">Start</span>
-            </li>
-            <li id="progress-custom-setup" class="">
-                <span class="txt-setup">Custom Setup</span>
-            </li>
-            <li class="">
-                <span class="txt-install">Install</span>
-            </li>
-            <li class="">
-                <span class="txt-summary">Summary</span>
-            </li>
+      </div>
+      <!-- NAVIGATION INDICATORS -->
+      <div class="steps-container">
+        <ul class="steps">
+          <li id="marker-step-1" class="step step--incomplete step--active">
+            <span class="step__icon"></span>
+            <span class="step__label">Start</span>
+          </li>
+          <li id="marker-step-2" class="step step--incomplete step--inactive">
+            <span class="step__icon"></span>
+            <span class="step__label">Setup</span>
+          </li>
+          <li id="marker-step-3" class="step step--incomplete step--inactive">
+            <span class="step__icon"></span>
+            <span class="step__label">Install</span>
+          </li>
+          <li id="marker-step-4" class="step step--incomplete step--inactive">
+            <span class="step__icon"></span>
+            <span class="step__label">Summary</span>
+          </li>
         </ul>
+      </div>
 
-        <main>
-            <div id="available">
-                <p class="success">
-                    <span class="txt-product-available">Product Available </span> <i class="fas fa-check-circle enlarge"></i>
-                </p>
-                <p class="reminders">
-                    <p class="txt-available-message">Reminders:</p>
-                    <ul class="reminder-list">
-                        <li>Remove the Unistall button in your application</li>
-                        <li>You may redirect to your application by updating the premiumAppURL in the /wizard/config/config.js file</li>
-                    </ul>
-                </p>
-                <button id="next" class="btn-info right">
-                    <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i></button>
-            </div>
-
-            <div id="unavailable" class="">
-                <p class="fail">
-                    <span class="txt-product-not-available">Product not avaiable.</span>  <i class="fas fa-times-circle enlarge"></i>
-                </p>
-                <p>
-                    <span class="txt-not-available-message">
-                    We're sorry but your Genesys Cloud org does not have the Premium App Sample Product enabled.
-                    Please contact the authorities.
-                    </span>
-                </p>
-            </div>
-        </main>
-    </div>
-    <footer>
-            <img src="./assets/img/logo.png" alt="Logo">
-    </footer>
-
-    <!-- MODAL-->
-    <div id="loading-modal">
-        <div class="overlay"></div>
-        <div class="modal">
-            <img class="logo" src='./assets/img/loading.svg' alt="" srcset="">
-            <div class="modal-message"></div>
+      <!-- ===========================   HOME PAGE   ======================================== -->
+      <div id="index-page">
+        <div id="available">
+          <p class="success">
+            <i class="fas fa-check-circle enlarge"></i>
+            <div class="txt-product-available">Product Available </div> 
+          </p>
+          <p class="reminders">
+            <p class="txt-available-message">Reminders:</p>
+            <ul class="reminder-list">
+              <li>Remove the Unistall button in your application</li>
+              <li>You may redirect to your application or to your web site by updating the redirectURLOnWizardCompleted
+                in
+                the /wizard/config/config.js file</li>
+            </ul>
+          </p>
+          <button class="btn-next" class="btn-info right">
+            <span class="txt-start">Start</span> <i class="button-icon fas fa-chevron-right"></i></button>
         </div>
+      </div>
+      <!-- ===========================   CUSTOM SETUP PAGE   ======================================== -->
+      <!-- This is where you can put custom fields or custom functionality for your wizard -->
+      <div id="custom-setup-page">
+        <p>
+          Put your custom provisioning here.
+          <br><br>
+          Update the ./docs/wizard/scripts/main.js to call your custom provisioning functions.
+        </p>
+
+        <!-- Don't remove buttons below -->
+        <button class="btn-prev">
+          <i class="button-icon fas fa-chevron-left"> </i> <span class="txt-back">Back</span>
+        </button>
+        <button class="btn-next"  class="btn-info right">
+          <span class="txt-next">Next</span> <i class="button-icon fas fa-chevron-right"></i>
+        </button>
+      </div>
+      <!-- =================----====  INSTALLATION DETAILS PAGE   =========================== -->
+      <div id="install-details-page">
+        <p>
+          <span class="txt-install-summary">These are the steps that will be automatically performed for
+            you!</span>
+        </p>
+
+        <div class="message-container">
+          <div id="messages" class="messages">
+            <div class="message">
+              <div class="message-title">
+                <span>1. </span><span class="txt-create-role">Create Role</span>
+                <hr>
+              </div>
+              <div class="message-content">
+                <div>
+                  <span class="txt-create-role-msg">
+                    Create a role specifically to provide access to the app.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="message">
+              <div class="message-title">
+                <span>2. </span><span class="txt-create-group">Create Groups</span>
+                <hr>
+              </div>
+              <div class="message-content">
+                <div>
+                  <span class="txt-create-group-msg">
+                    Groups will provide filtering to users' access to the app instances.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="message">
+              <div class="message-title">
+                <span>3. </span><span class="txt-create-app-instance">Create instances</span>
+              </div>
+              <hr>
+              <div class="message-content">
+                <div>
+                  <span class="txt-create-app-instance-msg">
+                    More instances of the app will be created with different URI endpoints to provide
+                    different features of the app.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="message">
+              <div class="message-title">
+                <span>4. </span><span class="txt-create-oauth-client">Create OAuth Client</span>
+              </div>
+              <hr>
+              <div class="message-content">
+                <div>
+                  <span class="txt-create-oauth-client-msg">
+                    An optional OAuth Client could be created for server-to-server communication. After
+                    creation, it should be followed by a method that will pass the OAuth Client information
+                    to the app's server.
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="sink-more">
+          <span class="txt-please-click">
+            Please click the button to start the installation.
+          </span>
+        </p>
+
+        <button class="btn-prev">
+          <i class="button-icon fas fa-chevron-left"></i> <span class="txt-back">Back</span>
+        </button>
+        <button id="btn-install">
+          <span class="txt-install">Install</span>
+        </button>
+      </div>
+      <!-- =======================  INSTALLATION FINISHED PAGE   ============================ -->
+      <div id="installation-finished-page">
+        <p class="success">
+          <div class="txt-finish-install">
+            Successfully installed
+          </div>
+          <div id="summary-container">
+            <!-- Dynamically filled. Don't add anything manually here -->
+          </div>
+          <div>
+            <p class="txt-finish-install-2">Raw data here: </p>
+            <textarea id="summary-raw-data" cols="70" rows="7"></textarea>
+          </div>
+          <button id="btn-goto-app"  class="btn-info">
+            <span class="txt-goto-app">Go To Application</span>
+          </button>
+        </p>
+      </div>
+      <!-- =============================  ERROR PAGE   ====================================== -->
+      <div id="error-page">
+        <div>
+          <!-- Don't add classes to #error-title and #error-message. They're being modified in code (view.js) -->
+          <!-- If you want to style them, enclose in container element or use id -->
+          <h3 class="error"><i class="fas fa-times-circle enlarge"></i> 
+            <span id="error-title">Unknown Error</span>
+          </h3>
+          <p id="error-message">Sorry but something went wrong, please contact your administrator.</p>
+          <div id="additional-error-content"> 
+            <!-- Filled dynamically in code (view.js). Don't manually add anything here --> 
+          </div>
+        </div>
+      </div>
+      <!-- ==========================  UNINSTALL PAGE   ===================================== -->
+      <div id="uninstall-page"></div>
+    </main>
+  </div>
+
+  <footer>
+    <img id="footer-logo" src="./assets/img/logo-footer.png" alt="Logo">
+  </footer>
+
+  <!-- MODAL-->
+  <div id="loading-modal">
+    <div class="overlay"></div>
+    <div class="modal">
+      <img id="loading-img" class="logo" src='./assets/img/loading.svg' alt="" srcset="">
+      <div class="modal-message"></div>
     </div>
-    
-    <script src="./scripts/main.js" type="module"></script>
+  </div>
+
+  <script src="./scripts/main.js" type="module"></script>
 </body>
+
 </html>

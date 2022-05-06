@@ -8,13 +8,35 @@ const authorizationApi = new platformClient.AuthorizationApi();
  * Get existing roles in Genesys Cloud based on prefix
  * @returns {Promise.<Array>} Genesys Cloud Roles
  */
-function getExisting(){
-    let authOpts = { 
-        'name': config.prefix + "*", // Wildcard to work like STARTS_WITH 
-        'userCount': false
-    };
+async function getExisting() {
+    let roles = []
 
-    return authorizationApi.getAuthorizationRoles(authOpts);
+    // Internal recursive function for calling 
+    // next pages (if any) of the integrations
+    let _getRoles = async (pageNum) => {
+        let data = await authorizationApi.getAuthorizationRoles({
+                        pageSize: 100,
+                        pageNumber: pageNum,
+                        name: config.prefix + "*",
+                        userCount: 'false'
+                    });
+
+        data.entities
+            .forEach(role =>
+                roles.push(role));
+
+        if (data.nextUri) {
+            return _getRoles(pageNum + 1);
+        }
+    }
+
+    try {
+        await _getRoles(1);
+    } catch(e) {
+        console.error(e)
+    }
+
+    return roles;
 }
 
 /**
@@ -22,21 +44,20 @@ function getExisting(){
  * @param {Function} logFunc logs any messages
  * @returns {Promise}
  */
-function remove(logFunc){
+async function remove(logFunc) {
     logFunc('Uninstalling Roles...');
 
-    return getExisting()
-    .then(roles => {
-        let del_role = [];
+    let instances = await getExisting();
 
-        if(roles.total > 0){
-            roles.entities.map(r => r.id).forEach(rid => {
-                del_role.push(authorizationApi.deleteAuthorizationRole(rid));
-            });
-        }
-        
-        return Promise.all(del_role);
-    });
+    let del_roles = [];
+
+    if (instances.length > 0) {
+        instances.forEach(entity => {
+            del_roles.push(authorizationApi.deleteAuthorizationRole(entity.id));
+        });
+    }
+
+    return Promise.all(del_roles);
 }
 
 /**
@@ -46,7 +67,7 @@ function remove(logFunc){
  * @returns {Promise.<Object>} were key is the unprefixed name and the values
  *                          is the Genesys Cloud object details of that type.
  */
-function create(logFunc, data){
+async function create(logFunc, data) {
     let rolePromises = [];
     let roleData = {}; // Object of "rolename": (Role Object)
 
@@ -60,19 +81,21 @@ function create(logFunc, data){
 
         // Assign role to user
         let roleId = null;
-        rolePromises.push(
-            authorizationApi.postAuthorizationRoles(roleBody)
-            .then((data) => {
+        rolePromises.push((async () => {
+            try {
+                let result = await authorizationApi.postAuthorizationRoles(roleBody);
                 logFunc('Created role: ' + role.name);
 
-                roleData[role.name] = data;
-            })
-            .catch((err) => console.log(err))
-        );
+                roleData[role.name] = result;
+            } catch(e) {
+                console.log(e)
+            }
+        })());
     });
 
-    return Promise.all(rolePromises)
-    .then(() => roleData);
+
+    await Promise.all(rolePromises);
+    return roleData;
 }
 
 /**
@@ -82,24 +105,22 @@ function create(logFunc, data){
  * @param {Object} installedData contains everything that was installed by the wizard
  * @param {String} userId User id if needed
  */
-function configure(logFunc, installedData, userId){
+async function configure(logFunc, installedData, userId) {
     // Assign the role to the user
     // Required before you can assign the role to an Auth Client.
     let promiseArr = [];
     let roleData = installedData.role;
 
     Object.keys(roleData).forEach((roleKey) => {
-        promiseArr.push(
-            authorizationApi.putAuthorizationRoleUsersAdd(
-                roleData[roleKey].id, 
-                [userId]
-            )
-            .then((data) => {
-                logFunc('Assigned ' + roleData[roleKey].name + ' to user');
-            })
-        );
+        promiseArr.push((async () => {
+            await authorizationApi.putAuthorizationRoleUsersAdd(
+                    roleData[roleKey].id,
+                    [userId]
+                );
+            logFunc('Assigned ' + roleData[roleKey].name + ' to user');
+        })());
     });
-    
+
     return Promise.all(promiseArr);
 }
 
