@@ -48,6 +48,17 @@ async function configure(logFunc, installedData, user, gcClient) {
                 body: JSON.stringify(provisionBody)
             }));
 
+            // Receiving the HTTP POST, the backend can:
+            // 1) The backend can verify that the request is coming from a legitimate customer
+            //   (i.e. customer has a Genesys Cloud environment and has purchased the Premium Application)
+            //   - Retrieve apiEnvironment (Genesys Cloud region: mypurecloud.com, mypurecloud.ie, ...), oauthClientId and oauthClientSecret (the wizard must create an OAuth client with Client Credentials grant first - config.provisioningInfo)
+            //   - The backend validates the region is valid and attempts to connect to the Genesys Cloud environment (using provided oauthClientId and oauthClientSecret)
+            //   - The backend can then verify that the Premium Application product (e.g. examplePremiumApp) has been purchased with [GET /api/v2/authorization/products](https://developer.genesys.cloud/devapps/api-explorer#get-api-v2-authorization-products)
+            //     or can verify the Premium Application Integration Type (e.g. premium-app-example) with [GET /api/v2/integrations/types/{typeId}](https://developer.genesys.cloud/devapps/api-explorer#get-api-v2-integrations-types--typeId-)
+            // 2) If granted access, the backend can create/modify/update 3rd party resources for this customer
+            // 3) If necessary, the backend can perform updates in the customer's Genesys Cloud environment using the Platform API
+            // 4) The backend returns the final status in case of Success or in case of Error
+
             if (backendResult.status === 200) {
                 resolve({ status: true, cause: 'SUCCESS' });
             } else {

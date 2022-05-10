@@ -146,7 +146,9 @@ export default {
         'ws-data-actions': ['integrations:integration:view', 'integrations:integration:add', 'integrations:integration:edit', 'integrations:action:add', 'integrations:action:edit'],
         'gc-data-actions': ['integrations:integration:view', 'integrations:integration:add', 'integrations:integration:edit', 'integrations:action:add', 'integrations:action:edit'],
         'data-table': ['architect:datatable:view', 'architect:datatable:add'],
-        'byoc-cloud-trunk': ['telephony:plugin:all']
+        'byoc-cloud-trunk': ['telephony:plugin:all'],
+        'audiohook': ['integrations:integration:view', 'integrations:integration:add', 'integrations:integration:edit'],
+        'event-bridge': ['integrations:integration:view', 'integrations:integration:add', 'integrations:integration:edit']
     },
     uninstallPermissions: {
         'custom': [],
@@ -163,7 +165,9 @@ export default {
         'ws-data-actions': ['integrations:integration:delete'],
         'gc-data-actions': ['integrations:integration:delete'],
         'data-table': ['architect:datatable:delete'],
-        'byoc-cloud-trunk': ['telephony:plugin:all']
+        'byoc-cloud-trunk': ['telephony:plugin:all'],
+        'audiohook': ['integrations:integration:delete'],
+        'event-bridge': ['integrations:integration:delete']
     },
 
     // These are the necessary scopes that the Vendor Wizard's OAuth Client (defined in Vendor's org) must have to allow the wizard to install or uninstall
@@ -183,7 +187,9 @@ export default {
         'ws-data-actions': ['integrations'],
         'gc-data-actions': ['integrations'],
         'data-table': ['architect'],
-        'byoc-cloud-trunk': ['telephony', 'organization:readonly']
+        'byoc-cloud-trunk': ['telephony', 'organization:readonly'],
+        'audiohook': ['integrations'],
+        'event-bridge': ['integrations']
     },
     uninstallScopes: {
         'custom': [],
@@ -200,6 +206,8 @@ export default {
         'ws-data-actions': ['integrations'],
         'gc-data-actions': ['integrations'],
         'data-table': ['architect'],
-        'byoc-cloud-trunk': ['telephony']
+        'byoc-cloud-trunk': ['telephony'],
+        'audiohook': ['integrations'],
+        'event-bridge': ['integrations']
     },
 }

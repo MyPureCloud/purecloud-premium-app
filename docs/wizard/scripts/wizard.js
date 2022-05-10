@@ -14,6 +14,8 @@ import gcDataActionsModule from './modules/gc-data-actions.js';
 import widgetDeploymentModule from './modules/widget-deployment.js';
 import openMessagingModule from './modules/open-messaging.js';
 import byocCloudTrunkModule from './modules/byoc-cloud-trunk.js';
+import audiohookModule from './modules/audiohook.js';
+import eventBridgeModule from './modules/event-bridge.js';
 // Module Post Custom Setup
 import postCustomSetup from './modules/post-custom-setup.js';
 
@@ -32,7 +34,9 @@ let modules = [
     gcDataActionsModule,
     widgetDeploymentModule,
     openMessagingModule,
-    byocCloudTrunkModule
+    byocCloudTrunkModule,
+    audiohookModule,
+    eventBridgeModule
 ];
 
 const jobOrder = config.provisioningInfo;

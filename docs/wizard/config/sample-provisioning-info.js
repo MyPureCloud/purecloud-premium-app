@@ -289,5 +289,27 @@ let sample = {
                 'trunk_rlt_enabled': false
             }
         }
+    ],
+    'audiohook': [
+        {
+            'name': 'Audiohook',
+            'autoEnable': true,
+            'channel': 'both',
+            'connectionUri': 'wss://mywebsocketserver.test.test',
+            'credentials': {
+                'apiKey': 'TEST API KEY value',
+                'clientSecret': '5678'
+            }
+        }
+    ],
+    'event-bridge': [
+        {
+            'name': 'AWS EventBridge',
+            'autoEnable': true,
+            'awsAccountId': '123123456456',
+            'awsAccountRegion': 'us-east-1',
+            'eventSourceSuffix': 'gc-',
+            'eventFilter': ['v2.analytics.flow.{id}.aggregates', 'v2.analytics.users.{id}.aggregates', 'v2.architect.dependencytracking.build']
+        }
     ]
 }
