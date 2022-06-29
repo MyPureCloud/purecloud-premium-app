@@ -9,7 +9,7 @@ export default {
     // redirectURLOnWizardCompleted: 'http://localhost:8080/premium-app-sample/index.html',
     redirectURLOnWizardCompleted: 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html',
     redirectURLWithParams: true,
-    
+
     // Genesys Cloud assigned name for the premium app
     // This should match the integration type name of the Premium App
     // NOTE: During initial development please use ‘premium-app-example’.
@@ -72,6 +72,8 @@ export default {
     prefix: 'PREMIUM_EXAMPLE_',
 
     // These are the Genesys Cloud items that will be added and provisioned by the wizard
+    // To see the sample configuration of all possible objects please consult
+    // ./sample-provisioning-info.js on the same folder
     provisioningInfo: {
         'role': [
             {
