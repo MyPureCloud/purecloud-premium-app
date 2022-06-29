@@ -81,7 +81,7 @@ const Validator = {
    */
   notEqual(value1, value2, value1Name, additionalComment) {
     // value1 should not be null or undefined
-    if(!value1){
+    if(value1 === null || value1 === undefined){
       return [false, `${value1Name} does not exist`]
     }
 
@@ -169,17 +169,17 @@ let config = null; // Config object of the config file
  */
 function printMessages(){
   console.log(chalk.blue(' --------- PASSED ----------'));  
-  if(passedMessages.length <= 0) console.log('none'.grey);
+  if(!passedMessages || passedMessages.length <= 0) console.log(chalk.grey('none'));
   passedMessages.forEach((m, i) => console.log(chalk.green(`${i + 1}. ${m}`)));
   console.log();
 
   console.log(chalk.blue(' --------- WARNING ----------'));  
-  if(warningMessages.length <= 0) console.log('none'.grey);
+  if(!warningMessages || warningMessages.length <= 0) console.log(chalk.grey('none'));
   warningMessages.forEach((m, i) => console.log(chalk.yellow(`${i + 1}. ${m}`)));
   console.log();
 
   console.log(chalk.blue(' --------- CRITICAL ----------'));
-  if(criticalMessages.length <= 0) console.log('none'.grey);
+  if(!criticalMessages || criticalMessages.length <= 0) console.log(chalk.grey('none'));
   criticalMessages.forEach((m, i) => console.log(chalk.redBright(`${i + 1}. ${m}`)));
   console.log();
 
@@ -239,9 +239,9 @@ async function getConfigObject(){
 }
 
 /**
- * Evaluate the config.json
+ * Validate the config.json
  */
-async function evaluateConfig(){
+async function validateConfig(){
   if(!config) throw new Error('Error on getting the config file.');
 
   // =================== WARNING LEVEL ===============
@@ -305,14 +305,14 @@ async function evaluateConfig(){
     Validator.propertyExists(config, 'uninstallPermissions', 'config', 'uninstallPermissions should exist'),
     Validator.propertyExists(config, 'installScopes', 'config', 'installScopes should exist'),
     Validator.propertyExists(config, 'uninstallScopes', 'config', 'uninstallScopes should exist'),
-
+    Validator.notEqual(config.enableUninstall, true, 'config.enableUninstall', 'Uninstall should be disabled for production'),
   ])
 }
 
 /**
  * Check if language files exist for the available languages in config
  */
-async function evaluateLanguageFiles(){
+async function validateLanguageFiles(){
   const toBeEvaluated = [];
 
   Object.keys(config.availableLanguageAssets).forEach(langKey => {
@@ -341,7 +341,7 @@ async function evaluateLanguageFiles(){
  * In that case, we'll assume that because they're using a different default language, that the text would 
  * already be their own.
  */
-async function evaluateWizardText(){
+async function validateWizardText(){
   let langFileObject = null;
 
   // If en-us.json does not exist, skip
@@ -370,7 +370,7 @@ async function evaluateWizardText(){
  * Evaluate images if they've been changed
  * Uses md5 checksum to check if the same as default image
  */
-async function evaluateImages(){
+async function validateImages(){
   let htmlString = null;
   let htmlValue = null; // Parsed HTML
   let forEvaluation = [];
@@ -414,7 +414,7 @@ async function evaluateImages(){
 /**
  * Evaluate CSS values
  */
-async function evaluateStyles(){
+async function validateStyles(){
   let forEvaluation = [];
   let cssString = null;
   let cssValue = null;
@@ -472,11 +472,11 @@ async function evaluateStyles(){
 async function validateAll(){
   config = await getConfigObject();
   
-  const validations = [evaluateConfig(), 
-    // evaluateLanguageFiles(), 
-    // evaluateWizardText(),
-    evaluateImages(),
-    evaluateStyles()
+  const validations = [validateConfig(), 
+    // validateLanguageFiles(), 
+    // validateWizardText(),
+    validateImages(),
+    validateStyles()
   ]
 
   await Promise.all(validations)
@@ -498,5 +498,4 @@ validateAll();
  * TODO: verify that div ids for 'pages' exist in index.html
  * TODO: Make sure wizarduribase hase / at the end of it
  * TODO: if post custom setup is enabled make sure translation keys exist.
- * TODO: Make sure uninstall is disabled in config.js
- */
+*/

@@ -38,7 +38,31 @@ let sample = {
             'type': 'widget',
             'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
             'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
-            'groups': ['Agents', 'Supervisors']
+            'groups': ['Agents', 'Supervisors'],
+            'advanced': { 
+                // All Advanced Properties are optional
+
+                // To learn more about lifecycle hooks, refer to:
+                // https://developer.genesys.cloud/platform/integrations/client-apps/sdk/lifecycleapi
+                'lifecycle': { },
+            
+                // Icons for the App.
+                // Read More: https://developer.genesys.cloud/platform/integrations/client-apps/#application-icons
+                'icon': {
+                    'vector': '',
+                    '24x24': '',
+                    '36x36': '',
+                    '48x48': '',
+                    '72x72': ''
+                },
+                'monochromicIcon': {
+                    'vector': '',
+                    '24x24': '',
+                    '36x36': '',
+                    '48x48': '',
+                    '72x72': ''
+                }
+            }
         },
         {
             'name': 'Supervisor Widget',
@@ -56,7 +80,31 @@ let sample = {
             'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
             'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
             'groups': ['Agents'],
-            'communicationTypeFilter': 'chat, call, email'
+            'communicationTypeFilter': 'chat, call, email',
+            'advanced': { 
+                // All Advanced Properties are optional
+
+                // To learn more about lifecycle hooks, refer to:
+                // https://developer.genesys.cloud/platform/integrations/client-apps/sdk/lifecycleapi
+                'lifecycle': { },
+            
+                // Icons for the App.
+                // Read More: https://developer.genesys.cloud/platform/integrations/client-apps/#application-icons
+                'icon': {
+                    'vector': '',
+                    '24x24': '',
+                    '36x36': '',
+                    '48x48': '',
+                    '72x72': ''
+                },
+                'monochromicIcon': {
+                    'vector': '',
+                    '24x24': '',
+                    '36x36': '',
+                    '48x48': '',
+                    '72x72': ''
+                }
+            }
         }
     ],
     'interaction-widget': [
@@ -66,7 +114,31 @@ let sample = {
             'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
             'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
             'groups': ['Agents'],
-            'communicationTypeFilter': 'chat, call, email'
+            'communicationTypeFilter': 'chat, call, email',
+            'advanced': { 
+                // All Advanced Properties are optional
+
+                // To learn more about lifecycle hooks, refer to:
+                // https://developer.genesys.cloud/platform/integrations/client-apps/sdk/lifecycleapi
+                'lifecycle': { },
+            
+                // Icons for the Widget.
+                // Read More: https://developer.genesys.cloud/platform/integrations/client-apps/#application-icons
+                'icon': {
+                    'vector': '',
+                    '24x24': '',
+                    '36x36': '',
+                    '48x48': '',
+                    '72x72': ''
+                },
+                'monochromicIcon': {
+                    'vector': '',
+                    '24x24': '',
+                    '36x36': '',
+                    '48x48': '',
+                    '72x72': ''
+                }
+            }
         }
     ],
     'widget-deployment': [

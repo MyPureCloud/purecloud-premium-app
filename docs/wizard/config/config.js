@@ -9,7 +9,7 @@ export default {
     // redirectURLOnWizardCompleted: 'http://localhost:8080/premium-app-sample/index.html',
     redirectURLOnWizardCompleted: 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html',
     redirectURLWithParams: true,
-
+    
     // Genesys Cloud assigned name for the premium app
     // This should match the integration type name of the Premium App
     // NOTE: During initial development please use ‘premium-app-example’.
@@ -107,24 +107,11 @@ export default {
                 'description': 'Generated Client that\'s passed to the App Backend',
                 'roles': ['Role'],
                 'authorizedGrantType': 'CLIENT_CREDENTIALS',
-
-                /**
-                 * This function is for other processing that needs
-                 * to be done after creating an object.
-                 * 'finally' is available for all the other
-                 * resources configured in this config file.
-                 * NOTE: Finally functions must return a Promise.
-                 * For Client Credentials, normally it means
-                 * passing the details to the backend.
-                 * @param {Object} installedData the Genesys Cloud resource created
-                 * @returns {Promise}    
+                /** NOTE: 
+                 * If you want to learn how you can send the created credentials back to your system,
+                 * Please read about the Post Custom Setup module here:
+                 * https://developer.genesys.cloud/appfoundry/premium-app-wizard/7-custom-setup#post-custom-setup-module
                  */
-                'finally': function (installedData) {
-                    return new Promise((resolve, reject) => {
-                        console.log('Fake Sending Credentials...');
-                        setTimeout(() => resolve(), 2000);
-                    });
-                }
             }
         ]
     },
