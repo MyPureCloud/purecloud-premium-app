@@ -486,6 +486,8 @@ async function onInstallationSummaryEnter() {
       // Special treatment for OAuth Client and Widget Deployment
       if (category === 'oauth-client') {
         childElemsString += `
+          <span><b>Grant Type: </b>${obj.authorizedGrantType}</span>
+          <br/>
           <span><b>Client ID: </b>${obj.id}</span>
           <br/>
           <span><b>Client Secret: </b>${obj.secret}</span>
