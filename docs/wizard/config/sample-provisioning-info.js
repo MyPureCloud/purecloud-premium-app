@@ -39,13 +39,13 @@ let sample = {
             'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
             'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
             'groups': ['Agents', 'Supervisors'],
-            'advanced': { 
+            'advanced': {
                 // All Advanced Properties are optional
 
                 // To learn more about lifecycle hooks, refer to:
                 // https://developer.genesys.cloud/platform/integrations/client-apps/sdk/lifecycleapi
-                'lifecycle': { },
-            
+                'lifecycle': {},
+
                 // Icons for the App.
                 // Read More: https://developer.genesys.cloud/platform/integrations/client-apps/#application-icons
                 'icon': {
@@ -81,13 +81,13 @@ let sample = {
             'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
             'groups': ['Agents'],
             'communicationTypeFilter': 'chat, call, email',
-            'advanced': { 
+            'advanced': {
                 // All Advanced Properties are optional
 
                 // To learn more about lifecycle hooks, refer to:
                 // https://developer.genesys.cloud/platform/integrations/client-apps/sdk/lifecycleapi
-                'lifecycle': { },
-            
+                'lifecycle': {},
+
                 // Icons for the App.
                 // Read More: https://developer.genesys.cloud/platform/integrations/client-apps/#application-icons
                 'icon': {
@@ -115,13 +115,13 @@ let sample = {
             'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
             'groups': ['Agents'],
             'communicationTypeFilter': 'chat, call, email',
-            'advanced': { 
+            'advanced': {
                 // All Advanced Properties are optional
 
                 // To learn more about lifecycle hooks, refer to:
                 // https://developer.genesys.cloud/platform/integrations/client-apps/sdk/lifecycleapi
-                'lifecycle': { },
-            
+                'lifecycle': {},
+
                 // Icons for the Widget.
                 // Read More: https://developer.genesys.cloud/platform/integrations/client-apps/#application-icons
                 'icon': {
@@ -310,12 +310,29 @@ let sample = {
             'description': 'Generated Client that\'s passed to the App Backend',
             'roles': ['Admin'],
             'authorizedGrantType': 'CLIENT_CREDENTIALS',
+            'accessTokenValiditySeconds': 86400,
             'finally': function (installedData) {
                 return new Promise((resolve, reject) => {
                     console.log('Fake Sending Credentials...');
                     setTimeout(() => resolve(), 2000);
                 });
             }
+        },
+        {
+            'name': 'OAuth Implicit Client',
+            'description': 'Generated Client that\'s used by the App FrontEnd',
+            'registeredRedirectUri': ['https://replace_this_url/some_path/index.html'],
+            'scope': ['user-basic-info', 'analytics', 'search:readonly'],
+            'authorizedGrantType': 'TOKEN',
+            'accessTokenValiditySeconds': 86400
+        },
+        {
+            'name': 'OAuth AuthCode Client',
+            'description': 'Generated Client that\'s used by the App FrontEnd and the App Backend',
+            'registeredRedirectUri': ['https://replace_this_url/some_path/index.html'],
+            'scope': ['user-basic-info', 'analytics', 'search:readonly'],
+            'authorizedGrantType': 'CODE',
+            'accessTokenValiditySeconds': 86400
         }
     ],
     'byoc-cloud-trunk': [

@@ -28,19 +28,19 @@ async function remove(logFunc) {
     if (instances.length > 0) {
         instances.forEach(entity => {
             del_clients.push((async () => {
-                try{
+                try {
                     entity.state = 'inactive';
                     let result = await oAuthApi.putOauthClient(entity.id, entity);
                     await oAuthApi.deleteOauthClient(entity.id);
                     logFunc('Deleted ' + entity.name + ' auth client');
-                } catch(e) {
+                } catch (e) {
                     console.log(e);
                 }
             })());
         });
     }
 
-    return Promise.all(del_clients);    
+    return Promise.all(del_clients);
 }
 
 /**
@@ -56,8 +56,8 @@ async function create(logFunc, data) {
     // Assign employee role to the oauth client because required
     // to have a role id on creation
     let rolesResult = await authorizationApi.getAuthorizationRoles({
-                                name: 'employee'
-                            });
+        name: 'employee'
+    });
     let employeeRole = rolesResult.entities[0];
     let authPromises = [];
 
@@ -66,16 +66,26 @@ async function create(logFunc, data) {
             name: config.prefix + oauth.name,
             description: oauth.description,
             authorizedGrantType: oauth.authorizedGrantType,
-            roleIds: [employeeRole.id]
+            accessTokenValiditySeconds: oauth.accessTokenValiditySeconds || 86400
         };
 
+        if (oauth.authorizedGrantType === 'CLIENT_CREDENTIALS') {
+            oauthClient.roleIds = [employeeRole.id];
+        } else {
+            oauthClient.registeredRedirectUri = oauth.registeredRedirectUri || ['https://replace_this_url/some_path/index.html'];
+            oauthClient.scope = oauth.scope || ['user-basic-info'];
+            if (!oauthClient.scope.includes('user-basic-info')) {
+                oauthClient.scope.push('user-basic-info');
+            }
+        }
+
         authPromises.push((async () => {
-            try{
+            try {
                 let result = await oAuthApi.postOauthClients(oauthClient);
                 authData[oauth.name] = result;
 
                 logFunc('Created ' + result.name + ' auth client');
-            } catch(e) {
+            } catch (e) {
                 console.log(e);
             }
         })());
@@ -97,56 +107,58 @@ async function configure(logFunc, installedData, userId) {
     let oauthData = installedData['oauth-client'];
 
     Object.keys(oauthData).forEach((oauthKey) => {
-        let promise = new Promise((resolve, reject) => {
-            let oauth = oauthData[oauthKey];
-            let oauthInstall = config.provisioningInfo['oauth-client']
-                .find((info) => info.name == oauthKey);
+        let oauth = oauthData[oauthKey];
+        if (oauth.authorizedGrantType === 'CLIENT_CREDENTIALS') {
+            let promise = new Promise((resolve, reject) => {
+                let oauthInstall = config.provisioningInfo['oauth-client']
+                    .find((info) => info.name == oauthKey);
 
-            let timer = setInterval(() => {
-                usersApi.getUsersMe({
-                    expand: ['authorization']
-                })
-                    .then((result) => {
-                        console.log(result);
-                        let userRoleIds = result.authorization.roles.map(u => u.id);
-                        let userAssigned = true;
+                let timer = setInterval(() => {
+                    usersApi.getUsersMe({
+                        expand: ['authorization']
+                    })
+                        .then((result) => {
+                            console.log(result);
+                            let userRoleIds = result.authorization.roles.map(u => u.id);
+                            let userAssigned = true;
 
-                        // Check if all roles for these client is already assigned
-                        // to the user
-                        oauthInstall.roles.forEach((r) => {
-                            if (!userRoleIds.includes(installedData.role[r].id)) {
-                                userAssigned = false;
+                            // Check if all roles for these client is already assigned
+                            // to the user
+                            oauthInstall.roles.forEach((r) => {
+                                if (!userRoleIds.includes(installedData.role[r].id)) {
+                                    userAssigned = false;
+                                }
+                            });
+
+                            if (userAssigned) {
+                                clearInterval(timer);
+
+                                oAuthApi.putOauthClient(
+                                    oauthData[oauthKey].id,
+                                    {
+                                        name: oauth.name,
+                                        authorizedGrantType: oauth.authorizedGrantType,
+                                        roleIds: oauthInstall.roles.map(
+                                            (roleName) => installedData.role[roleName].id)
+                                            .filter(g => g != undefined)
+                                    }
+                                )
+                                    .then(() => {
+                                        resolve();
+                                    })
+                                    .catch((e) => reject(e));
                             }
-                        });
-
-                        if (userAssigned) {
+                        })
+                        .catch(e => {
                             clearInterval(timer);
 
-                            oAuthApi.putOauthClient(
-                                oauthData[oauthKey].id,
-                                {
-                                    name: oauth.name,
-                                    authorizedGrantType: oauth.authorizedGrantType,
-                                    roleIds: oauthInstall.roles.map(
-                                        (roleName) => installedData.role[roleName].id)
-                                        .filter(g => g != undefined)
-                                }
-                            )
-                                .then(() => {
-                                    resolve();
-                                })
-                                .catch((e) => reject(e));
-                        }
-                    })
-                    .catch(e => {
-                        clearInterval(timer);
+                            console.error(e);
+                        });
+                }, 3000);
+            });
 
-                        console.error(e);
-                    });
-            }, 3000);
-        });
-
-        promiseArr.push(promise);
+            promiseArr.push(promise);
+        }
     });
 
     return Promise.all(promiseArr);
