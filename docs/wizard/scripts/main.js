@@ -60,15 +60,40 @@ async function authenticateGenesysCloud(appParams) {
  */
 async function validateProductAvailability() {
   let productAvailable = false;
-  try {
-    await integrationsApi.getIntegrationsType(premiumAppIntegrationTypeId);
-    console.log('PRODUCT AVAILABLE');
-    return true;
-  } catch (e) {
-    console.log('PRODUCT UNAVAILABLE')
+
+  // Internal recursive function for calling 
+  // next pages (if any) of the integration types
+  let _getIntegrationsTypes = async (pageNum) => {
+    let data = await integrationsApi.getIntegrationsTypes({
+      pageSize: 100,
+      pageNumber: pageNum
+    });
+
+    let productIntegrationType = data.entities.find(instance => instance.id == premiumAppIntegrationTypeId);
+
+    if (productIntegrationType) {
+      console.log('PRODUCT AVAILABLE');
+      return true;
+    }
+
+    if (data.nextUri) {
+      return _getIntegrationsTypes(pageNum + 1);
+    } else {
+      console.log('PRODUCT UNAVAILABLE');
+      return false;
+    }
   }
+
+  try {
+    productAvailable = await _getIntegrationsTypes(1);
+  } catch (e) {
+    console.error(e);
+    console.log('PRODUCT UNAVAILABLE');
+  }
+
   return productAvailable;
 }
+
 
 /**
  * Checks if the Genesys Cloud org has the BYOC Cloud Add-On enabled
