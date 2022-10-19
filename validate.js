@@ -15,9 +15,9 @@ const css = require('css');
 const md5 = require('md5');
 
 // File paths
-const configFilePath = path.join(__dirname, 'docs/wizard/config/config.js')
-const languageDirPath = path.join(__dirname, 'docs/wizard/assets/languages')
-const wizardPath = path.join(__dirname, 'docs/wizard')
+const configFilePath = path.join(__dirname, 'wizard/config/config.js')
+const languageDirPath = path.join(__dirname, 'wizard/assets/languages')
+const wizardPath = path.join(__dirname, 'wizard')
 
 // Default config constants to check
 const defaultClientId = 'fd2ba742-446f-46c5-bbbc-1cad2f34ac3a';

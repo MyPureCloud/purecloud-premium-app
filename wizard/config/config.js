@@ -1,13 +1,13 @@
 export default {
-    clientID: 'fd2ba742-446f-46c5-bbbc-1cad2f34ac3a',
+    clientID: 'f7c203a1-0825-498a-b41a-1a1b1259d4c9',
 
-    // wizardUriBase: 'http://localhost:8080/wizard/',
-    wizardUriBase: 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
+    wizardUriBase: 'http://localhost:8080/wizard/',
+    // wizardUriBase: 'https://mypurecloud.github.io/purecloud-premium-app/wizard/',
 
     // The actual URL of the landing page of your web app or your web site (when wizard has been run).
     // previously - defined as premiumAppURL
     // redirectURLOnWizardCompleted: 'http://localhost:8080/premium-app-sample/index.html',
-    redirectURLOnWizardCompleted: 'https://mypurecloud.github.io/purecloud-premium-app/premium-app-sample/index.html',
+    redirectURLOnWizardCompleted: 'https://app.salesloft.com',
     redirectURLWithParams: true,
 
     // Genesys Cloud assigned name for the premium app
@@ -87,20 +87,6 @@ export default {
                         'allowConditions': false
                     }
                 ]
-            }
-        ],
-        'group': [
-            {
-                'name': 'Supervisors',
-                'description': 'Supervisors have the ability to watch a queue for ACD conversations.',
-            }
-        ],
-        'app-instance': [
-            {
-                'name': 'Partner Enablement Tools',
-                'url': 'https://genesysappfoundry.github.io/partner-enablement-tools/index.html?language={{pcLangTag}}&environment={{pcEnvironment}}',
-                'type': 'standalone',
-                'groups': ['Supervisors']
             }
         ],
         'oauth-client': [
