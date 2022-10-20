@@ -1,12 +1,21 @@
-import config from '../config/config.js';
-import view from './view.js';
-import wizard from './wizard.js';
-import { PAGES } from './enums.js'
-import { setPageLanguage, localizePage, getSelectedLanguage, getTranslatedText } from './language-manager.js';
-import { getResourcePath, beautifyModuleKey, getQueryParameters } from './utils.js'
+import config from "../config/config.js";
+import view from "./view.js";
+import wizard from "./wizard.js";
+import { PAGES } from "./enums.js";
+import {
+  setPageLanguage,
+  localizePage,
+  getSelectedLanguage,
+  getTranslatedText,
+} from "./language-manager.js";
+import {
+  getResourcePath,
+  beautifyModuleKey,
+  getQueryParameters,
+} from "./utils.js";
 
 // Genesys Cloud
-const platformClient = require('platformClient');
+const platformClient = require("platformClient");
 const client = platformClient.ApiClient.instance;
 const usersApi = new platformClient.UsersApi();
 const integrationsApi = new platformClient.IntegrationsApi();
@@ -19,7 +28,7 @@ const startPage = PAGES.INDEX_PAGE;
 // Variables
 let pcLanguage; // Initial language from query parameter | config.
 let pcEnvironment;
-let state; // State from implicit grant 
+let state; // State from implicit grant
 let currentPage = null;
 let userMe = null;
 
@@ -61,39 +70,40 @@ async function authenticateGenesysCloud(appParams) {
 async function validateProductAvailability() {
   let productAvailable = false;
 
-  // Internal recursive function for calling 
+  // Internal recursive function for calling
   // next pages (if any) of the integration types
   let _getIntegrationsTypes = async (pageNum) => {
     let data = await integrationsApi.getIntegrationsTypes({
       pageSize: 100,
-      pageNumber: pageNum
+      pageNumber: pageNum,
     });
 
-    let productIntegrationType = data.entities.find(instance => instance.id == premiumAppIntegrationTypeId);
+    let productIntegrationType = data.entities.find(
+      (instance) => instance.id == premiumAppIntegrationTypeId
+    );
 
     if (productIntegrationType) {
-      console.log('PRODUCT AVAILABLE');
+      console.log("PRODUCT AVAILABLE");
       return true;
     }
 
     if (data.nextUri) {
       return _getIntegrationsTypes(pageNum + 1);
     } else {
-      console.log('PRODUCT UNAVAILABLE');
+      console.log("PRODUCT UNAVAILABLE");
       return false;
     }
-  }
+  };
 
   try {
     productAvailable = await _getIntegrationsTypes(1);
   } catch (e) {
     console.error(e);
-    console.log('PRODUCT UNAVAILABLE');
+    console.log("PRODUCT UNAVAILABLE");
   }
 
   return productAvailable;
 }
-
 
 /**
  * Checks if the Genesys Cloud org has the BYOC Cloud Add-On enabled
@@ -105,21 +115,21 @@ async function validateBYOCAvailability() {
     let products = await authorizationApi.getAuthorizationProducts();
     // Check if "byoc" is listed - return true or false
     for (let product of products.entities) {
-      if (product.id === 'byoc') {
+      if (product.id === "byoc") {
         byocAvailable = true;
-        console.log('BYOC AVAILABLE')
+        console.log("BYOC AVAILABLE");
         break;
       }
     }
   } catch (e) {
-    console.log('BYOC UNAVAILABLE')
+    console.log("BYOC UNAVAILABLE");
   }
   return byocAvailable;
 }
 
 /**
  * Navigate to a new page
-* @param {Enum.PAGES} targetPage the target page
+ * @param {Enum.PAGES} targetPage the target page
  */
 async function switchPage(targetPage) {
   currentPage = targetPage;
@@ -140,9 +150,11 @@ async function switchPage(targetPage) {
       await onInstallationSummaryEnter();
       break;
     case PAGES.UNINSTALL:
-      alert('The uninstall button is for development purposes only. Remove this button before demo.');
+      alert(
+        "The uninstall button is for development purposes only. Remove this button before demo."
+      );
 
-      view.showLoadingModal('Uninstalling...');
+      view.showLoadingModal("Uninstalling...");
 
       await wizard.uninstall();
       await new Promise((resolve, reject) => {
@@ -157,7 +169,7 @@ async function switchPage(targetPage) {
     case PAGES.ERROR:
       break;
     default:
-      throw new Error('Unknown page');
+      throw new Error("Unknown page");
   }
   console.log(`Loaded page: ${currentPage}`);
 }
@@ -166,14 +178,14 @@ async function switchPage(targetPage) {
  * Assign navigation functionality for buttons
  */
 function setEventListeners() {
-  const nextButtons = Array.from(document.getElementsByClassName('btn-next'));
-  const prevButtons = Array.from(document.getElementsByClassName('btn-prev'));
-  const installButton = document.getElementById('btn-install');
-  const goToAppButton = document.getElementById('btn-goto-app');
+  const nextButtons = Array.from(document.getElementsByClassName("btn-next"));
+  const prevButtons = Array.from(document.getElementsByClassName("btn-prev"));
+  const installButton = document.getElementById("btn-install");
+  const goToAppButton = document.getElementById("btn-goto-app");
 
   // Buttons
-  nextButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
+  nextButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
       switch (currentPage) {
         case PAGES.INDEX_PAGE:
           if (config.enableCustomSetupPageBeforeInstall) {
@@ -186,11 +198,11 @@ function setEventListeners() {
           switchPage(PAGES.INSTALL_DETAILS);
           break;
       }
-    })
+    });
   });
 
-  prevButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
+  prevButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
       switch (currentPage) {
         case PAGES.CUSTOM_SETUP:
           switchPage(PAGES.INDEX_PAGE);
@@ -203,19 +215,19 @@ function setEventListeners() {
           }
           break;
       }
-    })
+    });
   });
 
   if (installButton) {
-    installButton.addEventListener('click', () => {
+    installButton.addEventListener("click", () => {
       install();
-    })
+    });
   }
 
   if (goToAppButton) {
-    goToAppButton.addEventListener('click', () => {
+    goToAppButton.addEventListener("click", () => {
       goToPremiumApp();
-    })
+    });
   }
 
   // Progreess bar animation
@@ -246,26 +258,26 @@ function getMissingInstallPermissions() {
   const permissionType = config.checkInstallPermissions;
   let missingPermissions = [];
 
-  if (permissionType === 'premium') {
+  if (permissionType === "premium") {
     if (!userPermissions.includes(config.premiumAppViewPermission)) {
       missingPermissions.push(config.premiumAppViewPermission);
     }
-  } else if (permissionType === 'wizard' || permissionType === 'all') {
+  } else if (permissionType === "wizard" || permissionType === "all") {
     let permissionsToCheck = [];
 
-    if (permissionType === 'all') {
+    if (permissionType === "all") {
       permissionsToCheck.push(config.premiumAppViewPermission);
     }
 
     let modulesToCheck = Object.keys(config.provisioningInfo);
-    modulesToCheck.push('custom');
-    modulesToCheck.push('wizard');
+    modulesToCheck.push("custom");
+    modulesToCheck.push("wizard");
     if (config.enableCustomSetupStepAfterInstall === true) {
-      modulesToCheck.push('postCustomSetup');
+      modulesToCheck.push("postCustomSetup");
     }
 
-    modulesToCheck.forEach(modKey => {
-      config.installPermissions[modKey].forEach(item => {
+    modulesToCheck.forEach((modKey) => {
+      config.installPermissions[modKey].forEach((item) => {
         if (!permissionsToCheck.includes(item)) {
           permissionsToCheck.push(item);
         }
@@ -274,7 +286,9 @@ function getMissingInstallPermissions() {
 
     // check permissions
     // first filter on exact match
-    let filteredPermissionsToCheck = permissionsToCheck.filter((perm) => !userPermissions.includes(perm));
+    let filteredPermissionsToCheck = permissionsToCheck.filter(
+      (perm) => !userPermissions.includes(perm)
+    );
     // second filter using startsWith match criteria - to manage division based permissions
     for (const checkPerm of filteredPermissionsToCheck) {
       let permissionFound = false;
@@ -301,8 +315,20 @@ function getMissingInstallPermissions() {
  * @param {String} msgClass (Optional) CSS class to add to the element. (For use in on-the-fly translation)
  * @param {Function} extraContentFunc (Optional) Function that returns an element to be added to #additional-error-content
  */
-function showErrorPage(errorTitle, errorMessage, titleClass, msgClass, extraContentFunc) {
-  view.setError(errorTitle, errorMessage, titleClass, msgClass, extraContentFunc);
+function showErrorPage(
+  errorTitle,
+  errorMessage,
+  titleClass,
+  msgClass,
+  extraContentFunc
+) {
+  view.setError(
+    errorTitle,
+    errorMessage,
+    titleClass,
+    msgClass,
+    extraContentFunc
+  );
   switchPage(PAGES.ERROR);
 }
 
@@ -310,7 +336,7 @@ function showErrorPage(errorTitle, errorMessage, titleClass, msgClass, extraCont
  * Start the wizard installation
  */
 async function install() {
-  view.showLoadingModal('Installing..');
+  view.showLoadingModal("Installing..");
   try {
     const customSetupStatus = await wizard.install();
 
@@ -320,24 +346,28 @@ async function install() {
     } else {
       // Show error from post custom setup
       showErrorPage(
-        getTranslatedText('txt-post-custom-setup-failure'),
-        getTranslatedText('txt-failure-backend'),
-        'txt-post-custom-setup-failure',
-        'txt-failure-backend',
+        getTranslatedText("txt-post-custom-setup-failure"),
+        getTranslatedText("txt-failure-backend"),
+        "txt-post-custom-setup-failure",
+        "txt-failure-backend",
         () => {
-          const container = document.createElement('div');
+          const container = document.createElement("div");
           container.innerHTML = `
             <p>
               <b>
-                <span class="txt-details-failure-backend">${getTranslatedText('txt-details-failure-backend')}:</span>
+                <span class="txt-details-failure-backend">${getTranslatedText(
+                  "txt-details-failure-backend"
+                )}:</span>
               </b>
               <i>
-                <span class="details-failure-backend">${customSetupStatus.cause}</span>
+                <span class="details-failure-backend">${
+                  customSetupStatus.cause
+                }</span>
               </i>
             </p>
             <p>
               <span class="txt-resolve-backend">
-                ${getTranslatedText('txt-resolve-backend')}
+                ${getTranslatedText("txt-resolve-backend")}
               </span>
             </p>
             `;
@@ -349,9 +379,9 @@ async function install() {
     console.error(e);
     // Show error page on any error during installation
     showErrorPage(
-      getTranslatedText('txt-installation-error'),
-      `\n ${e.name} - ${e.message}. \n ${e.stack ? e.stack : ''}`,
-      'txt-installation-error'
+      getTranslatedText("txt-installation-error"),
+      `\n ${e.name} - ${e.message}. \n ${e.stack ? e.stack : ""}`,
+      "txt-installation-error"
     );
   }
   view.hideLoadingModal();
@@ -365,10 +395,10 @@ async function onInitialPageEnter() {
   const productAvailable = await validateProductAvailability();
   if (!productAvailable) {
     showErrorPage(
-      getTranslatedText('txt-product-not-available'),
-      getTranslatedText('txt-not-available-message'),
-      'txt-product-not-available',
-      'txt-not-available-message'
+      getTranslatedText("txt-product-not-available"),
+      getTranslatedText("txt-not-available-message"),
+      "txt-product-not-available",
+      "txt-not-available-message"
     );
     return;
   }
@@ -377,10 +407,10 @@ async function onInitialPageEnter() {
     const byocAvailable = await validateBYOCAvailability();
     if (!byocAvailable) {
       showErrorPage(
-        getTranslatedText('txt-byoc-not-available'),
-        getTranslatedText('txt-no-byoc-message'),
-        'txt-byoc-not-available',
-        'txt-no-byoc-message'
+        getTranslatedText("txt-byoc-not-available"),
+        getTranslatedText("txt-no-byoc-message"),
+        "txt-byoc-not-available",
+        "txt-no-byoc-message"
       );
       return;
     }
@@ -390,18 +420,22 @@ async function onInitialPageEnter() {
   const integrationInstalled = await wizard.isExisting();
   if (integrationInstalled) {
     // If user is lacking permission, don't redirect to Premium App
-    if (!userMe.authorization.permissions.includes(config.premiumAppViewPermission)) {
+    if (
+      !userMe.authorization.permissions.includes(
+        config.premiumAppViewPermission
+      )
+    ) {
       showErrorPage(
-        'Unauthorized',
-        getTranslatedText('txt-missing-permissions'),
+        "Unauthorized",
+        getTranslatedText("txt-missing-permissions"),
         null,
-        'txt-missing-permissions',
+        "txt-missing-permissions",
         // Show the missing permissions in the error page
         () => {
-          const container = document.createElement('ul');
-          const entryElem = document.createElement('li');
-          entryElem.style.display = 'flex';
-          entryElem.style.justifyContent = 'center';
+          const container = document.createElement("ul");
+          const entryElem = document.createElement("li");
+          entryElem.style.display = "flex";
+          entryElem.style.justifyContent = "center";
           entryElem.innerText = config.premiumAppViewPermission;
           container.appendChild(entryElem);
 
@@ -417,18 +451,18 @@ async function onInitialPageEnter() {
       let missingPermissions = getMissingInstallPermissions();
       if (missingPermissions && missingPermissions.length > 0) {
         showErrorPage(
-          'Unauthorized',
-          getTranslatedText('txt-missing-permissions'),
+          "Unauthorized",
+          getTranslatedText("txt-missing-permissions"),
           null,
-          'txt-missing-permissions',
+          "txt-missing-permissions",
           // Show the missing permissions in the error page
           () => {
-            const container = document.createElement('ul');
+            const container = document.createElement("ul");
 
-            missingPermissions.forEach(perm => {
-              const entryElem = document.createElement('li');
-              entryElem.style.display = 'flex';
-              entryElem.style.justifyContent = 'center';
+            missingPermissions.forEach((perm) => {
+              const entryElem = document.createElement("li");
+              entryElem.style.display = "flex";
+              entryElem.style.justifyContent = "center";
               entryElem.innerText = perm;
               container.appendChild(entryElem);
             });
@@ -444,27 +478,33 @@ async function onInitialPageEnter() {
 
 async function onInstallDetailsEnter() {
   if (config.enableDynamicInstallSummary == true) {
-    let messagesDiv = document.getElementById('messages');
-    messagesDiv.innerHTML = '';
+    let messagesDiv = document.getElementById("messages");
+    messagesDiv.innerHTML = "";
 
     let modulesToInstall = Object.keys(config.provisioningInfo);
     if (config.enableCustomSetupStepAfterInstall === true) {
-      modulesToInstall.push('post-custom-setup');
+      modulesToInstall.push("post-custom-setup");
     }
     let moduleIndex = 0;
-    modulesToInstall.forEach(modKey => {
+    modulesToInstall.forEach((modKey) => {
       moduleIndex++;
       let messageDiv = document.createElement("div");
       messageDiv.className = "message";
 
       let messageTitle = document.createElement("div");
       messageTitle.className = "message-title";
-      messageTitle.innerHTML = "<span>" + moduleIndex.toString() + ". </span><span class='txt-create-" + modKey + "'></span><hr>";
+      messageTitle.innerHTML =
+        "<span>" +
+        moduleIndex.toString() +
+        ". </span><span class='txt-create-" +
+        modKey +
+        "'></span><hr>";
       messageDiv.appendChild(messageTitle);
 
       let messageContent = document.createElement("div");
       messageContent.className = "message-content";
-      messageContent.innerHTML = "<div><span class='txt-create-" + modKey + "-msg'></span></div>";
+      messageContent.innerHTML =
+        "<div><span class='txt-create-" + modKey + "-msg'></span></div>";
       messageDiv.appendChild(messageContent);
 
       messagesDiv.appendChild(messageDiv);
@@ -485,19 +525,19 @@ async function onInstallationSummaryEnter() {
 
   // Show the results in the page
   // TODO: Make this more pretty
-  const summaryContainer = document.getElementById('summary-container');
+  const summaryContainer = document.getElementById("summary-container");
   if (!summaryContainer) return;
 
-  // Create an array that contains HTML string per object category 
+  // Create an array that contains HTML string per object category
   const summaryElems = dataKeys.map((category, i) => {
-    let childElemsString = '';
+    let childElemsString = "";
 
     const installedObjects = installedData[category];
     const installedObjectsKeys = Object.keys(installedObjects);
     // Build the children elements for the category
-    installedObjectsKeys.forEach(objKey => {
-      const obj = installedObjects[objKey]
-      const resourcePath = getResourcePath(pcEnvironment, category, obj.id)
+    installedObjectsKeys.forEach((objKey) => {
+      const obj = installedObjects[objKey];
+      const resourcePath = getResourcePath(pcEnvironment, category, obj.id);
 
       if (resourcePath) {
         childElemsString += `
@@ -509,7 +549,7 @@ async function onInstallationSummaryEnter() {
         `;
       }
       // Special treatment for OAuth Client and Widget Deployment
-      if (category === 'oauth-client') {
+      if (category === "oauth-client") {
         childElemsString += `
           <span><b>Grant Type: </b>${obj.authorizedGrantType}</span>
           <br/>
@@ -519,7 +559,7 @@ async function onInstallationSummaryEnter() {
           <br/><br/>
         `;
       }
-      if (category === 'widget-deployment') {
+      if (category === "widget-deployment") {
         childElemsString += `
         <span><b>Deployment Key: </b>${obj.id}</span>
         <br/>
@@ -527,7 +567,7 @@ async function onInstallationSummaryEnter() {
         <br/><br/>
       `;
       }
-      if (category === 'open-messaging') {
+      if (category === "open-messaging") {
         childElemsString += `
         <span><b>Integration ID: </b>${obj.id}</span>
         <br/><br/>
@@ -536,27 +576,29 @@ async function onInstallationSummaryEnter() {
     });
 
     const template = `
-      <div id="installation-summary-${dataKeys[i]}" class="install-summary-category">
+      <div id="installation-summary-${
+        dataKeys[i]
+      }" class="install-summary-category">
         <h3>${beautifyModuleKey(category)}</h3>
         ${childElemsString}
       </div>
-    `
+    `;
 
     return template;
   });
 
   // Add the elements
-  summaryElems.forEach(summary => {
+  summaryElems.forEach((summary) => {
     summaryContainer.innerHTML += summary;
-  })
+  });
 
   // Add the raw installation data to the textarea
-  const textAreaSummary = document.getElementById('summary-raw-data');
+  const textAreaSummary = document.getElementById("summary-raw-data");
   if (!textAreaSummary) return;
   if (config.displaySummarySimplifiedData === true) {
     textAreaSummary.value = JSON.stringify(simpleInstalledData);
   } else {
-    textAreaSummary.style.display = 'none';
+    textAreaSummary.style.display = "none";
   }
 }
 
@@ -565,7 +607,7 @@ async function onInstallationSummaryEnter() {
  * NOTE: Add your code for any custom initialization functionality here.
  */
 async function onCustomSetupEnter() {
-  console.log('Custom Page Here');
+  console.log("Custom Page Here");
 }
 
 /**
@@ -581,24 +623,28 @@ async function setup() {
     let appParams = getQueryParameters();
 
     // Determine Genesys Cloud environment
-    pcEnvironment = appParams.environment ? appParams.environment : config.defaultPcEnvironment;
+    pcEnvironment = appParams.environment
+      ? appParams.environment
+      : config.defaultPcEnvironment;
     // Set language
-    pcLanguage = appParams.language ? appParams.language : config.defaultLanguage;
+    pcLanguage = appParams.language
+      ? appParams.language
+      : config.defaultLanguage;
     await setPageLanguage(pcLanguage);
 
     if (appParams.error === true) {
       if (appParams.errorCode != "access_denied") {
         showErrorPage(
-          getTranslatedText('txt-error-access-invalid'),
-          getTranslatedText('txt-error-access-invalid-msg'),
-          'txt-error-access-invalid',
-          'txt-error-access-invalid-msg',
+          getTranslatedText("txt-error-access-invalid"),
+          getTranslatedText("txt-error-access-invalid-msg"),
+          "txt-error-access-invalid",
+          "txt-error-access-invalid-msg",
           () => {
-            const container = document.createElement('ul');
-            const entryElem = document.createElement('li');
-            entryElem.style.display = 'flex';
-            entryElem.style.justifyContent = 'center';
-            entryElem.innerText = "\"" + appParams.errorDescription + "\"";
+            const container = document.createElement("ul");
+            const entryElem = document.createElement("li");
+            entryElem.style.display = "flex";
+            entryElem.style.justifyContent = "center";
+            entryElem.innerText = '"' + appParams.errorDescription + '"';
             container.appendChild(entryElem);
 
             return container;
@@ -606,16 +652,16 @@ async function setup() {
         );
       } else {
         showErrorPage(
-          getTranslatedText('txt-error-access-denied'),
-          getTranslatedText('txt-error-access-denied-msg'),
-          'txt-error-access-denied',
-          'txt-error-access-denied-msg',
+          getTranslatedText("txt-error-access-denied"),
+          getTranslatedText("txt-error-access-denied-msg"),
+          "txt-error-access-denied",
+          "txt-error-access-denied-msg",
           () => {
-            const container = document.createElement('ul');
-            const entryElem = document.createElement('li');
-            entryElem.style.display = 'flex';
-            entryElem.style.justifyContent = 'center';
-            entryElem.innerText = "\"" + appParams.errorDescription + "\"";
+            const container = document.createElement("ul");
+            const entryElem = document.createElement("li");
+            entryElem.style.display = "flex";
+            entryElem.style.justifyContent = "center";
+            entryElem.innerText = '"' + appParams.errorDescription + '"';
             container.appendChild(entryElem);
 
             return container;
@@ -628,14 +674,17 @@ async function setup() {
 
     // Authenticate and get current user
     await authenticateGenesysCloud(appParams);
-    userMe = await usersApi.getUsersMe({ 'expand': ['organization', 'authorization'] });
+    userMe = await usersApi.getUsersMe({
+      expand: ["organization", "authorization"],
+    });
 
     // Initialize the Wizard object
     wizard.setup(client, userMe);
 
     // Check if app is for uninstallation
     // ie. query parameter 'uninstall=true'
-    if (config.enableUninstall && state.uninstall === 'true') await switchPage(PAGES.UNINSTALL);
+    if (config.enableUninstall && state.uninstall === "true")
+      await switchPage(PAGES.UNINSTALL);
 
     // Load the Home page
     await switchPage(startPage);
@@ -650,7 +699,3 @@ async function setup() {
 }
 
 setup();
-
-
-
-
