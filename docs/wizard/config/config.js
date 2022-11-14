@@ -108,7 +108,7 @@ export default {
                 'name': 'OAuth Client',
                 'description': 'Generated Client that\'s passed to the App Backend',
                 'roles': ['Role'],
-                'authorizedGrantType': 'CLIENT_CREDENTIALS',
+                'authorizedGrantType': 'CLIENT-CREDENTIALS',
                 /** NOTE: 
                  * If you want to learn how you can send the created credentials back to your system,
                  * Please read about the Post Custom Setup module here:

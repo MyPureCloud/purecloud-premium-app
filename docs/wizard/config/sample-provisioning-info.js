@@ -309,7 +309,7 @@ let sample = {
             'name': 'OAuth Client',
             'description': 'Generated Client that\'s passed to the App Backend',
             'roles': ['Admin'],
-            'authorizedGrantType': 'CLIENT_CREDENTIALS',
+            'authorizedGrantType': 'CLIENT-CREDENTIALS',
             'accessTokenValiditySeconds': 86400,
             'finally': function (installedData) {
                 return new Promise((resolve, reject) => {

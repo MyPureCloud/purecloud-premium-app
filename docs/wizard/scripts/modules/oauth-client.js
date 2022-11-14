@@ -69,7 +69,7 @@ async function create(logFunc, data) {
             accessTokenValiditySeconds: oauth.accessTokenValiditySeconds || 86400
         };
 
-        if (oauth.authorizedGrantType === 'CLIENT_CREDENTIALS') {
+        if (oauth.authorizedGrantType === 'CLIENT-CREDENTIALS') {
             oauthClient.roleIds = [employeeRole.id];
         } else {
             oauthClient.registeredRedirectUri = oauth.registeredRedirectUri || ['https://replace_this_url/some_path/index.html'];
@@ -108,7 +108,7 @@ async function configure(logFunc, installedData, userId) {
 
     Object.keys(oauthData).forEach((oauthKey) => {
         let oauth = oauthData[oauthKey];
-        if (oauth.authorizedGrantType === 'CLIENT_CREDENTIALS') {
+        if (oauth.authorizedGrantType === 'CLIENT-CREDENTIALS') {
             let promise = new Promise((resolve, reject) => {
                 let oauthInstall = config.provisioningInfo['oauth-client']
                     .find((info) => info.name == oauthKey);
