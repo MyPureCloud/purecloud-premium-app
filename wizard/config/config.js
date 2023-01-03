@@ -35,7 +35,7 @@ export default {
   // Default Values for fail-safe/testing. Shouldn't have to be changed since the app
   // must be able to determine the environment from the query parameter
   // of the integration's URL
-  defaultPcEnvironment: "mypurecloud.com",
+  defaultPcEnvironment: "usw2.pure.cloud",
   defaultLanguage: "en-us",
   // List available language assets - manage pcLangTag with possible formats like: en, en-US, en_US, en-CA, en_CA, ...
   // Values in lower case, using - or no separator
@@ -75,62 +75,57 @@ export default {
   // To see the sample configuration of all possible objects please consult
   // ./sample-provisioning-info.js on the same folder
   provisioningInfo: {
-    role: [
-      {
-        name: "Role",
-        description: "Generated role for Salesloft access.",
-        permissionPolicies: [
-          {
-            domain: "integration",
-            entityName: "examplePremiumApp",
-            actionSet: ["*"],
-            allowConditions: false,
-          },
-          {
-            domain: "authorization",
-            entityName: "role",
-            actionSet: ["view", "edit"],
-            allowConditions: false,
-          },
-          {
-            domain: "analytics",
-            entityName: "conversationDetail",
-            actionSet: ["view"],
-            allowConditions: false,
-          },
-          {
-            domain: "oauth",
-            entityName: "client",
-            actionSet: ["edit"],
-            allowConditions: false,
-          },
-          {
-            domain: "analytics",
-            entityName: "conversationAggregate",
-            actionSet: ["view"],
-            allowConditions: false,
-          },
-          {
-            domain: "analytics",
-            entityName: "agentConversationDetail",
-            actionSet: ["view"],
-            allowConditions: false,
-          },
-          {
-            domain: "conversation",
-            entityName: "communication",
-            actionSet: ["view"],
-            allowConditions: false,
-          },
-        ],
-      },
-    ],
+    // role: [
+    //   {
+    //     name: "Role",
+    //     description: "Generated role for Salesloft access.",
+    //     permissionPolicies: [
+    //       {
+    //         domain: "integration",
+    //         entityName: "examplePremiumApp",
+    //         actionSet: ["*"],
+    //         allowConditions: false,
+    //       },
+    //       {
+    //         domain: "authorization",
+    //         entityName: "role",
+    //         actionSet: ["view", "edit"],
+    //         allowConditions: false,
+    //       },
+    //       {
+    //         domain: "oauth",
+    //         entityName: "client",
+    //         actionSet: ["edit"],
+    //         allowConditions: false,
+    //       },
+    //       {
+    //         domain: "recording",
+    //         entityName: "recording",
+    //         actionSet: ["view"],
+    //         allowConditions: false,
+    //       },
+    //       {
+    //         domain: "conversation",
+    //         entityName: "communication",
+    //         actionSet: ["view"],
+    //         allowConditions: false,
+    //       },
+    //     ],
+    //   },
+    // ],
     "oauth-client": [
       {
         name: "OAuth_Client",
         description: "Generated Client that allows Salesloft Integration",
-        roles: ["Role"],
-        authorizedGrantType: "CLIENT-CREDENTIALS",
+        registeredRedirectUri: ['www.app.salesloft.com'],
+        scope: [
+          "user-recordings:readonly",
+          "recordings:readonly",
+          "conversations:readonly",
+          "oauth",
+        ],
+        authorizedGrantType: "CODE",
+        accessTokenValiditySeconds: 86400
         /** NOTE:
          * If you want to learn how you can send the created credentials back to your system,
          * Please read about the Post Custom Setup module here:

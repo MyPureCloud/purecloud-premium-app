@@ -26,7 +26,7 @@ export const GC_OBJECT_BASE_URL_MAP = {
 export const GC_CATEGORY_URL_MAP = {};
 
 export const GC_CATEGORY_LABEL = {
-  "oauth-client": "OAuth Clients (Client Credentials Grant)",
+  "oauth-client": "OAuth Clients (Authorization Code)",
   role: "Role",
   "post-custom-setup": "Post Setup",
 };
