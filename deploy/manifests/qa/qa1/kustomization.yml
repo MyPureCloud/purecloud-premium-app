@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: qa1-global
+
+resources:
+- ../base/
+- git@github.com:Salesloft/k8s-services-sensitive-envs-qa.git/genesys-integration-wizard/qa1
+
+configMapGenerator:
+- name: genesys-integration-wizard
+  behavior: merge  
+  envs:
+  - qa1.env
+
+patches:
+- target:
+    kind: Deployment
+    name: genesys-integration-wizard
+  patch: |-
+    - op: add
+      path: /metadata/annotations/salesloft.com~1applier-git-subdirectory.manifest
+      value: genesys-integration-wizard/qa1
+- target:
+    kind: Ingress
+    name: genesys-integration-wizard
+  patch: |-
+    - op: add
+      path: /spec/rules/0/host
+      value: genesys-integration-wizard.qasalesloft.com
+    - op: add
+      path: /metadata/annotations/nginx.ingress.kubernetes.io~1server-alias
+      value: genesys-integration-wizard.qasalesloft.com
+    - op: add
+      path: /metadata/annotations/external-dns.alpha.kubernetes.io~1hostname
+      value: genesys-integration-wizard.qasalesloft.com

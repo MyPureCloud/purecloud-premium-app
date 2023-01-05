@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: genesys-integration-wizard
+  labels:
+    salesloft-app: genesys-integration-wizard
+    application-primary: 'true'
+  annotations:
+    salesloft.com/git-url: git@github.com:SalesLoft/genesys-integration-wizard.git
+    salesloft.com/applier-git-url.manifest: git@github.com:SalesLoft/genesys-integration-wizard.git
+    salesloft.com/kate-build-secrets: sljohnnyfive-github-buildargs
+spec:
+  selector:
+    matchLabels:
+      salesloft-app: genesys-integration-wizard
+  replicas: 1
+  revisionHistoryLimit: 2
+  template:
+    metadata:
+      labels:
+        name: genesys-integration-wizard
+    spec:
+      containers:
+      - name: registry.devsalesloft.com/genesys-integration-wizard:master
+        image: registry.devsalesloft.com/genesys-integration-wizard:master
+        imagePullPolicy: Always
+        command: [node]
+        args: [app/index.js]
+        envFrom:
+          - configMapRef:
+              name: genesys-integration-wizard
+          - configMapRef:
+              name: genesys-integration-wizard-secrets
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 20
+          periodSeconds: 20
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5

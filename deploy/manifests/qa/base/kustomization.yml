@@ -1,0 +1,35 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base/
+
+images:
+  - name: registry.devsalesloft.com/genesys-integration-wizard
+    newName: registry.qasalesloft.com/genesys-integration-wizard
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: genesys-integration-wizard
+    behavior: create
+
+patches:
+- target:
+    kind: Deployment
+  patch: |-
+    - op: add
+      path: /spec/template/spec/imagePullSecrets
+      value:
+        - name: salesloft-docker-registry-qa
+- target:
+    kind: Ingress
+    name: genesys-integration-wizard
+  patch: |-
+    - op: add
+      path: /spec/rules/0/host
+      value: genesys-integration-wizard.qasalesloft.com
+    - op: add
+      path: /metadata/annotations/external-dns.alpha.kubernetes.io~1hostname
+      value: genesys-integration-wizard.qasalesloft.com
