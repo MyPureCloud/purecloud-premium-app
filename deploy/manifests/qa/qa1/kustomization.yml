@@ -5,7 +5,6 @@ namespace: qa1-global
 
 resources:
 - ../base/
-- git@github.com:Salesloft/k8s-services-sensitive-envs-qa.git/genesys-integration-wizard/qa1
 
 configMapGenerator:
 - name: genesys-integration-wizard
@@ -20,7 +19,7 @@ patches:
   patch: |-
     - op: add
       path: /metadata/annotations/salesloft.com~1applier-git-subdirectory.manifest
-      value: genesys-integration-wizard/qa1
+      value: deploy/manifests/qa/qa1
 - target:
     kind: Ingress
     name: genesys-integration-wizard

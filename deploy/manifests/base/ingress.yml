@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: genesys-integration-wizard
@@ -10,6 +10,9 @@ spec:
   - http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: genesys-integration-wizard
-          servicePort: 80
+          service:
+            name: genesys-integration-wizard-server
+            port:
+              number: 80

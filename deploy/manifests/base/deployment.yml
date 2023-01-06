@@ -1,10 +1,8 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: genesys-integration-wizard
   labels:
-    salesloft-app: genesys-integration-wizard
     application-primary: 'true'
   annotations:
     salesloft.com/git-url: git@github.com:SalesLoft/genesys-integration-wizard.git
@@ -13,7 +11,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      salesloft-app: genesys-integration-wizard
+      name: genesys-integration-wizard
   replicas: 1
   revisionHistoryLimit: 2
   template:
@@ -22,16 +20,14 @@ spec:
         name: genesys-integration-wizard
     spec:
       containers:
-      - name: registry.devsalesloft.com/genesys-integration-wizard:master
+      - name: genesys-integration-wizard
         image: registry.devsalesloft.com/genesys-integration-wizard:master
         imagePullPolicy: Always
         command: [node]
-        args: [app/index.js]
+        args: [index.js]
         envFrom:
-          - configMapRef:
-              name: genesys-integration-wizard
-          - configMapRef:
-              name: genesys-integration-wizard-secrets
+        - configMapRef:
+            name: genesys-integration-wizard
         livenessProbe:
           httpGet:
             path: /health
