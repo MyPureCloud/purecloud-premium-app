@@ -24,7 +24,7 @@ spec:
         image: registry.devsalesloft.com/genesys-integration-wizard:master
         imagePullPolicy: Always
         ports:
-          - containerPort: 8080
+          - containerPort: 3000
         envFrom:
         - configMapRef:
             name: genesys-integration-wizard
