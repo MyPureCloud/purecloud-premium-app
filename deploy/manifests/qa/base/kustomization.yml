@@ -17,13 +17,6 @@ configMapGenerator:
 
 patches:
 - target:
-    kind: Deployment
-  patch: |-
-    - op: add
-      path: /spec/template/spec/imagePullSecrets
-      value:
-        - name: salesloft-docker-registry-qa
-- target:
     kind: Ingress
     name: genesys-integration-wizard
   patch: |-
