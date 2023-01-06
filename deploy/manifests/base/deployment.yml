@@ -24,21 +24,21 @@ spec:
         image: registry.devsalesloft.com/genesys-integration-wizard:master
         imagePullPolicy: Always
         ports:
-          - containerPort: 3000
+          - containerPort: 8080
         envFrom:
         - configMapRef:
             name: genesys-integration-wizard
         livenessProbe:
           httpGet:
             path: /health
-            port: 80
+            port: 8080
           initialDelaySeconds: 20
           periodSeconds: 20
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /health
-            port: 80
+            port: 8080
           initialDelaySeconds: 10
           periodSeconds: 10
           timeoutSeconds: 5
