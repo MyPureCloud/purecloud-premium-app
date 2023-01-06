@@ -5,7 +5,7 @@ metadata:
   labels:
     name: genesys-integration-wizard
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
   - name: genesys-integration-wizard
     port: 80
