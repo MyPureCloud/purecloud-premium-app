@@ -23,8 +23,8 @@ spec:
       - name: genesys-integration-wizard
         image: registry.devsalesloft.com/genesys-integration-wizard:master
         imagePullPolicy: Always
-        command: [node]
-        args: [index.js]
+        ports:
+          - containerPort: 8080
         envFrom:
         - configMapRef:
             name: genesys-integration-wizard
