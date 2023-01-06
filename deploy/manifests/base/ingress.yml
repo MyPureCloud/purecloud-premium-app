@@ -13,6 +13,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: genesys-integration-wizard-server
+            name: genesys-integration-wizard
             port:
               number: 80

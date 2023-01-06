@@ -5,11 +5,11 @@ metadata:
   labels:
     name: genesys-integration-wizard
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - name: genesys-integration-wizard
     port: 80
     targetPort: 8080
     protocol: TCP
   selector:
-    name: genesys-integration-wizard-web
+    name: genesys-integration-wizard
