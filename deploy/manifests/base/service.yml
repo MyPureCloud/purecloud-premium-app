@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: genesys-integration-wizard
+  labels:
+    name: genesys-integration-wizard
+spec:
+  type: ClusterIP
+  ports:
+  - name: genesys-integration-wizard
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    name: genesys-integration-wizard
