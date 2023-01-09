@@ -71,13 +71,7 @@ When adding a module, also add the import to [wizard.js](../wizard.js) and add t
 ```javascript
 // Module scripts
 import roleModule from './modules/role.js';
-import groupModule from './modules/group.js';
-import appInstanceModule from './modules/app-instance.js';
 import OAuthClientModule from './modules/oauth-client.js';
-import dataTableModule from './modules/data-table.js';
-import interactionWidget from './modules/interaction-widget.js';
-import wsDataActions from './modules/ws-data-actions.js';
-import widgetDeployment from './modules/widget-deployment.js';
 // -->> Add your modules here...
 ```
 

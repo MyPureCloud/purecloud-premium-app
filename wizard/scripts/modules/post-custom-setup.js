@@ -1,6 +1,6 @@
-import config from '../../config/config.js';
+import config from "../../config/config.js";
 
-const platformClient = require('platformClient');
+const platformClient = require("platformClient");
 
 /**
  * Post Custom Setup
@@ -11,17 +11,20 @@ const platformClient = require('platformClient');
  * @returns {Promise.<Object>}
  */
 async function configure(logFunc, installedData, user, gcClient) {
-    return new Promise(async (resolve, reject) => {
-        logFunc('Post Custom Setup...');
+  return new Promise(async (resolve, reject) => {
+    logFunc("Post Custom Setup...");
+    console.log("installed Data", installedData);
+    console.log("user", user);
+    console.log("gcClient", gcClient);
 
-        resolve({ status: true, cause: 'SUCCESS' });
+    resolve({ status: true, cause: "SUCCESS" });
 
-        // successful
-        // resolve({status: true, cause: ''})
-        // failure
-        // resolve({status: false, cause: 'detailed reason or empty string'})
+    // successful
+    // resolve({status: true, cause: ''})
+    // failure
+    // resolve({status: false, cause: 'detailed reason or empty string'})
 
-        /*
+    /*
         try {
             let provisionBody = {
                 apiEnvironment: gcClient.config.environment,
@@ -69,12 +72,11 @@ async function configure(logFunc, installedData, user, gcClient) {
             resolve({ status: false, cause: 'ERROR - Request to backend failed' });
         }
         */
-
-    });
+  });
 }
 
 export default {
-    provisioningInfoKey: 'post-custom-setup',
+  provisioningInfoKey: "post-custom-setup",
 
-    configure: configure
-}
+  configure: configure,
+};
