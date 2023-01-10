@@ -62,12 +62,12 @@
 
 .step:before {
   width: 100%;
-  background-color: #e6e7e8;
+  background-color: var(--sl-color-greyLighter);
 }
 
 .step:after {
   width: 0;
-  background-color: #3b90aa;
+  background-color: var(--sl-color-green);
 }
 
 .step--complete:after {
@@ -83,8 +83,8 @@
   position: relative;
   width: 35px;
   height: 35px;
-  background-color: #fff;
-  border: 0.25rem solid #e6e7e8;
+  background-color: var(--sl-color-white);
+  border: 0.25rem solid var(--sl-color-greyLighter);
   border-radius: 50%;
   color: transparent;
   font-size: 2rem;
@@ -93,17 +93,21 @@
 
 .step__icon:before {
   display: block;
-  color: #fff;
+  color: var(--sl-color-white);
   content: "\2713";
   font-size: 20px;
 }
 
-.step.step--incomplete .step__icon:before {
-  font-size: 18px;
-  color: #888;
+.step.step--incomplete.step--active .step__icon:before {
+  color: var(--sl-color-green);
 }
 
-#marker-step-1.step--incomplete .step__icon:before {
+.step.step--incomplete .step__icon:before {
+  font-size: 18px;
+  color: var(--sl-color-greyLighter);
+}
+
+.step.step--incomplete .step__icon:before #marker-step-1.step--incomplete .step__icon:before {
   content: "1";
 }
 
@@ -120,21 +124,21 @@
 }
 
 .step--complete.step--active .step__icon {
-  color: #fff;
+  color: var(--sl-color-white);
   transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out,
     color 0.3s ease-in-out;
 }
 
 .step--incomplete.step--active .step__icon {
-  border-color: #3b90aa;
+  border-color: var(--sl-color-green);
   transition-delay: 0.5s;
 }
 
 .step--complete .step__icon {
   animation: bounce 0.5s ease-in-out;
-  background-color: #3b90aa;
-  border-color: #3b90aa;
-  color: #fff;
+  background-color: var(--sl-color-green);
+  border-color: var(--sl-color-green);
+  color: var(--sl-color-white);
 }
 
 .step__label {

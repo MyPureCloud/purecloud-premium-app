@@ -1,0 +1,44 @@
+name: Docker
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        arch:
+          - x64
+          - arm64
+    uses: salesloft/sl_reusable_workflows/.github/workflows/docker.yml@master
+    with:
+      arch: ${{ matrix.arch }}
+      docker-image-name: genesys-integration-wizard
+    secrets:
+      DOCKERHUB_PULL_USER: ${{ secrets.DOCKERHUB_PULL_USER }}
+      DOCKERHUB_PULL_TOKEN: ${{ secrets.DOCKERHUB_PULL_TOKEN }}
+      SL_QA_DOCKER_USER: ${{ secrets.SL_QA_DOCKER_USER }}
+      SL_QA_DOCKER_TOKEN: ${{ secrets.SL_QA_DOCKER_TOKEN }}
+  manifest:
+    needs:
+      - build
+    uses: salesloft/sl_reusable_workflows/.github/workflows/docker-manifest.yml@master
+    with:
+      docker-image-name: genesys-integration-wizard
+    secrets: 
+      SL_QA_DOCKER_USER: ${{ secrets.SL_QA_DOCKER_USER }}
+      SL_QA_DOCKER_TOKEN: ${{ secrets.SL_QA_DOCKER_TOKEN }}
+  scan:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs:
+      - manifest
+    uses: salesloft/sl_reusable_workflows/.github/workflows/snyk-container-scan.yml@master
+    with:
+      docker-image-name: genesys-integration-wizard
+    secrets:
+      SNYK_CONTAINER_TOKEN: ${{ secrets.SNYK_CONTAINER_TOKEN }}
+      SL_QA_DOCKER_USER: ${{ secrets.SL_QA_DOCKER_USER }}
+      SL_QA_DOCKER_TOKEN: ${{ secrets.SL_QA_DOCKER_TOKEN }}
