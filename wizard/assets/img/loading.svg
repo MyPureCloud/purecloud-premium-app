@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; background: none; display: block; shape-rendering: auto;" width="200px" height="100px" viewBox="0 0 100 50" preserveAspectRatio="xMidYMid">
 <g transform="translate(25 25)">
-<circle cx="0" cy="0" r="9" fill="#b9b9b9">
+<circle cx="0" cy="0" r="9" fill="#437762">
   <animateTransform attributeName="transform" type="scale" begin="-0.4504504504504505s" calcMode="spline" keySplines="0.3 0 0.7 1;0.3 0 0.7 1" values="0.5;1.2;0.5" keyTimes="0;0.5;1" dur="1.3513513513513513s" repeatCount="indefinite"></animateTransform>
 </circle>
 </g><g transform="translate(50 25)">
-<circle cx="0" cy="0" r="9" fill="#b9b9b9">
+<circle cx="0" cy="0" r="9" fill="#437762">
   <animateTransform attributeName="transform" type="scale" begin="-0.22522522522522526s" calcMode="spline" keySplines="0.3 0 0.7 1;0.3 0 0.7 1" values="0.5;1.2;0.5" keyTimes="0;0.5;1" dur="1.3513513513513513s" repeatCount="indefinite"></animateTransform>
 </circle>
 </g><g transform="translate(75 25)">
-<circle cx="0" cy="0" r="9" fill="#b9b9b9">
+<circle cx="0" cy="0" r="9" fill="#437762">
   <animateTransform attributeName="transform" type="scale" begin="0s" calcMode="spline" keySplines="0.3 0 0.7 1;0.3 0 0.7 1" values="0.5;1.2;0.5" keyTimes="0;0.5;1" dur="1.3513513513513513s" repeatCount="indefinite"></animateTransform>
 </circle>
 </g>
