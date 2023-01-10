@@ -1,12 +1,12 @@
 export default
     {
         "en-us": {
-            "txt-premium-app-name": "Premium App",
+            "txt-premium-app-name": "Genesys Integration Wizard",
             "txt-premium-home": "Home",
             "txt-premium-install": "Install",
             "txt-premium-summary": "Summary",
             "txt-greeting": "Hi",
-            "txt-greeting-2": "Welcome to the Premium App Example Application",
+            "txt-greeting-2": "Welcome to the Genesys Integration Wizard",
             "txt-start": "Start",
             "txt-setup": "Custom Setup",
             "txt-install": "Install",
@@ -72,12 +72,12 @@ export default
             "txt-goto-app": "Go To Application"
         },
         "es": {
-            "txt-premium-app-name": "Premium App",
+            "txt-premium-app-name": "Asistente de Integración de Genesys",
             "txt-premium-home": "Home",
             "txt-premium-install": "Instalar",
             "txt-premium-summary": "Resumen",
             "txt-greeting": "Hola",
-            "txt-greeting-2": "Bienvenido a la Aplicación de Ejemplo de Aplicación Premium",
+            "txt-greeting-2": "Bienvenido al Asistente de Integración de Genesys",
             "txt-start": "Inicio",
             "txt-setup": "Custom Setup",
             "txt-install": "Instalar",

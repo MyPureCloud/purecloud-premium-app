@@ -60,7 +60,7 @@ const Validator = {
   propertyExists(obj, propertyName, objectName, additionalComment) {
     if (propertyName in obj) {
       // If string, make sure it's not a blank string
-      if(typeof obj[propertyName] == 'string' && obj[propertyName].trim().length <= 0){
+      if (typeof obj[propertyName] == 'string' && obj[propertyName].trim().length <= 0) {
         return Promise.resolve([false, `${propertyName} does not exist in ${objectName}. -- ${additionalComment}`])
       }
 
@@ -81,11 +81,11 @@ const Validator = {
    */
   notEqual(value1, value2, value1Name, additionalComment) {
     // value1 should not be null or undefined
-    if(value1 === null || value1 === undefined){
+    if (value1 === null || value1 === undefined) {
       return [false, `${value1Name} does not exist`]
     }
 
-    if(value1 !== value2){
+    if (value1 !== value2) {
       return Promise.resolve([true, `${value1Name} is not equal to '${value2.toString()}' -- ${additionalComment}`])
     } else {
       return Promise.resolve([false, `${value1Name} is equal to '${value2.toString()}' -- ${additionalComment}`])
@@ -102,9 +102,9 @@ const Validator = {
    */
   customEvaluation(func, passMessage, failMessage, additionalComment) {
     let result = func();
-    if(typeof result != 'boolean') throw new Error('Func does not return boolean');
-    
-    if(result){
+    if (typeof result != 'boolean') throw new Error('Func does not return boolean');
+
+    if (result) {
       return Promise.resolve([true, `${passMessage} -- ${additionalComment}`])
     } else {
       return Promise.resolve([false, `${failMessage} -- ${additionalComment}`])
@@ -121,9 +121,9 @@ const Validator = {
    */
   async customEvaluationAsync(func, passMessage, failMessage, additionalComment) {
     let result = await func();
-    if(typeof result != 'boolean') throw new Error('Func resolution does not return boolean');
-    
-    if(result){
+    if (typeof result != 'boolean') throw new Error('Func resolution does not return boolean');
+
+    if (result) {
       return Promise.resolve([true, `${passMessage} -- ${additionalComment}`])
     } else {
       return Promise.resolve([false, `${failMessage} -- ${additionalComment}`])
@@ -143,13 +143,13 @@ const Validator = {
       const message = evaluation[1];
 
       // If test passed, add message
-      if(result){
+      if (result) {
         passedMessages.push(message);
         return;
-      } 
+      }
 
       // For non-pass, determine level
-      switch(importanceLevel){
+      switch (importanceLevel) {
         case this.WARNING:
           warningMessages.push(message);
           break;
@@ -167,19 +167,19 @@ let config = null; // Config object of the config file
 /**
  * Print the result messages
  */
-function printMessages(){
-  console.log(chalk.blue(' --------- PASSED ----------'));  
-  if(!passedMessages || passedMessages.length <= 0) console.log(chalk.grey('none'));
+function printMessages() {
+  console.log(chalk.blue(' --------- PASSED ----------'));
+  if (!passedMessages || passedMessages.length <= 0) console.log(chalk.grey('none'));
   passedMessages.forEach((m, i) => console.log(chalk.green(`${i + 1}. ${m}`)));
   console.log();
 
-  console.log(chalk.blue(' --------- WARNING ----------'));  
-  if(!warningMessages || warningMessages.length <= 0) console.log(chalk.grey('none'));
+  console.log(chalk.blue(' --------- WARNING ----------'));
+  if (!warningMessages || warningMessages.length <= 0) console.log(chalk.grey('none'));
   warningMessages.forEach((m, i) => console.log(chalk.yellow(`${i + 1}. ${m}`)));
   console.log();
 
   console.log(chalk.blue(' --------- CRITICAL ----------'));
-  if(!criticalMessages || criticalMessages.length <= 0) console.log(chalk.grey('none'));
+  if (!criticalMessages || criticalMessages.length <= 0) console.log(chalk.grey('none'));
   criticalMessages.forEach((m, i) => console.log(chalk.redBright(`${i + 1}. ${m}`)));
   console.log();
 
@@ -192,25 +192,25 @@ function printMessages(){
 /**
  * Print message to validation.log file
  */
-function logToFile(){
+function logToFile() {
   let log = '';
   let ts = Date.now();
   let dateTime = (new Date(ts)).toISOString();
 
   log += `${dateTime}\n\n`;
 
-  log += ' --------- PASSED ----------\n';  
-  if(passedMessages.length <= 0) log += 'none\n';
+  log += ' --------- PASSED ----------\n';
+  if (passedMessages.length <= 0) log += 'none\n';
   passedMessages.forEach((m, i) => log += `${i + 1}. ${m}\n`);
   log += '\n';
 
-  log += ' --------- WARNING ----------\n';  
-  if(warningMessages.length <= 0) log += 'none\n';
+  log += ' --------- WARNING ----------\n';
+  if (warningMessages.length <= 0) log += 'none\n';
   warningMessages.forEach((m, i) => log += `${i + 1}. ${m}\n`);
   log += '\n';
 
-  log += ' --------- CRITICAL ----------\n';  
-  if(criticalMessages.length <= 0) log += 'none\n';
+  log += ' --------- CRITICAL ----------\n';
+  if (criticalMessages.length <= 0) log += 'none\n';
   criticalMessages.forEach((m, i) => log += `${i + 1}. ${m}\n`);
   log += '\n';
 
@@ -221,7 +221,7 @@ function logToFile(){
  * Get the config file and return the contents as an object
  * @returns {Promise<Object|null>}
  */
-async function getConfigObject(){
+async function getConfigObject() {
   let configObject = null;
 
   try {
@@ -230,9 +230,9 @@ async function getConfigObject(){
     let configContent = configData.toString()
     configContent = configContent.substring(configContent.indexOf('{'));
     configObject = Function('return (' + configContent + ')')()
-  } catch(e) {
+  } catch (e) {
     console.error(e);
-    return null ;
+    return null;
   }
 
   return configObject;
@@ -241,8 +241,8 @@ async function getConfigObject(){
 /**
  * Validate the config.json
  */
-async function validateConfig(){
-  if(!config) throw new Error('Error on getting the config file.');
+async function validateConfig() {
+  if (!config) throw new Error('Error on getting the config file.');
 
   // =================== WARNING LEVEL ===============
   await Validator.evaluateArr(Validator.WARNING, [
@@ -274,13 +274,13 @@ async function validateConfig(){
     Validator.propertyExists(config, 'premiumAppViewPermission', 'config', 'premiumAppViewPermission should exist'),
     // checkInstallPermissions
     Validator.customEvaluation(() => {
-        let installPermisison = config.checkInstallPermissions;
-        if(!installPermisison) return false;
+      let installPermisison = config.checkInstallPermissions;
+      if (!installPermisison) return false;
 
-        if(['all', 'premium', 'wizard', 'none'].includes(installPermisison)) return true;
+      if (['all', 'premium', 'wizard', 'none'].includes(installPermisison)) return true;
 
-        return false;
-      }, `${config.checkInstallPermissions} is valid value for checkInstallPermissions`,
+      return false;
+    }, `${config.checkInstallPermissions} is valid value for checkInstallPermissions`,
       `${config.checkInstallPermissions} is not valid value for checkInstallPermissions`,
       `Valid values: all, premium, wizard, none`
     ),
@@ -293,10 +293,10 @@ async function validateConfig(){
     Validator.propertyExists(config, 'availableLanguageAssets', 'config', 'availableLanguageAssets should exist'),
     // Check if defaultLanguage value is valid
     Validator.customEvaluation(() => {
-        if(!config.defaultLanguage) return false;
+      if (!config.defaultLanguage) return false;
 
-        return Object.keys(config.availableLanguageAssets).includes(config.defaultLanguage)
-      },
+      return Object.keys(config.availableLanguageAssets).includes(config.defaultLanguage)
+    },
       `${config.defaultLanguage} is a valid language value`,
       `${config.defaultLanguage} is not available in the availableLanguageAssets`,
       `defaultLanguage should be valid`
@@ -312,19 +312,19 @@ async function validateConfig(){
 /**
  * Check if language files exist for the available languages in config
  */
-async function validateLanguageFiles(){
+async function validateLanguageFiles() {
   const toBeEvaluated = [];
 
   Object.keys(config.availableLanguageAssets).forEach(langKey => {
     toBeEvaluated.push(Validator.customEvaluationAsync(async () => {
-        const langFilePath = path.join(languageDirPath, `${langKey}.json`);
-        try {
-          await fs.access(langFilePath, fsConstants.F_OK);
-          return true;
-        } catch(e) {
-          return false
-        }
-      },
+      const langFilePath = path.join(languageDirPath, `${langKey}.json`);
+      try {
+        await fs.access(langFilePath, fsConstants.F_OK);
+        return true;
+      } catch (e) {
+        return false
+      }
+    },
       `${langKey}.json exists`,
       `${langKey} is declared in config languages but ${langKey}.json does not exist.`,
       'Language file should exist'
@@ -341,25 +341,25 @@ async function validateLanguageFiles(){
  * In that case, we'll assume that because they're using a different default language, that the text would 
  * already be their own.
  */
-async function validateWizardText(){
+async function validateWizardText() {
   let langFileObject = null;
 
   // If en-us.json does not exist, skip
   try {
     const langFileData = await fs.readFile(path.join(languageDirPath, 'en-us.json'));
     langFileObject = JSON.parse(langFileData.toString());
-  } catch(e) {
+  } catch (e) {
     console.log(e)
     return;
   }
 
   // If language default is not en-us, skip
-  if(config.defaultLanguage != 'en-us') return;
+  if (config.defaultLanguage != 'en-us') return;
 
   const forEvaluation = [];
 
   Object.keys(defaultLanguage).forEach(textKey => {
-    forEvaluation.push(Validator.notEqual(langFileObject[textKey], defaultLanguage[textKey], 
+    forEvaluation.push(Validator.notEqual(langFileObject[textKey], defaultLanguage[textKey],
       textKey, `text should be personalized`));
   })
 
@@ -370,7 +370,7 @@ async function validateWizardText(){
  * Evaluate images if they've been changed
  * Uses md5 checksum to check if the same as default image
  */
-async function validateImages(){
+async function validateImages() {
   let htmlString = null;
   let htmlValue = null; // Parsed HTML
   let forEvaluation = [];
@@ -382,7 +382,7 @@ async function validateImages(){
     const htmlData = await fs.readFile(path.join(wizardPath, 'index.html'));
     htmlString = htmlData.toString();
     htmlValue = HTMLParser.parse(htmlString);
-  } catch(e) {
+  } catch (e) {
     console.error(`Error in parsing index.html`)
     throw e;
   }
@@ -390,8 +390,8 @@ async function validateImages(){
   const footerImgSrc = htmlValue.querySelector('#footer-logo').getAttribute('src');
   const footerImgData = await fs.readFile(path.join(wizardPath, footerImgSrc));
   forEvaluation.push(Validator.customEvaluation(() => {
-      return md5(footerImgData) !== defaulImgHash.footerImg;
-    },
+    return md5(footerImgData) !== defaulImgHash.footerImg;
+  },
     `Footer image has been replaced`,
     `Footer image is the default footer image`,
     `Personalize UI`
@@ -401,8 +401,8 @@ async function validateImages(){
   const loaderImgSrc = htmlValue.querySelector('#loading-img').getAttribute('src');
   const loaderImgData = await fs.readFile(path.join(wizardPath, loaderImgSrc));
   forEvaluation.push(Validator.customEvaluation(() => {
-      return md5(loaderImgData) !== defaulImgHash.loadingImg;
-    },
+    return md5(loaderImgData) !== defaulImgHash.loadingImg;
+  },
     `"Loading" graphic has been replaced`,
     `"Loading" graphic is still the default svg`,
     `Personalize UI`
@@ -414,7 +414,7 @@ async function validateImages(){
 /**
  * Evaluate CSS values
  */
-async function validateStyles(){
+async function validateStyles() {
   let forEvaluation = [];
   let cssString = null;
   let cssValue = null;
@@ -423,21 +423,21 @@ async function validateStyles(){
     const cssData = await fs.readFile(path.join(wizardPath, 'styles/style.css'));
     cssString = cssData.toString();
     cssValue = css.parse(cssString);
-  } catch(e) {
+  } catch (e) {
     console.error(`Error in parsing style.css`)
     throw e;
   }
 
   const titleColor = getStyleValue(cssValue, '.title', 'color');
-  if (titleColor){
+  if (titleColor) {
     forEvaluation.push(Validator.notEqual(titleColor, '#3B90AA', '.title CSS', 'Personalize CSS'));
   }
   const messageTitleColor = getStyleValue(cssValue, '.message-title', 'color');
-  if (messageTitleColor){
+  if (messageTitleColor) {
     forEvaluation.push(Validator.notEqual(messageTitleColor, '#00AE9E', '.message-title color CSS', 'Personalize CSS'));
   }
   const buttonColor = getStyleValue(cssValue, 'button', 'background-color');
-  if (buttonColor){
+  if (buttonColor) {
     forEvaluation.push(Validator.notEqual(buttonColor, '#00AE9E', 'button background-color CSS', 'Personalize CSS'));
   }
 
@@ -451,32 +451,32 @@ async function validateStyles(){
  * @param {String} selector CSS selector (not multiple)
  * @param {String} property property of the element
  * @returns {String|null} value of the selector's property
- * */ 
- function getStyleValue(ast, selector, property) {
+ * */
+function getStyleValue(ast, selector, property) {
   const cssRules = ast.stylesheet.rules;
   const rule = cssRules.find(rule => {
-    if(!rule.selectors) return false;
+    if (!rule.selectors) return false;
     return rule.selectors.includes(selector);
   });
-  if(!rule) return null;
-  
+  if (!rule) return null;
+
   const declaration = rule.declarations.find(declaration => declaration.property == property);
-  if(!declaration) return null;
+  if (!declaration) return null;
 
   const value = declaration.value;
-  if(!value) return null;
+  if (!value) return null;
 
   return value;
 }
 
-async function validateAll(){
+async function validateAll() {
   config = await getConfigObject();
-  
-  const validations = [validateConfig(), 
-    // validateLanguageFiles(), 
-    // validateWizardText(),
-    validateImages(),
-    validateStyles()
+
+  const validations = [validateConfig(),
+  // validateLanguageFiles(), 
+  // validateWizardText(),
+  validateImages(),
+  validateStyles()
   ]
 
   await Promise.all(validations)
