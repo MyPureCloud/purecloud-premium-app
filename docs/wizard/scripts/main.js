@@ -683,7 +683,6 @@ async function setup() {
 
 
 document.addEventListener('DOMContentLoaded', function () {
-  console.log("JSM DEBUG - READY");
   setup();
 });
 
