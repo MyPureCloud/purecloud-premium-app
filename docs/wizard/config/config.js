@@ -35,9 +35,9 @@ export default {
     // Default Values for fail-safe/testing. Shouldn't have to be changed since the app
     // must be able to determine the environment from the query parameter 
     // of the integration's URL
-    defaultPcEnvironment: 'mypurecloud.com',
+    defaultGcEnvironment: 'mypurecloud.com',
     defaultLanguage: 'en-us',
-    // List available language assets - manage pcLangTag with possible formats like: en, en-US, en_US, en-CA, en_CA, ...
+    // List available language assets - manage gcLangTag with possible formats like: en, en-US, en_US, en-CA, en_CA, ...
     // Values in lower case, using - or no separator
     availableLanguageAssets: {
         'en-us': 'English',
@@ -50,6 +50,8 @@ export default {
     // Ex: www.electric-sheep-app.com?langTag=en-us&environment=mypurecloud.com
     languageQueryParam: 'langTag',
     genesysCloudEnvironmentQueryParam: 'environment',
+    genesysCloudHostOriginQueryParam: 'hostOrigin',
+    genesysCloudTargetEnvQueryParam: 'targetEnv',
 
     // Enable the optional 'Step 2' in the provisoning process
     // If false, it will not show the page or the step in the wizard
@@ -98,7 +100,7 @@ export default {
         'app-instance': [
             {
                 'name': 'Partner Enablement Tools',
-                'url': 'https://genesysappfoundry.github.io/partner-enablement-tools/index.html?language={{pcLangTag}}&environment={{pcEnvironment}}',
+                'url': 'https://genesysappfoundry.github.io/partner-enablement-tools/index.html?langTag={{gcLangTag}}&hostOrigin={{gcHostOrigin}}&targetEnv={{gcTargetEnv}}',
                 'type': 'standalone',
                 'groups': ['Supervisors']
             }

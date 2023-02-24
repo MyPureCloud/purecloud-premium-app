@@ -34,7 +34,7 @@ let sample = {
     'app-instance': [
         {
             'name': 'Agent Widget',
-            'url': 'https://mypurecloud.github.io/purecloud-premium-app/index.html?lang={{pcLangTag}}&environment={{pcEnvironment}}',
+            'url': 'https://mypurecloud.github.io/purecloud-premium-app/index.html?langTag={{gcLangTag}}&hostOrigin={{gcHostOrigin}}&targetEnv={{gcTargetEnv}}',
             'type': 'widget',
             'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
             'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
@@ -66,7 +66,7 @@ let sample = {
         },
         {
             'name': 'Supervisor Widget',
-            'url': 'https://mypurecloud.github.io/purecloud-premium-app/supervisor.html?lang={{pcLangTag}}&environment={{pcEnvironment}}',
+            'url': 'https://mypurecloud.github.io/purecloud-premium-app/supervisor.html?langTag={{gcLangTag}}&hostOrigin={{gcHostOrigin}}&targetEnv={{gcTargetEnv}}',
             'type': 'standalone',
             'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
             'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
@@ -76,7 +76,7 @@ let sample = {
     'widget-instance': [
         {
             'name': 'Premium Widget',
-            'url': 'https://app-website.com/?conversationid={{pcConversationId}}&lang={{pcLangTag}}&environment={{pcEnvironment}}',
+            'url': 'https://app-website.com/?conversationid={{gcConversationId}}&langTag={{gcLangTag}}&hostOrigin={{gcHostOrigin}}&targetEnv={{gcTargetEnv}}',
             'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
             'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
             'groups': ['Agents'],
@@ -110,7 +110,7 @@ let sample = {
     'interaction-widget': [
         {
             'name': 'Interaction Widget',
-            'url': 'https://app-website.com/?conversationid={{pcConversationId}}&lang={{pcLangTag}}&environment={{pcEnvironment}}',
+            'url': 'https://app-website.com/?conversationid={{gcConversationId}}&langTag={{gcLangTag}}&hostOrigin={{gcHostOrigin}}&targetEnv={{gcTargetEnv}}',
             'sandbox': 'allow-forms,allow-modals,allow-popups,allow-presentation,allow-same-origin,allow-scripts,allow-downloads',
             'permissions': 'camera,microphone,geolocation,clipboard-write,display-capture,fullscreen',
             'groups': ['Agents'],

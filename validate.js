@@ -284,7 +284,7 @@ async function validateConfig(){
       `${config.checkInstallPermissions} is not valid value for checkInstallPermissions`,
       `Valid values: all, premium, wizard, none`
     ),
-    Validator.propertyExists(config, 'defaultPcEnvironment', 'config', 'defaultPcEnvironment should exist'),
+    Validator.propertyExists(config, 'defaultGcEnvironment', 'config', 'defaultGcEnvironment should exist'),
     // TODO: Maybe test if pcEnvironment is valid value
     Validator.propertyExists(config, 'prefix', 'config', 'prefix should exist'),
     Validator.notEqual(config.prefix, defaultPrefix, 'prefix', 'Prefix should be updated to be unique'),

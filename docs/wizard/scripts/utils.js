@@ -3,19 +3,19 @@ import { GC_OBJECT_BASE_URL_MAP, GC_CATEGORY_URL_MAP, GC_CATEGORY_LABEL } from '
 
 /**
  * Build the complete URL for the resource. Used in the summary page
- * @param {String} environment GC environment. eg mypurecloud.com
+ * @param {String} hostOrigin GC Host Origin. eg https://apps.mypurecloud.com
  * @param {String} category provisioningKey of the module
  * @param {String} id id of the actual GC object
  * @returns {String|null} path to the resource.
  */
-export function getResourcePath(environment, category, id) {
+export function getResourcePath(hostOrigin, category, id) {
     let objectBasePath = GC_OBJECT_BASE_URL_MAP[category];
     if (!objectBasePath) {
         let categoryPath = GC_CATEGORY_URL_MAP[category];
         if (!categoryPath) return null;
-        return `https://apps.${environment}${categoryPath}`;
+        return `${hostOrigin}${categoryPath}`;
     } else {
-        return `https://apps.${environment}${objectBasePath}${id}`;
+        return `${hostOrigin}${objectBasePath}${id}`;
     }
 }
 
@@ -72,10 +72,14 @@ export function getQueryParameters() {
         let urlParams = new URLSearchParams(window.location.search);
         let language = urlParams.get(config.languageQueryParam);
         let environment = urlParams.get(config.genesysCloudEnvironmentQueryParam);
+        let hostOrigin = urlParams.get(config.genesysCloudHostOriginQueryParam);
+        let targetEnv = urlParams.get(config.genesysCloudTargetEnvQueryParam);
         let uninstall = urlParams.get('uninstall');
 
         if (language) ret.language = language;
         if (environment) ret.environment = environment;
+        if (hostOrigin) ret.hostOrigin = hostOrigin;
+        if (targetEnv) ret.targetEnv = targetEnv;
         if (uninstall) ret.uninstall = uninstall;
     }
 

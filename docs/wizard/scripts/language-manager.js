@@ -50,7 +50,7 @@ function setupDropdownSelector(currentlySelected) {
  * @returns {Promise}
  */
 export async function setPageLanguage(requestedLanguage) {
-    // Manage pcLangTag with possible formats like: en, en-US, en_US, en-CA, en_CA, ...
+    // Manage gcLangTag with possible formats like: en, en-US, en_US, en-CA, en_CA, ...
     // Transform: replace _ with -, tolowercase
     // Check en-us, en-ca, ... - if not found, check en - if not found, use default language
     currentLanguageCode = requestedLanguage.toLowerCase().replace('_', '-');
