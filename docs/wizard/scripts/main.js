@@ -17,8 +17,11 @@ const premiumAppIntegrationTypeId = config.premiumAppIntegrationTypeId;
 const startPage = PAGES.INDEX_PAGE;
 
 // Variables
-let pcLanguage; // Initial language from query parameter | config.
-let pcEnvironment;
+let gcLanguage; // Initial language from query parameter | config.
+let gcEnvironment;
+let gcClientApp;
+let gcHostOrigin;
+let gcTargetEnv;
 let state; // State from implicit grant 
 let currentPage = null;
 let userMe = null;
@@ -30,7 +33,7 @@ function goToPremiumApp() {
   let redirectUrl = config.redirectURLOnWizardCompleted;
   if (config.redirectURLWithParams && config.redirectURLWithParams === true) {
     let currentLanguage = getSelectedLanguage();
-    redirectUrl += `?${config.genesysCloudEnvironmentQueryParam}=${pcEnvironment}&${config.languageQueryParam}=${currentLanguage}`;
+    redirectUrl += `?${config.genesysCloudHostOriginQueryParam}=${gcHostOrigin}&${config.genesysCloudTargetEnvQueryParam}=${gcTargetEnv}&${config.languageQueryParam}=${currentLanguage}`;
   }
   window.location.href = redirectUrl;
 }
@@ -41,7 +44,7 @@ function goToPremiumApp() {
  */
 async function authenticateGenesysCloud(appParams) {
   // Set Genesys Cloud environment
-  client.setEnvironment(pcEnvironment);
+  client.setEnvironment(gcEnvironment);
 
   // Authenticate with Genesys Cloud and get the state
   client.setPersistSettings(true, premiumAppIntegrationTypeId);
@@ -148,7 +151,7 @@ async function switchPage(targetPage) {
       await new Promise((resolve, reject) => {
         setTimeout(() => {
           let currentLanguage = getSelectedLanguage();
-          window.location.href = `${config.wizardUriBase}index.html?${config.genesysCloudEnvironmentQueryParam}=${pcEnvironment}&${config.languageQueryParam}=${currentLanguage}`;
+          window.location.href = `${config.wizardUriBase}index.html?${config.genesysCloudHostOriginQueryParam}=${gcHostOrigin}&${config.genesysCloudTargetEnvQueryParam}=${gcTargetEnv}&${config.languageQueryParam}=${currentLanguage}`;
           resolve();
         }, 2000);
       });
@@ -497,7 +500,7 @@ async function onInstallationSummaryEnter() {
     // Build the children elements for the category
     installedObjectsKeys.forEach(objKey => {
       const obj = installedObjects[objKey]
-      const resourcePath = getResourcePath(pcEnvironment, category, obj.id)
+      const resourcePath = getResourcePath(gcHostOrigin, category, obj.id)
 
       if (resourcePath) {
         childElemsString += `
@@ -581,10 +584,39 @@ async function setup() {
     let appParams = getQueryParameters();
 
     // Determine Genesys Cloud environment
-    pcEnvironment = appParams.environment ? appParams.environment : config.defaultPcEnvironment;
+    if (appParams.hostOrigin && appParams.targetEnv) {
+      try {
+        gcHostOrigin = appParams.hostOrigin;
+        gcTargetEnv = appParams.targetEnv;
+        var ClientApp = window.purecloud.apps.ClientApp;
+        /*
+        // parsing query params works on first index.html invocation, but not on redirect (encode in state parameter)
+        gcClientApp = new ClientApp({
+          gcHostOriginQueryParam: config.genesysCloudHostOriginQueryParam,
+          gcTargetEnvQueryParam: config.genesysCloudTargetEnvQueryParam
+        });
+        */
+        gcClientApp = new ClientApp({
+          gcHostOrigin: gcHostOrigin,
+          gcTargetEnv: gcTargetEnv
+        });
+        gcEnvironment = gcClientApp.gcEnvironment;
+      } catch (err) {
+        // if host origin and target env cannot be resolved
+        // try to override with environment query parameter if present
+        gcEnvironment = appParams.environment ? appParams.environment : config.defaultGcEnvironment;
+        gcHostOrigin = 'https://apps.' + gcEnvironment;
+        gcTargetEnv = 'prod';
+      }
+    } else {
+      gcEnvironment = appParams.environment ? appParams.environment : config.defaultGcEnvironment;
+      gcHostOrigin = 'https://apps.' + gcEnvironment;
+      gcTargetEnv = 'prod';
+    }
+    
     // Set language
-    pcLanguage = appParams.language ? appParams.language : config.defaultLanguage;
-    await setPageLanguage(pcLanguage);
+    gcLanguage = appParams.language ? appParams.language : config.defaultLanguage;
+    await setPageLanguage(gcLanguage);
 
     if (appParams.error === true) {
       if (appParams.errorCode != "access_denied") {
@@ -649,7 +681,10 @@ async function setup() {
   }
 }
 
-setup();
+
+document.addEventListener('DOMContentLoaded', function () {
+  setup();
+});
 
 
 
