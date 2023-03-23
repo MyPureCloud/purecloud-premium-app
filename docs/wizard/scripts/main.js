@@ -33,7 +33,12 @@ function goToPremiumApp() {
   let redirectUrl = config.redirectURLOnWizardCompleted;
   if (config.redirectURLWithParams && config.redirectURLWithParams === true) {
     let currentLanguage = getSelectedLanguage();
-    redirectUrl += `?${config.genesysCloudHostOriginQueryParam}=${gcHostOrigin}&${config.genesysCloudTargetEnvQueryParam}=${gcTargetEnv}&${config.languageQueryParam}=${currentLanguage}`;
+    // Manage legacy url using pcEnvironment for interpolation
+    if (gcTargetEnv === 'default') {
+      redirectUrl += `?${config.genesysCloudEnvironmentQueryParam}=${gcEnvironment}&${config.languageQueryParam}=${currentLanguage}`;
+    } else {
+      redirectUrl += `?${config.genesysCloudHostOriginQueryParam}=${gcHostOrigin}&${config.genesysCloudTargetEnvQueryParam}=${gcTargetEnv}&${config.languageQueryParam}=${currentLanguage}`;
+    }
   }
   window.location.href = redirectUrl;
 }
@@ -151,7 +156,12 @@ async function switchPage(targetPage) {
       await new Promise((resolve, reject) => {
         setTimeout(() => {
           let currentLanguage = getSelectedLanguage();
-          window.location.href = `${config.wizardUriBase}index.html?${config.genesysCloudHostOriginQueryParam}=${gcHostOrigin}&${config.genesysCloudTargetEnvQueryParam}=${gcTargetEnv}&${config.languageQueryParam}=${currentLanguage}`;
+          // Manage legacy url using pcEnvironment for interpolation
+          if (gcTargetEnv === 'default') {
+            window.location.href = `${config.wizardUriBase}index.html?${config.genesysCloudEnvironmentQueryParam}=${gcEnvironment}&${config.languageQueryParam}=${currentLanguage}`;
+          } else {
+            window.location.href = `${config.wizardUriBase}index.html?${config.genesysCloudHostOriginQueryParam}=${gcHostOrigin}&${config.genesysCloudTargetEnvQueryParam}=${gcTargetEnv}&${config.languageQueryParam}=${currentLanguage}`;
+          }
           resolve();
         }, 2000);
       });
@@ -606,14 +616,15 @@ async function setup() {
         // try to override with environment query parameter if present
         gcEnvironment = appParams.environment ? appParams.environment : config.defaultGcEnvironment;
         gcHostOrigin = 'https://apps.' + gcEnvironment;
-        gcTargetEnv = 'prod';
+        gcTargetEnv = 'default';
       }
     } else {
+      // Manage legacy url using pcEnvironment for interpolation
       gcEnvironment = appParams.environment ? appParams.environment : config.defaultGcEnvironment;
       gcHostOrigin = 'https://apps.' + gcEnvironment;
-      gcTargetEnv = 'prod';
+      gcTargetEnv = 'default';
     }
-    
+
     // Set language
     gcLanguage = appParams.language ? appParams.language : config.defaultLanguage;
     await setPageLanguage(gcLanguage);
