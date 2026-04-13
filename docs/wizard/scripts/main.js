@@ -22,7 +22,7 @@ let gcEnvironment;
 let gcClientApp;
 let gcHostOrigin;
 let gcTargetEnv;
-let state; // State from implicit grant 
+let state; // State from authentication 
 let currentPage = null;
 let userMe = null;
 
@@ -53,7 +53,7 @@ async function authenticateGenesysCloud(appParams) {
 
   // Authenticate with Genesys Cloud and get the state
   client.setPersistSettings(true, premiumAppIntegrationTypeId);
-  const authData = await client.loginImplicitGrant(
+  const authData = await client.loginPKCEGrant(
     config.clientID,
     `${config.wizardUriBase}index.html`,
     { state: JSON.stringify(appParams) }
