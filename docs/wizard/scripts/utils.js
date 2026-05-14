@@ -68,19 +68,41 @@ export function getQueryParameters() {
             ret.error = true;
         }
     } else if (window.location.search) {
-        // Get Query Parameters
         let urlParams = new URLSearchParams(window.location.search);
-        let language = urlParams.get(config.languageQueryParam);
-        let environment = urlParams.get(config.genesysCloudEnvironmentQueryParam);
-        let hostOrigin = urlParams.get(config.genesysCloudHostOriginQueryParam);
-        let targetEnv = urlParams.get(config.genesysCloudTargetEnvQueryParam);
-        let uninstall = urlParams.get('uninstall');
 
-        if (language) ret.language = language;
-        if (environment) ret.environment = environment;
-        if (hostOrigin) ret.hostOrigin = hostOrigin;
-        if (targetEnv) ret.targetEnv = targetEnv;
-        if (uninstall) ret.uninstall = uninstall;
+        if (urlParams.has('code')) {
+            // PKCE Grant success: state contains the original appParams
+            let stateParam = urlParams.get('state');
+            if (stateParam) {
+                ret = JSON.parse(decodeURIComponent(stateParam));
+            } else {
+                ret.errorCode = "400";
+                ret.errorDescription = "Missing state";
+                ret.error = true;
+            }
+        } else if (urlParams.has('error')) {
+            // PKCE Grant error
+            let stateParam = urlParams.get('state');
+            if (stateParam) {
+                ret = JSON.parse(decodeURIComponent(stateParam));
+            }
+            ret.error = true;
+            ret.errorCode = urlParams.get('error');
+            ret.errorDescription = urlParams.get('error_description');
+        } else {
+            // First invocation: params provided directly in URL
+            let language = urlParams.get(config.languageQueryParam);
+            let environment = urlParams.get(config.genesysCloudEnvironmentQueryParam);
+            let hostOrigin = urlParams.get(config.genesysCloudHostOriginQueryParam);
+            let targetEnv = urlParams.get(config.genesysCloudTargetEnvQueryParam);
+            let uninstall = urlParams.get('uninstall');
+
+            if (language) ret.language = language;
+            if (environment) ret.environment = environment;
+            if (hostOrigin) ret.hostOrigin = hostOrigin;
+            if (targetEnv) ret.targetEnv = targetEnv;
+            if (uninstall) ret.uninstall = uninstall;
+        }
     }
 
     return ret;
