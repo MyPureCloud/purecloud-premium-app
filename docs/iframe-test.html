@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Iframe Test — Login Required Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1a1a2e; display: flex; flex-direction: column; height: 100vh; font-family: sans-serif; }
+    .bar {
+      background: #16213e;
+      color: #aaa;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-bottom: 1px solid #0f3460;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .bar strong { color: #e94560; }
+    iframe { flex: 1; border: none; width: 100%; }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <strong>IFRAME TEST</strong>
+    Simulates the wizard running inside a Genesys Cloud iframe.
+    Stored auth is cleared so the login-required state renders.
+  </div>
+  <script>
+    // Clear stored SDK auth so isLoginRequired evaluates to true in the iframe.
+    localStorage.clear();
+  </script>
+  <iframe src="./wizard/index.html"></iframe>
+</body>
+</html>

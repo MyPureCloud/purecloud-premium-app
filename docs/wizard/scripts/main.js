@@ -45,21 +45,109 @@ function goToPremiumApp() {
 
 /**
  * Authenticate with Genesys Cloud
- * @returns {Promise}
+ * Returns false if this page is a popup auth callback that should close itself.
+ * @returns {Promise<boolean>}
  */
 async function authenticateGenesysCloud(appParams) {
-  // Set Genesys Cloud environment
   client.setEnvironment(gcEnvironment);
-
-  // Authenticate with Genesys Cloud and get the state
   client.setPersistSettings(true, premiumAppIntegrationTypeId);
-  const authData = await client.loginPKCEGrant(
-    config.clientID,
-    `${config.wizardUriBase}index.html`,
-    { state: JSON.stringify(appParams) }
-  );
-  state = JSON.parse(authData.state);
+
+  // After setPersistSettings, the SDK loads any stored token into client.authData.
+  // If a valid token is already present, loginPKCEGrant will return it immediately
+  // without redirecting, so no popup is needed.
+  const isLoginRequired = !client.authData || !client.authData.accessToken;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  // Popup context: opened by loginViaPopup() with ?authmode=popup, or returned from GC with authmode in state
+  const isPopupContext = (window.opener !== null) &&
+    (urlParams.get('authmode') === 'popup' || appParams.authmode === 'popup');
+
+  if (isLoginRequired && window.self !== window.top && !isPopupContext) {
+    // Running in an iframe and login is needed.
+    // Surface index-page, swap #available for #login-required-section, and wait
+    // for a user click — the click gesture is required for the browser to allow the popup.
+    view.displayPage(PAGES.INDEX_PAGE);
+    document.getElementById('available').style.display = 'none';
+    document.getElementById('login-required-section').style.display = '';
+    view.hideLoadingModal();
+
+    await new Promise((resolve, reject) => {
+      document.getElementById('btn-login-popup').addEventListener('click', async () => {
+        document.getElementById('login-required-section').style.display = 'none';
+        document.getElementById('available').style.display = '';
+        view.showLoadingModal();
+        try {
+          await loginViaPopup(appParams);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      }, { once: true });
+    });
+
+    // The popup stored the token in localStorage via setPersistSettings;
+    // calling loginPKCEGrant now finds it and returns without redirecting.
+    const authData = await client.loginPKCEGrant(
+      config.clientID,
+      `${config.wizardUriBase}index.html`,
+      { state: JSON.stringify(appParams) }
+    );
+    state = JSON.parse(authData.state);
+  } else {
+    // Standalone mode, or this IS the popup window doing the PKCE flow.
+    // Encode authmode=popup in the state so it survives the GC redirect.
+    const authData = await client.loginPKCEGrant(
+      config.clientID,
+      `${config.wizardUriBase}index.html`,
+      { state: JSON.stringify({ ...appParams, authmode: 'popup' }) }
+    );
+    state = JSON.parse(authData.state);
+
+    if (isPopupContext && window.opener) {
+      // Auth is done. Notify the parent iframe and close this popup.
+      window.opener.postMessage({ type: 'gc-auth-complete' }, window.location.origin);
+      window.close();
+      return false;
+    }
+  }
+
   console.log(state);
+  return true;
+}
+
+/**
+ * Open a popup window that performs the full PKCE login flow.
+ * The popup stores the token via setPersistSettings so the iframe can read it.
+ * @param {Object} appParams
+ * @returns {Promise<void>}
+ */
+function loginViaPopup(appParams) {
+  return new Promise((resolve, reject) => {
+    const params = new URLSearchParams();
+    params.set('authmode', 'popup');
+    if (appParams.language)    params.set(config.languageQueryParam, appParams.language);
+    if (appParams.environment) params.set(config.genesysCloudEnvironmentQueryParam, appParams.environment);
+    if (appParams.hostOrigin)  params.set(config.genesysCloudHostOriginQueryParam, appParams.hostOrigin);
+    if (appParams.targetEnv)   params.set(config.genesysCloudTargetEnvQueryParam, appParams.targetEnv);
+
+    const popupUrl = `${config.wizardUriBase}index.html?${params.toString()}`;
+    const popup = window.open(popupUrl, 'gc-auth-popup', 'width=500,height=700,left=200,top=100');
+
+    if (!popup) {
+      reject(new Error('Authentication popup was blocked. Please allow popups for this site.'));
+      return;
+    }
+
+    function onAuthMessage(event) {
+      if (event.origin !== window.location.origin) return;
+      if (event.data && event.data.type === 'gc-auth-complete') {
+        window.removeEventListener('message', onAuthMessage);
+        resolve();
+      }
+    }
+
+    window.addEventListener('message', onAuthMessage);
+  });
 }
 
 /**
@@ -670,7 +758,8 @@ async function setup() {
     }
 
     // Authenticate and get current user
-    await authenticateGenesysCloud(appParams);
+    const continueSetup = await authenticateGenesysCloud(appParams);
+    if (!continueSetup) return; // This page is a popup that just closed itself after auth
     userMe = await usersApi.getUsersMe({ 'expand': ['organization', 'authorization'] });
 
     // Initialize the Wizard object
